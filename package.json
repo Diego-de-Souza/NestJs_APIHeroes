@@ -24,6 +24,7 @@
     "debug": ""
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.864.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^10.0.0",
@@ -46,7 +47,8 @@
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "sequelize": "^6.37.3",
-    "sequelize-typescript": "^2.1.6"
+    "sequelize-typescript": "^2.1.6",
+    "stripe": "^18.3.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -57,6 +59,7 @@
     "@types/multer": "^1.4.12",
     "@types/node": "^20.17.11",
     "@types/sequelize": "^4.28.20",
+    "@types/stripe": "^8.0.416",
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",

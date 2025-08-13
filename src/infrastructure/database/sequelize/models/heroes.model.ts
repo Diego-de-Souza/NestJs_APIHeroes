@@ -81,12 +81,12 @@ export class Heroes extends Model<Heroes> {
   genre: string;
 
   @Column({
-    type: DataType.BLOB, // Representa o campo BLOB para imagens
+    type: DataType.BLOB('medium'), // Mudança aqui: BLOB para MEDIUMBLOB
   })
-  image1: Buffer; // Usar Buffer para armazenar blobs
+  image1: Buffer;
 
   @Column({
-    type: DataType.BLOB, // Representa o campo BLOB para imagens
+    type: DataType.BLOB('medium'), // Mudança aqui: BLOB para MEDIUMBLOB
   })
-  image2: Buffer; // Usar Buffer para armazenar blobs
+  image2: Buffer;
 }

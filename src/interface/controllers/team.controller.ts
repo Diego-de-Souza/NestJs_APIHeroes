@@ -48,7 +48,7 @@ export class TeamController {
     }
   }
   
-  @Get('find-all-Team')
+  @Get('find-all-team')
   @ApiOperation({ summary: 'Busca todas as equipes' })
   @ApiResponse({ status: 200, description: 'Lista de equipes retornada com sucesso' })
   @ApiResponse({ status: 500, description: 'Erro inesperado ao buscar equipes' })

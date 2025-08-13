@@ -8,9 +8,12 @@ import { ValidationPipe } from '@nestjs/common';
 import * as express from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const configService = app.get(ConfigService);
 
   app.use(cookieParser());
 
@@ -26,9 +29,15 @@ async function bootstrap() {
   app.use(express.json());
 
   app.enableCors({
-    origin: '*', // Permite apenas o domínio do front-end
+    origin: [configService.get('FRONTEND_URL')], // Permite apenas o domínio do front-end
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type, Accept',
+    allowedHeaders: [
+      'Content-Type', 
+      'Accept', 
+      'Authorization',
+      'X-Requested-With'
+    ],
+    credentials: true
   });
   app.useGlobalPipes(new ValidationPipe({transform: true, whitelist: true, forbidNonWhitelisted: true}));
   
@@ -44,8 +53,8 @@ async function bootstrap() {
     next();
   });
 
-  await app.listen(3020, '0.0.0.0', ()=>{
-    console.log("API rodando na porta 3020!!!")
+  await app.listen(configService.get('PORT'), '0.0.0.0', ()=>{
+    console.log(`API rodando na porta ${configService.get('PORT')}!!!`)
   });
 }
 bootstrap();

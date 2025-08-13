@@ -189,5 +189,23 @@ export class DadosHeroisController {
 
     }
   }
+
+  @ApiTags('Get Heroes by Studio')
+  @ApiOperation({ summary: 'Busca heróis por estúdio' })
+  @ApiParam({ name: 'studioId', type: Number, description: 'ID do estúdio' })
+  @ApiResponse({ status: 200, description: 'Lista de heróis do estúdio' })
+  @Get("editora/:studioId")
+  async findHeroesByStudio(@Param("studioId") studioId: number) : Promise<ApiResponseInterface>{
+      try {
+          const result = await this.dadosHeroisService.findHeroesByStudio(studioId);
+          return result;
+      } catch (error) {
+          return {
+              status: 500,
+              message: 'Erro inesperado ao buscar heróis por estúdio.',
+              error: error.message || error,
+          };
+      }
+  }
       
 }

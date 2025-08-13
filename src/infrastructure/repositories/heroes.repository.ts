@@ -3,6 +3,7 @@ import { InjectModel } from "@nestjs/sequelize";
 import { Heroes } from "../database/sequelize/models/heroes.model";
 import { CreateDadosHeroisDto } from "src/interface/dtos/dados-herois/create-dados-herois.dto";
 import { UpdateDadosHeroisDto } from "src/interface/dtos/dados-herois/update-dados-herois.dto";
+import { WhereOptions } from "sequelize";
 
 @Injectable()
 export class HeroesRepository {
@@ -30,5 +31,16 @@ export class HeroesRepository {
 
     async DeleteHeroes(id: number): Promise<number>{
         return await this.heroesModel.destroy({where: {id}});
+    }
+
+    async findBy(field: keyof Heroes, value: string | number): Promise<Heroes[] | null> {
+        const whereCondition: WhereOptions<Heroes> = {
+            [field]: value
+        };
+        return await this.heroesModel.findAll({ where: whereCondition });
+    }
+
+    async findAllByStudio(studioId: number): Promise<Heroes[] | null> {
+        return this.findBy('studio_id', studioId);
     }
 }

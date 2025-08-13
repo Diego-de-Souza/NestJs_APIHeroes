@@ -11,6 +11,7 @@ import { FindHeroesByIdUseCase } from 'src/application/use-cases/heroes/find-her
 import { UpdateHeroesUseCase } from 'src/application/use-cases/heroes/update-heroes.use-case';
 import { DeleteHeroesUseCase } from 'src/application/use-cases/heroes/delete-heroes.use-case';
 import { HeroesRepository } from 'src/infrastructure/repositories/heroes.repository';
+import { FindHeroesByStudioUseCase } from 'src/application/use-cases/heroes/find-heroe-by-studio.use-case';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { HeroesRepository } from 'src/infrastructure/repositories/heroes.reposit
     FindHeroesByIdUseCase,
     UpdateHeroesUseCase,
     DeleteHeroesUseCase, 
-    HeroesRepository
+    HeroesRepository, 
+    FindHeroesByStudioUseCase
   ],
   exports: [DataHeroesService],
 })

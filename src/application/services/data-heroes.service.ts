@@ -8,6 +8,7 @@ import { FindHeroesByIdUseCase } from "../use-cases/heroes/find-heroes-by-id.use
 import { UpdateHeroesUseCase } from "../use-cases/heroes/update-heroes.use-case";
 import { UpdateDadosHeroisDto } from "src/interface/dtos/dados-herois/update-dados-herois.dto";
 import { DeleteHeroesUseCase } from "../use-cases/heroes/delete-heroes.use-case";
+import { FindHeroesByStudioUseCase } from "../use-cases/heroes/find-heroe-by-studio.use-case";
 
 @Injectable()
 export class DataHeroesService {
@@ -17,7 +18,8 @@ export class DataHeroesService {
         private readonly findAllHeroesUseCase: FindAllHeroesUseCase,
         private readonly findHeroesByIdUseCase: FindHeroesByIdUseCase,
         private readonly updateHeroesUseCase: UpdateHeroesUseCase,
-        private readonly deleteHeroesUseCase: DeleteHeroesUseCase
+        private readonly deleteHeroesUseCase: DeleteHeroesUseCase,
+        private readonly findHeroesByStudioUseCase: FindHeroesByStudioUseCase
     ){}
 
     async create(heroesDto: CreateDadosHeroisDto): Promise<ApiResponseInterface<Heroes>>{
@@ -38,5 +40,9 @@ export class DataHeroesService {
 
     async DeleteHeroes(id: number): Promise<ApiResponseInterface<number>>{
         return await this.deleteHeroesUseCase.DeleteHeroes(id);
+    }
+
+    async findHeroesByStudio(studioId: number): Promise<ApiResponseInterface<Heroes>> {
+        return await this.findHeroesByStudioUseCase.findHeroesByStudio(studioId);
     }
 }

@@ -37,8 +37,8 @@ CREATE TABLE IF NOT EXISTS heroes (
     story VARCHAR(255),
     team_id INT,
     genre VARCHAR(50),
-    image1 BLOB,
-    image2 BLOB,
+    image1 MEDIUMBLOB,
+    image2 MEDIUMBLOB,
     FOREIGN KEY (studio_id) REFERENCES studios(id),
     FOREIGN KEY (team_id) REFERENCES team(id)
 );

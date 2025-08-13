@@ -16,43 +16,76 @@ export class CreateHeroesUseCase {
     ){}
 
     async create(heroesDto: CreateDadosHeroisDto): Promise<ApiResponseInterface<Heroes>>{
-        if(!await this.VerifyForeignKey(heroesDto)){
+    try {
+        console.log('=== USE CASE - INICIANDO ===');
+        console.log('heroesDto recebido:', {
+            name: heroesDto.name,
+            studio_id: heroesDto.studio_id,
+            team_id: heroesDto.team_id
+        });
+
+        console.log('Verificando foreign keys...');
+        const foreignKeyCheck = await this.VerifyForeignKey(heroesDto);
+        console.log('Resultado da verificação:', foreignKeyCheck);
+        
+        if(!foreignKeyCheck.status){
+            console.log('Foreign key check falhou, retornando erro');
             return {
-                message: "Erro ao adicionar herois",
+                message: foreignKeyCheck.message || "Erro ao verificar dados relacionados",
                 status : HttpStatus.BAD_REQUEST
             };
         }
 
-        await this.heroesRepository.create(heroesDto);
+        console.log('Foreign keys OK, criando herói...');
+        const createdHero = await this.heroesRepository.create(heroesDto);
+        console.log('Herói criado com sucesso!');
 
         return{
             status : HttpStatus.CREATED,
-            message: "Heroi adicionado com sucesso"
+            message: "Heroi adicionado com sucesso",
+            dataUnit: createdHero
         }
-    }
-
-    private async VerifyForeignKey(hero){
-        const teamExists = await this.teamRepository.findTeamById(hero.team_id);
-
-        if( hero.team_id && !teamExists){
-            return {
-                status: false,
-                message: "Equipe não encontrada."
-            }
-        }
-
-        const studioExists = await this.studioRepository.findStudioById(hero.studio_id);
-    
-        if(hero.studio_id && !studioExists){
-            return {
-                status: false,
-                message: "Studio não encontrado."
-            }
-        }
-        return {
-            status: true,
-            message: "Dados encontrados com sucesso."
-        }
+    } catch (error) {
+        console.error('=== ERRO NO USE CASE ===');
+        console.error('Erro ao criar herói:', error);
         
+        return {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: "Erro interno do servidor ao criar herói",
+            error: error.message || error
+        };
     }
+}
+
+private async VerifyForeignKey(hero){
+    console.log('Verificando team_id:', hero.team_id);
+    const teamExists = await this.teamRepository.findTeamById(hero.team_id);
+    console.log('Team encontrado:', !!teamExists);
+
+    if( hero.team_id && !teamExists){
+        console.log('Team não encontrado, retornando false');
+        return {
+            status: false,
+            message: "Equipe não encontrada."
+        }
+    }
+
+    console.log('Verificando studio_id:', hero.studio_id);
+    const studioExists = await this.studioRepository.findStudioById(hero.studio_id);
+    console.log('Studio encontrado:', !!studioExists);
+
+    if(hero.studio_id && !studioExists){
+        console.log('Studio não encontrado, retornando false');
+        return {
+            status: false,
+            message: "Studio não encontrado."
+        }
+    }
+    
+    console.log('Todas as foreign keys OK');
+    return {
+        status: true,
+        message: "Dados encontrados com sucesso."
+    }
+}
 }

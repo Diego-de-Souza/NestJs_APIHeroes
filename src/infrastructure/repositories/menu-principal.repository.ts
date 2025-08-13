@@ -12,10 +12,10 @@ export class MenuPrincipalRepository {
     ){}
 
     async findAllStudio(): Promise<Studio[] | null> {
-        return await this.studioModel.findAll({ attributes: ['name'] });
+        return await this.studioModel.findAll({ attributes: ['id','name'] });
     }
 
     async findAllTeam(): Promise<Team[] | null>{
-        return await this.teamModel.findAll({ attributes: ['name'] });
+        return await this.teamModel.findAll({ attributes: ['id','name'] });
     }
 }

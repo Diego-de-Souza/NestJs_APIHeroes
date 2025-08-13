@@ -5,6 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { QuizService } from 'src/application/services/quiz.service';
 import { CreateQuestionUseCase } from 'src/application/use-cases/quiz/create-question.use-case';
 import { QuizRepository } from 'src/infrastructure/repositories/quiz.repository';
+import { FindQuestionsByTheme } from 'src/application/use-cases/quiz/find-questions-by-theme';
 
 @Module({
     imports: [SequelizeModule.forFeature(models)],
@@ -12,6 +13,7 @@ import { QuizRepository } from 'src/infrastructure/repositories/quiz.repository'
     providers: [
         QuizService,
         CreateQuestionUseCase,
+        FindQuestionsByTheme,
         QuizRepository
     ],
     exports: [
