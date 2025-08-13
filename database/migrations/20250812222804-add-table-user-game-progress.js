@@ -29,7 +29,7 @@ module.exports = {
         type: Sequelize.SMALLINT,
         allowNull: false
       },
-      points: {
+      score: {
         type: Sequelize.INTEGER,
         allowNull: false
       },

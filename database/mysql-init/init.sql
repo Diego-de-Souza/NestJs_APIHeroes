@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- criar a tabela "roles"
 CREATE TABLE IF NOT EXISTS roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     role VARCHAR(50) NOT NULL,
@@ -73,6 +74,7 @@ CREATE TABLE IF NOT EXISTS roles (
     FOREIGN KEY (usuario_id) REFERENCES users(id)
 );
 
+-- criar a tabela "curiosities"
 CREATE TABLE IF NOT EXISTS curiosities (
     id int AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
@@ -84,6 +86,7 @@ CREATE TABLE IF NOT EXISTS curiosities (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- criar a tabela "articles"
 CREATE TABLE if not exists articles(
     id int AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) not null,
@@ -95,3 +98,33 @@ CREATE TABLE if not exists articles(
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )
 
+-- criar a tabela "quiz"
+CREATE TABLE IF NOT EXISTS quiz (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    text VARCHAR(100) NOT NULL,
+    options JSON,
+    difficulty VARCHAR(50),
+    theme VARCHAR(50),
+);
+
+-- criar a tabela "games"
+CREATE TABLE IF NOT EXISTS games (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    type VARCHAR(50),
+);
+
+--criar a tabela "user-game-process"
+CREATE TABLE IF NOT EXISTS user_game_process (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    game_id INT NOT NULL,
+    lvl_user SMALLINT NOT NULL,
+    score INT,
+    attempts SMALLINT,
+    last_move_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    metadata JSON,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (game_id) REFERENCES games(id)
+);

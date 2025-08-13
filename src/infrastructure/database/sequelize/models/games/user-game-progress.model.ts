@@ -36,7 +36,7 @@ export class UserGameProgress extends Model<UserGameProgress>{
         type: DataType.INTEGER,
         allowNull:false,
     })
-    points:number;
+    score:number;
 
     @Column({
         type: DataType.SMALLINT,
