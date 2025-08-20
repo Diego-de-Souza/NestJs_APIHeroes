@@ -1,26 +1,149 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
-import { Quiz } from "../database/sequelize/models/quiz.model";
 import { CreateQuizDto } from "src/interface/dtos/quiz/quizCreate.dto";
-import { Op } from "sequelize";
+import {Quiz, UserQuizProgress, QuizLevel, QuizQuestions} from "../database/sequelize/models/index.model";
 
 @Injectable()
 export class QuizRepository {
 
     constructor(
-        @InjectModel(Quiz) private readonly quizModel: typeof Quiz
+        @InjectModel(UserQuizProgress) private readonly userQuizProgressModel: typeof UserQuizProgress,
+        @InjectModel(Quiz) private readonly quizModel: typeof Quiz,
+        @InjectModel(QuizLevel) private readonly quizLevelModel: typeof QuizLevel,
+        @InjectModel(QuizQuestions) private readonly quizQuestionsModel: typeof QuizQuestions
     ){}
 
-    async createQuiz(questionDTO: CreateQuizDto): Promise<Quiz> {
+    async createQuiz(questionDTO: any): Promise<Quiz> {
         return await this.quizModel.create(questionDTO)
     }
 
-    async findQuestionsByThemeAndByLevel(theme: string, difficulty: string): Promise<Quiz[]> {
-        return await this.quizModel.findAll({
+    async createQuizLevel(quizLevelDTO: any): Promise<QuizLevel> {
+        return await this.quizLevelModel.create(quizLevelDTO);
+    }
+
+    async createQuestion(questionDTO: any): Promise<QuizQuestions> {
+        return await this.quizQuestionsModel.create(questionDTO);
+    }
+
+    async findLatestProgressByUserId(userId: number): Promise<UserQuizProgress | null> {
+        return await this.userQuizProgressModel.findOne({
+            where: { user_id: userId },
+            order: [['quiz_id', 'DESC']],
+        });
+    }
+
+    async findAllQuiz(): Promise<Quiz[]>{
+        const quiz = await this.quizModel.findAll();
+        return quiz.map(q => q.get({ plain: true }));
+    }
+
+    async findAllQuizzes(): Promise<Quiz[]> {
+        const quizzes = await this.quizModel.findAll({
+            include: [
+                {
+                    model: this.quizLevelModel,
+                    as: 'quiz_levels',
+                }
+            ]
+        });
+        return quizzes.map(q => q.get({ plain: true }));
+    }
+
+    async findQuizLevelById(id: number): Promise<QuizLevel | null> {
+        return await this.quizLevelModel.findOne({
+            where: { id: id }
+        });
+    }
+
+    async findAllQuizLevelsById(quizId: number): Promise<QuizLevel[] | null> {
+        const _quiz_level = await this.quizLevelModel.findAll({ where: { quiz_id: quizId } });
+        return _quiz_level.map(q => q.get({ plain: true }));
+    }
+
+    async findQuestionQuiz(quiz_level_id:number): Promise<QuizQuestions[] | null> {
+        return await this.quizQuestionsModel.findAll({where: {quiz_level_id: quiz_level_id}})
+    }
+
+    async findIdQuiz(quiz_level_id: number): Promise<number | null> {
+        const quizLevel = await this.quizLevelModel.findOne({
+            where: { id: quiz_level_id },
+            attributes: ['quiz_id']
+        });
+        return quizLevel ? quizLevel.quiz_id : null;
+    }
+
+    async findAllQuestions(quizLevelId: number): Promise<QuizQuestions[] | null> {
+        const questions = await this.quizQuestionsModel.findAll({ where: { quiz_level_id: quizLevelId } });
+        return questions.map(q => q.get({ plain: true }));
+    }
+
+    async updatedProgress(dataUpdate: any, userProgress: number): Promise<number> {
+        const [affectedCount] = await this.userQuizProgressModel.update(dataUpdate, { where: { id: userProgress } });
+        return affectedCount;
+    }
+
+    async createProgress(data: any): Promise<UserQuizProgress> {
+        return await this.userQuizProgressModel.create(data);
+    }
+
+    async findQuizById(id: number): Promise<Quiz | null> {
+        return await this.quizModel.findOne({
+            where: { id: id }
+        });
+    }
+
+    async deleteQuizById(id: number, levelId: number): Promise<void> {
+        await this.quizLevelModel.destroy({
             where: {
-                theme: theme,
-                difficulty: difficulty
+                id: levelId,
+                quiz_id: id
+            }
+        })
+    }
+
+    async deleteOneQuestion(questionNumber: number): Promise<void> {
+        await this.quizQuestionsModel.destroy({
+            where: {
+                id: questionNumber
             }
         });
     }
+
+    async deleteAllQuestions(quizLevelId: number): Promise<void> {
+        await this.quizQuestionsModel.destroy({
+            where: {
+                quiz_level_id: quizLevelId
+            }
+        });
+    }
+
+    async updateQuiz(id: number, quizDto: any): Promise<number> {
+        const [affectedCount] = await this.quizModel.update(quizDto, {
+            where: { id }
+        });
+        return affectedCount;
+    }
+
+    async updateQuizLevel(id: number, quizLevelDto: any): Promise<number> {
+        const [affectedCount] = await this.quizLevelModel.update(quizLevelDto, {
+            where: { id }
+        });
+        return affectedCount;
+    }
+
+    async updateQuestions(quiz_level_id:number, dataDto: any): Promise<number> {
+        const [affectedCount] = await this.quizQuestionsModel.update(dataDto, {
+            where: { id: dataDto.id, quiz_level_id: quiz_level_id }
+        });
+        return affectedCount;
+    }
+
+    // async findQuestionsByThemeAndByLevel(theme: string, difficulty: string): Promise<Quiz[]> {
+    //     return await this.quizModel.findAll({
+    //         where: {
+    //             theme: theme,
+    //             difficulty: difficulty
+    //         }
+    //     });
+    // }
 }

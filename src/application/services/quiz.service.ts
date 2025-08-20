@@ -1,23 +1,100 @@
 import { Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
 import { CreateQuizDto } from "src/interface/dtos/quiz/quizCreate.dto";
-import { CreateQuestionUseCase } from "../use-cases/quiz/create-question.use-case";
-import { FindQuestionsByTheme } from "../use-cases/quiz/find-questions-by-theme";
-import { GetQuizDto } from "src/interface/dtos/quiz/quizget.dto";
+import { CreateQuizUseCase } from "../use-cases/quiz/create-quiz.use-case";
+import { FindProgressQuestionsByThemeUseCase } from "../use-cases/quiz/find-progress-questions-by-theme";
+import { FindQuestionByIdUseCase } from "../use-cases/quiz/find-question-by-id.use-case";
+import { ProcessAnswerQuizUseCase } from "../use-cases/quiz/process-answer-quiz.use-case";
+import { CreateQuestionUseCase } from "../use-cases/quiz/create-questions.use-case";
+import { FindAllQuizUseCase } from "../use-cases/quiz/find-all-quiz.use-case";
+import { FindAllQuizLevelByIdUseCase } from "../use-cases/quiz/find-all-quiz-level.use-case";
+import { FindAllQuizWithLevelsUseCase } from "../use-cases/quiz/find-all-quiz-with-levels.use-case";
+import { DeleteQuizByIdUseCase } from "../use-cases/quiz/delete-quiz-by-id.use-case";
+import { DeleteOneQuizUseCase } from "../use-cases/quiz/delete-one-question.use-case";
+import { DeleteAllQuestionsUseCase } from "../use-cases/quiz/delete-all-questions.use-case";
+import { FindOneQuizAndQuizLevelUseCase } from "../use-cases/quiz/find-one-quiz-and-quiz-level.use-case";
+import { UpdateQuizUseCase } from "../use-cases/quiz/update-quiz.use-case";
+import { FindAllQuestionsUseCase } from "../use-cases/quiz/find-all-questions.use-case";
+import { UpdateQuestionsUseCase } from "../use-cases/quiz/update-questions.use-case";
 
 @Injectable()
 export class QuizService {
     
     constructor(
-        private readonly createQuizUseCase: CreateQuestionUseCase,
-        private readonly findQuestionsByTheme: FindQuestionsByTheme
+        private readonly createQuizUseCase: CreateQuizUseCase,
+        private readonly createQuestionUseCase: CreateQuestionUseCase,
+        private readonly findProgressQuestionsByTheme: FindProgressQuestionsByThemeUseCase,
+        private readonly findQuestionByIdUseCase: FindQuestionByIdUseCase,
+        private readonly processAnswerQuizUseCase: ProcessAnswerQuizUseCase,
+        private readonly findAllQuizUseCase: FindAllQuizUseCase,
+        private readonly findAllQuizLevelsByIdUseCase: FindAllQuizLevelByIdUseCase,
+        private readonly findAllQuizWithLevelsUseCase: FindAllQuizWithLevelsUseCase,
+        private readonly findOneQuizAndQuizLevelUseCase: FindOneQuizAndQuizLevelUseCase,
+        private readonly findAllQuestionsUseCase: FindAllQuestionsUseCase,
+        private readonly deleteQuizByIdUseCase: DeleteQuizByIdUseCase,
+        private readonly deleteOneQuizUseCase: DeleteOneQuizUseCase,
+        private readonly deleteAllQuestionsUseCase: DeleteAllQuestionsUseCase,
+        private readonly updateQuizUseCase: UpdateQuizUseCase,
+        private readonly updateQuestionsUseCase: UpdateQuestionsUseCase,
     ){}
 
-    async createQuestion(questionDTO: CreateQuizDto): Promise<ApiResponseInterface<string>>{
-        return await this.createQuizUseCase.createQuestion(questionDTO);
+    async createQuiz(quizDTO: CreateQuizDto): Promise<ApiResponseInterface<string>>{
+        return await this.createQuizUseCase.createQuiz(quizDTO);
     }
 
-    async getQuestionsByThemeAndByLevel(dataDto: GetQuizDto): Promise<ApiResponseInterface>{
-        return await this.findQuestionsByTheme.findQuestionsByThemeAndByLevel(dataDto);
+    async createQuestions(questionsDTO: any[]): Promise<ApiResponseInterface<string>> {
+        return await this.createQuestionUseCase.createQuestions(questionsDTO);
+    }
+
+    async getProgressQuiz(userId: number): Promise<ApiResponseInterface>{
+        return await this.findProgressQuestionsByTheme.getProgressQuiz(userId);
+    }
+
+    async getQuestionQuiz(id: number): Promise<any> {
+        return await this.findQuestionByIdUseCase.findQuestionById(id);
+    }
+
+    async answerQuiz(answerDto: any): Promise<any> {
+        return await this.processAnswerQuizUseCase.processAnswer(answerDto);
+    }
+
+    async getAllQuiz(): Promise<any> {
+        return await this.findAllQuizUseCase.getAllQuiz();
+    }
+
+    async getAllQuizLevelsById(id: number): Promise<any> {
+        return await this.findAllQuizLevelsByIdUseCase.getAllQuizLevelsById(id);
+    }
+    
+    async getAllQuizWithLevels(): Promise<ApiResponseInterface<any>> {
+        return await this.findAllQuizWithLevelsUseCase.getAllQuizWithLevels();
+    }
+
+    async getQuizWithLevels(id: number, levelId: number): Promise<ApiResponseInterface<any>> {
+        return await this.findOneQuizAndQuizLevelUseCase.findOneQuizAndQuizLevel(id, levelId);
+    }
+
+    async getQuizQuestions(id: number): Promise<ApiResponseInterface<any>> {
+        return await this.findAllQuestionsUseCase.findAllQuestions(id);
+    }
+
+    async deleteQuizById(id: number, levelId: number): Promise<ApiResponseInterface<any>> {
+        return await this.deleteQuizByIdUseCase.deleteQuizById(id, levelId);
+    }
+
+    async deleteOneQuestion(quizLevelId: number, questionNumber: number): Promise<ApiResponseInterface<any>> {
+        return await this.deleteOneQuizUseCase.deleteOneQuestion(quizLevelId, questionNumber);
+    }
+
+    async deleteAllQuestions(quizLevelId: number): Promise<ApiResponseInterface<any>> {
+        return await this.deleteAllQuestionsUseCase.deleteAllQuestions(quizLevelId);
+    }
+
+    async updateQuiz(id: number, id_quiz_level:number, quizDto: any): Promise<ApiResponseInterface<any>> {
+        return await this.updateQuizUseCase.updateQuiz(id, id_quiz_level, quizDto);
+    }
+
+    async updateQuestions(dataDto: any): Promise<ApiResponseInterface<any>> {
+        return await this.updateQuestionsUseCase.updateQuestions(dataDto);
     }
 }

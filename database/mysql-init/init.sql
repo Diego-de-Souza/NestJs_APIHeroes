@@ -101,10 +101,38 @@ CREATE TABLE if not exists articles(
 -- criar a tabela "quiz"
 CREATE TABLE IF NOT EXISTS quiz (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    text VARCHAR(100) NOT NULL,
-    options JSON,
-    difficulty VARCHAR(50),
-    theme VARCHAR(50),
+    name VARCHAR(100) NOT NULL,
+    logo VARCHAR(255),
+    color VARCHAR(20)
+);
+
+-- criar a tabela "quiz_levels"
+CREATE TABLE quiz_levels (
+  id SERIAL PRIMARY KEY,
+  quiz_id INTEGER REFERENCES quiz(id),
+  name VARCHAR(100) NOT NULL,
+  difficulty VARCHAR(20) NOT NULL,
+  unlocked BOOLEAN DEFAULT FALSE,
+  questions INTEGER,
+  xp_reward INTEGER
+);
+
+-- criar a tabela "quiz_heroes"
+CREATE TABLE quiz_heroes (
+  id SERIAL PRIMARY KEY,
+  quiz_level_id INTEGER REFERENCES quiz_levels(id),
+  name VARCHAR(100),
+  image VARCHAR(255),
+  quote TEXT
+);
+
+-- criar a tabela "quiz_questions"
+CREATE TABLE quiz_questions (
+  id SERIAL PRIMARY KEY,
+  quiz_level_id INTEGER REFERENCES quiz_levels(id),
+  question TEXT,
+  answer TEXT,
+  options JSONB
 );
 
 -- criar a tabela "games"
@@ -127,4 +155,20 @@ CREATE TABLE IF NOT EXISTS user_game_process (
     metadata JSON,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (game_id) REFERENCES games(id)
+);
+
+-- criar a tabela "user_quiz_progress"
+CREATE TABLE IF NOT EXISTS user_quiz_progress (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    quiz_id INT NOT NULL,
+    quiz_level_id INT NOT NULL,
+    completed BOOLEAN DEFAULT FALSE,
+    score INT DEFAULT 0,
+    skipped_questions JSON, -- array de ids das questões puladas
+    answered_questions JSON, -- array de ids das questões respondidas
+    finished_at TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (quiz_id) REFERENCES quiz(id),
+    FOREIGN KEY (quiz_level_id) REFERENCES quiz_levels(id)
 );

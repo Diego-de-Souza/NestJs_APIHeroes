@@ -1,10 +1,10 @@
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
 @Table({
-  tableName: "quiz",
+  tableName: "quiz_heroes",
   timestamps: false,
 })
-export class Quiz extends Model<Quiz> {
+export class QuizHeroes extends Model<QuizHeroes> {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -15,27 +15,26 @@ export class Quiz extends Model<Quiz> {
   id: number;
 
   @Column({
-      type: DataType.STRING(100),
+      type: DataType.INTEGER,
       allowNull: false,
-      unique: true,
   })
-  text : string;
-
-  @Column({
-    type: DataType.JSON,
-    allowNull: false,
-  })
-  options : string[];
-
-  @Column({
-    type: DataType.STRING(20),
-    allowNull: false,
-  })
-  difficulty: string;
+  quiz_level_id : number;
 
   @Column({
     type: DataType.STRING(50),
+    allowNull: false,
+  })
+  name : string;
+
+  @Column({
+    type: DataType.STRING(255),
     allowNull: false
   })
-  theme: string;
+  image: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: false
+  })
+  quote: string;
 }
