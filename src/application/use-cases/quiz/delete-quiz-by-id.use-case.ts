@@ -20,7 +20,9 @@ export class DeleteQuizByIdUseCase{
                 };
             }
 
-            await this.quizRepository.deleteQuizById(id, levelId);
+            await this.quizRepository.deleteQuizLevelById(id, levelId);
+
+            await this.quizRepository.deleteQuizById(id);
 
             return {
                 status: 200,

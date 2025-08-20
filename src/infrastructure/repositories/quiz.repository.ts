@@ -26,10 +26,11 @@ export class QuizRepository {
     }
 
     async findLatestProgressByUserId(userId: number): Promise<UserQuizProgress | null> {
-        return await this.userQuizProgressModel.findOne({
+        const progress = await this.userQuizProgressModel.findOne({
             where: { user_id: userId },
             order: [['quiz_id', 'DESC']],
         });
+        return progress ? progress.get({ plain: true }) : null;
     }
 
     async findAllQuiz(): Promise<Quiz[]>{
@@ -87,12 +88,19 @@ export class QuizRepository {
     }
 
     async findQuizById(id: number): Promise<Quiz | null> {
-        return await this.quizModel.findOne({
+        const quiz = await this.quizModel.findOne({
+            where: { id: id }
+        });
+        return quiz ? quiz.get({ plain: true }) : null;
+    }
+
+    async deleteQuizById(id: number): Promise<void> {
+        await this.quizModel.destroy({
             where: { id: id }
         });
     }
 
-    async deleteQuizById(id: number, levelId: number): Promise<void> {
+    async deleteQuizLevelById(id: number, levelId: number): Promise<void> {
         await this.quizLevelModel.destroy({
             where: {
                 id: levelId,

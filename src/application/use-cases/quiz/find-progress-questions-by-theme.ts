@@ -1,5 +1,7 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
+import { QuizInterface, QuizWithLevelsInterface } from "src/domain/interfaces/quiz.interface";
+import { UserQuizProgressInterface } from "src/domain/interfaces/UserQuizProgress.interface";
 import { QuizRepository } from "src/infrastructure/repositories/quiz.repository";
 
 @Injectable()
@@ -11,7 +13,7 @@ export class FindProgressQuestionsByThemeUseCase {
 
     async getProgressQuiz(userId: number): Promise<ApiResponseInterface>{
         try{
-            const dataQuizzes = await this.quizRepository.findAllQuizzes();
+            const dataQuizzes: QuizWithLevelsInterface[] = await this.quizRepository.findAllQuizzes();
 
             if(dataQuizzes.length === 0){
                 return {
@@ -20,10 +22,19 @@ export class FindProgressQuestionsByThemeUseCase {
                 }
             }
 
-            const dataQuizLevel = await this.quizRepository.findLatestProgressByUserId(userId);
+            let dataQuizLevel:UserQuizProgressInterface = await this.quizRepository.findLatestProgressByUserId(userId);
 
             if(!dataQuizLevel){
-                
+                dataQuizLevel = {
+                    user_id: userId,
+                    quiz_id: 1,
+                    quiz_level_id: 0,
+                    completed: false,
+                    score: 0,
+                    skipped_questions: [],
+                    answered_questions: [],
+                    finished_at: new Date()
+                }
             }
 
             const dataQuiz = {
@@ -31,7 +42,7 @@ export class FindProgressQuestionsByThemeUseCase {
                 progress: dataQuizLevel
             }
 
-            dataQuiz.quizzes = this.updateStatusQuizzes(dataQuiz.quizzes, dataQuizLevel.dataValues);
+            dataQuiz.quizzes = this.updateStatusQuizzes(dataQuiz.quizzes, dataQuizLevel);
 
             return {
                 status: HttpStatus.OK,
@@ -49,7 +60,7 @@ export class FindProgressQuestionsByThemeUseCase {
         }
     }
 
-    updateStatusQuizzes(quizzes: any[], userProgress: any) {
+    updateStatusQuizzes(quizzes: QuizWithLevelsInterface[] , userProgress: UserQuizProgressInterface) {
         return quizzes.map(quiz => {
             if (quiz.id === userProgress.quiz_id) {
                 quiz.quiz_levels = quiz.quiz_levels.map((level, idx, arr) => {
