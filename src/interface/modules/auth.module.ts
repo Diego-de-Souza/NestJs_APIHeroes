@@ -13,6 +13,7 @@ import { AuthSignInUseCase } from 'src/application/use-cases/auth/auth-signin.us
 import { FindAccessTokenUseCase } from 'src/application/use-cases/auth/find-acess-toke.use-case';
 import { TokenUseCase } from 'src/application/use-cases/auth/token.use-case';
 import { PasswordUseCase } from 'src/application/use-cases/auth/password.use-case';
+import { AuthSignInGoogleUseCase } from 'src/application/use-cases/auth/auth-signin-google.use-case';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PasswordUseCase } from 'src/application/use-cases/auth/password.use-cas
   providers: [
     AuthService,
     AuthSignInUseCase,
+    AuthSignInGoogleUseCase,
     FindAccessTokenUseCase,
     AuthRepository,
     TokenUseCase,

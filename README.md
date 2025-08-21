@@ -262,4 +262,79 @@ Pronto configurado pelo terminal.
 **Obs.:** Aconselho usar um gerenciador de banco como o Mysql workBench, é mais fácil de visualizar o resultado e tem uma interface gráfica, mais amigavel para iniciantes.
 os comando são praticamente os mesmos para criação do banco e etc.
 
+## Arquivo CHANGELOG
 
+Para melhor rastrebilidade, ajuda no entendimento de mudanças e agilidade da manutenção foi criado o arquivo CHANGELOG.md que deve ser preenchico para cada task (tarefa) executada.
+Como funciona o Changelog? Cada mudança que for feita na API deve ser documentada no arquivo, mas ele tem os tipos corretos para cada modificação:
+
+### tags
+
+#### Added
+Nessa área você coloca novas funcionalidades que você implementou, exemplo:
+  + Novo endpoint para autenticação com refresh token.
+  + Criação de integração com novo serviço de mensagens
+
+#### Changed
+Nessa área você coloca todas as mudanças que você vez no código a nivel de regras e funcionamento, ou seja, funcionalidades existenciais, exemplo:
+  + Melhorada a performace do endpoint.
+  + Mundaça nas regras de negocio no login de usuário.
+
+#### Deprecated
+Nessa área você coloca funcionalidade que serão removidas, exemplo:
+  + Endpoint '/old-login' marcado como obsoleto.
+  + Validação de rota com middleware ('validateUser') será removido e mudado para novo middlware de validação simples ('validateJwtToken').
+
+#### Removed
+Nessa área você coloca funcionalidades que foram removidas da aplicação, exemplo:
+  + Endpoint '/legacy-report' removido. 
+  + Tabela de log por dia foi removida.
+
+#### Fixed
+Nessa área você coloca correções de bus e hotfix efetuados na aplicação, exemplo:
+  + Corrigido bug de valização de CPF cadastro de usuário.
+  + Acerto do retorno de erro para o front.
+
+
+#### Security
+Nessa área você coloca vulderabilidades corrigidas na sua aplicação, exemplo:
+  + atualização dependencia do jwttoken para corrigir vuklnerabilidade
+
+### Semver
+O SemVer(semantic Version) ou Veriosmento semântico é a forma minima que deve seguir o versionamento da aplicação, para está aplicação foi adotado o padrão mais simples e extremamente funcional, o 'MAJOR.MINOR.PATCH'
+
+MAJOR - mudanças que quebram compatibilidade (breaking changes), exmeplo:
+  + mudar o formato de resposta de uma API, remover endpoint.
+
+MINOR - novas funcionalidades compatíveis com versões anteriores:
+  + adicionado novo endpoint, novo parâmetro opcional.
+
+PATCH - apenas correções de bug ou pequenos ajustes, sem alterar comportamento da API.
+
+Exemplo versionamento: 
+  + 1.0.0 -> primeira versão estável.
+  + 1.1.0 -> adicionou novos recursos, mas compatíveis.
+  + 1.1.1 -> só corrigiu bug.
+  + 2.0.0 -> mudança que quebra compatibilidade(ex:renomeou endpoint)
+
+## Como preencher
+Seguindo o detalhamento a cima lógico, na parte superior do arquivo temos o modelo [Unreleased], esse é um modelo não deve ser retirado do topo, as atualizações devem ser inseridas na parte superior de outras atualizações e abaixo dela.
+Você pode duplicar ela e ir preenchendo o que está fazendo para não perder os detalhes do que está fazendo no código. Após o termino da tarefa você inseri o versionamento conforme o **SemVer** e insere a data na frente, exemplo:
+ + # **[1.0.1]- 2025-08-21**
+
+importante: As áreas que não foram preenchidas devem ser removidas, só deve permanecer as que foram utilizadas nas suas anotações, exemplo:
+
+ Eu somente inclui uma nova rota, então ficaria assim:
+ # **[1.0.1]- 2025-08-21**
+
+ ### **✨ Added**
+
+ - adição de nova rota na controller tal.
+
+ou se foi removida uma rota:
+  # **[1.0.1]- 2025-08-21**
+
+ ### **✨ Removed**
+
+ - Removida a rota de teams na controller tal.
+
+Importante: SIga sempre o padrão para manter o arquivo organizado.
