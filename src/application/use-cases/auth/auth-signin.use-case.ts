@@ -21,6 +21,10 @@ export class AuthSignInUseCase {
                 throw new Error("Usuário não encontrado.");
             }
 
+            if(user.dataValues.password === 'userSocial'){
+                throw new Error("O usuário só tem o login social ativo, precisa logar com login social e atualizar os dados na área de configurações do usuario.")
+            }
+
             const role = await this.authRepository.findRoleByUserId(user.dataValues.id);
             const match = await this.passawordUseCase.validatyPassword(pass, user.dataValues.password);
 

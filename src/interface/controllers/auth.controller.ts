@@ -48,4 +48,24 @@ export class AuthController {
       throw new UnauthorizedException('Não foi possível processar o refresh token.');
     }
   }
+
+  @Post('google')
+  async googleAuth(@Body('token') token: string, @Res({ passthrough: true }) res: Response): Promise<ApiResponseInterface> {
+    try {
+      if (!token) {
+        return {
+          status: 400,
+          message: 'Token do Google não fornecido!',
+        };
+      }
+
+      const result = await this.authService.googleAuth(token, res);
+      return result;
+    } catch (error) {
+      throw new BadRequestException({
+        status: 401,
+        message: `Falha na autenticação com o Google. (controller): ${error.message}`,
+      });
+    }
+  }
 }

@@ -12,6 +12,7 @@ import { QuizLevel } from './quiz/quiz-level.model';
 import { QuizHeroes } from './quiz/quiz-heroes.model';
 import { QuizQuestions } from './quiz/quiz-question.model';
 import { UserQuizProgress } from './quiz/user-quiz-progress.model';
+import { UserSocial } from './user-social.model';
 
 export { 
   Heroes, 
@@ -25,7 +26,8 @@ export {
   QuizQuestions, 
   Games, 
   UserGameProgress, 
-  UserQuizProgress 
+  UserQuizProgress,
+  UserSocial
 }; 
 
 export const models = [
@@ -42,7 +44,8 @@ export const models = [
   QuizQuestions, 
   Games, 
   UserGameProgress, 
-  UserQuizProgress
+  UserQuizProgress,
+  UserSocial
 ];
 
 export function defineAssociations() {
@@ -76,4 +79,6 @@ export function defineAssociations() {
   User.hasMany(UserQuizProgress, { foreignKey: 'user_id', as: 'user_quiz_progress_user' });
   UserQuizProgress.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
+  User.hasMany(UserSocial, {foreignKey: 'user_id', as: 'user_social'})
+  UserSocial.belongsTo(User, {foreignKey: 'user_id', as: 'user'})
 }

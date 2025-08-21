@@ -5,6 +5,7 @@ import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interfac
 import { AuthSignInUseCase } from "../use-cases/auth/auth-signin.use-case";
 import { Response } from 'express';
 import { FindAccessTokenUseCase } from "../use-cases/auth/find-acess-toke.use-case";
+import { AuthSignInGoogleUseCase } from "../use-cases/auth/auth-signin-google.use-case";
 
 @Injectable()
 export class AuthService {
@@ -12,7 +13,8 @@ export class AuthService {
     constructor(
         private config: ConfigService,
         private readonly authSignInUseCase: AuthSignInUseCase,
-        private readonly findAccessTokenUseCase: FindAccessTokenUseCase
+        private readonly findAccessTokenUseCase: FindAccessTokenUseCase,
+        private readonly authSignInGoogleUseCase: AuthSignInGoogleUseCase
     ){}
 
     async generateHash(pass: string): Promise<any>{
@@ -40,5 +42,9 @@ export class AuthService {
     async findAccessToken(req, res): Promise<ApiResponseInterface<string>>{
         return await this.findAccessTokenUseCase.findAccessToken(req, res);
     }
-    
+
+    async googleAuth(token: string, res: Response): Promise<ApiResponseInterface> {
+        return await this.authSignInGoogleUseCase.authSignInGoogle(token, res);
+    }
+
 }

@@ -172,3 +172,15 @@ CREATE TABLE IF NOT EXISTS user_quiz_progress (
     FOREIGN KEY (quiz_id) REFERENCES quiz(id),
     FOREIGN KEY (quiz_level_id) REFERENCES quiz_levels(id)
 );
+
+--criar a tabela "user_social"
+CREATE TABLE IF NOT EXISTS user_social (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT UNIQUE NULL,
+    email VARCHAR(100) NOT NULL,
+    provider VARCHAR(50) NOT NULL,
+    provider_user_id VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
