@@ -32,6 +32,24 @@ O formato segue as convenções de [Keep a Changelog](https://keepachangelog.co
 
 ---
 
+# **[1.1.0]- 2025-08-23**
+
+### **✨ Added**
+
+- Adição de rota para atualização de senha na controller auth.
+- Adição do metodo de atualização da senha na authService.
+- Criação use-case que processa a sona senha e atualiza a senha no banco, converte em hash antes de salvar.
+- Criação do metodo de persistencia da nova senha no banco dentro do userRepository.
+
+### **🛠️ Changed**
+
+- Adição de metodo para alteração de senha na controller de auth.
+- Adição de metodo para chamar use-case para alteração de senha na AuthService.
+- Adição de metodo para atualizar senha na userService.
+- Declaração do provider AuthChangePasswordUseCase no module AuthModule.
+
+---
+
 # **[1.0.1]- 2025-08-21**
 
 ### **✨ Added**
