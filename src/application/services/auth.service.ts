@@ -6,6 +6,7 @@ import { AuthSignInUseCase } from "../use-cases/auth/auth-signin.use-case";
 import { Response } from 'express';
 import { FindAccessTokenUseCase } from "../use-cases/auth/find-acess-toke.use-case";
 import { AuthSignInGoogleUseCase } from "../use-cases/auth/auth-signin-google.use-case";
+import { AuthChangePasswordUseCase } from "../use-cases/auth/auth-chage-password.use-case";
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,8 @@ export class AuthService {
         private config: ConfigService,
         private readonly authSignInUseCase: AuthSignInUseCase,
         private readonly findAccessTokenUseCase: FindAccessTokenUseCase,
-        private readonly authSignInGoogleUseCase: AuthSignInGoogleUseCase
+        private readonly authSignInGoogleUseCase: AuthSignInGoogleUseCase,
+        private readonly authChangePasswordUseCase: AuthChangePasswordUseCase,
     ){}
 
     async generateHash(pass: string): Promise<any>{
@@ -45,6 +47,10 @@ export class AuthService {
 
     async googleAuth(token: string, res: Response): Promise<ApiResponseInterface> {
         return await this.authSignInGoogleUseCase.authSignInGoogle(token, res);
+    }
+
+    async changePassword(newPassword: string, res: Response): Promise<ApiResponseInterface> {
+        return await this.authChangePasswordUseCase.changePassword(newPassword, res);
     }
 
 }

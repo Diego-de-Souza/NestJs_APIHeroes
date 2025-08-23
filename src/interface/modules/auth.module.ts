@@ -14,6 +14,8 @@ import { FindAccessTokenUseCase } from 'src/application/use-cases/auth/find-aces
 import { TokenUseCase } from 'src/application/use-cases/auth/token.use-case';
 import { PasswordUseCase } from 'src/application/use-cases/auth/password.use-case';
 import { AuthSignInGoogleUseCase } from 'src/application/use-cases/auth/auth-signin-google.use-case';
+import { UserRepository } from 'src/infrastructure/repositories/user.repository';
+import { AuthChangePasswordUseCase } from 'src/application/use-cases/auth/auth-chage-password.use-case';
 
 @Module({
   imports: [
@@ -31,8 +33,10 @@ import { AuthSignInGoogleUseCase } from 'src/application/use-cases/auth/auth-sig
     AuthService,
     AuthSignInUseCase,
     AuthSignInGoogleUseCase,
+    AuthChangePasswordUseCase,
     FindAccessTokenUseCase,
     AuthRepository,
+    UserRepository,
     TokenUseCase,
     PasswordUseCase
   ],

@@ -50,21 +50,34 @@ export class AuthController {
   }
 
   @Post('google')
-  async googleAuth(@Body('token') token: string, @Res({ passthrough: true }) res: Response): Promise<ApiResponseInterface> {
+  async googleAuth(@Body('idToken') idToken: string, @Res({ passthrough: true }) res: Response): Promise<ApiResponseInterface> {
     try {
-      if (!token) {
+      if (!idToken) {
         return {
           status: 400,
           message: 'Token do Google não fornecido!',
         };
       }
 
-      const result = await this.authService.googleAuth(token, res);
+      const result = await this.authService.googleAuth(idToken, res);
       return result;
     } catch (error) {
       throw new BadRequestException({
         status: 401,
         message: `Falha na autenticação com o Google. (controller): ${error.message}`,
+      });
+    }
+  }
+
+  @Post('change-password')
+  async changePassword(@Body('newPassword') changePasswordDto: any, @Res({ passthrough: true }) res: Response): Promise<ApiResponseInterface> {
+    try {
+      const result = await this.authService.changePassword(changePasswordDto, res);
+      return result;
+    } catch (error) {
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao alterar a senha. (controller): ${error.message}`,
       });
     }
   }

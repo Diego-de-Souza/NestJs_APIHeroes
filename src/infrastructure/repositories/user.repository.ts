@@ -29,4 +29,11 @@ export class UserRepository {
   async findAllUser(): Promise<User[] | null>{
     return this.userModel.findAll();
   }
+
+  async updatePassword(id: number, newPassword: string): Promise<void> {
+    await this.userModel.update(
+        { password: newPassword },
+        { where: { id } }
+    );
+  }
 }

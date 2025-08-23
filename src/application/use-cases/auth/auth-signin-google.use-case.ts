@@ -4,15 +4,20 @@ import { TokenUseCase } from "./token.use-case";
 import { AuthRepository } from "src/infrastructure/repositories/auth.repository";
 import { UserRepository } from "src/infrastructure/repositories/user.repository";
 import { Response } from 'express';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 @Injectable()
 export class AuthSignInGoogleUseCase {
-    private googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    private googleClient: OAuth2Client;
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly userRepository: UserRepository,
     private readonly tokenUseCase: TokenUseCase
-    ) {}
+    ) {
+      this.googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    }
 
   async authSignInGoogle(token: string, res: Response): Promise<any> {
     try{
@@ -24,7 +29,7 @@ export class AuthSignInGoogleUseCase {
 
         let user = await this.findOrCreateUser(payload);
 
-        if(user){
+        if (user && user.error) {
             return {
                 status: HttpStatus.CONFLICT,
                 message: user.error
@@ -33,7 +38,7 @@ export class AuthSignInGoogleUseCase {
 
         const role = await this.authRepository.findRoleByUserId(user.user.id);
 
-        const accessToken = this.tokenUseCase.generateToken(user.user, role.dataValues);
+        const accessToken = await this.tokenUseCase.generateToken(user.user, role.dataValues);
 
         const refreshToken = await this.tokenUseCase.generateRefreshToken(user.user);
 
@@ -103,10 +108,10 @@ export class AuthSignInGoogleUseCase {
             }
         }else if(!_hasUserSocial && _hasUser){
             const _userSocialPayload = {
-                user_id: _hasUser.id,
+                user_id: _hasUser.dataValues.id,
                 email: payload.email,
                 provider: provider,
-                provider_id: payload.sub,
+                provider_user_id: payload.sub,
                 created_at: new Date()
             }
 
@@ -119,12 +124,12 @@ export class AuthSignInGoogleUseCase {
             }
 
             return {
-                user: _hasUser,
+                user: _hasUser.dataValues,
                 user_social: _newUserSocial
             }
         } else if(_hasUserSocial && _hasUser){
             return {
-                user: _hasUser,
+                user: _hasUser.dataValues,
                 user_social: _hasUserSocial
             }
         } else{
