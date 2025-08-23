@@ -54,16 +54,4 @@ export class TokenUseCase {
             throw new UnauthorizedException('Refresh token inválido ou expirado');
         }
     }
-
-    async extractUserIdFromToken(token: string): Promise<number | null> {
-        try {
-            const payload = await this.jwtService.verifyAsync(token, {
-                secret: process.env.JWT_ACCESS_SECRET,
-            });
-            return payload.sub;
-        } catch (error) {
-            console.error('Erro ao extrair o ID do usuário do token:', error);
-            return null;
-        }
-    }
 }

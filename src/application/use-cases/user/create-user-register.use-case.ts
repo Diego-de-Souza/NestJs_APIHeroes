@@ -1,18 +1,17 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { UserService } from "../../services/user.service";
 import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
 import { User } from "src/infrastructure/database/sequelize/models/user.model";
 import { CreateUserDTO } from "src/interface/dtos/user/userCreate.dto";
 import { RoleService } from "src/application/services/role.service";
-import { AuthService } from "src/application/services/auth.service";
 import { UserRepository } from "src/infrastructure/repositories/user.repository";
+import { GenenerateHashUseCase } from "../auth/generate-hash.use-case";
 
 @Injectable()
 export class CreateUserRegisterUseCase {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly roleService: RoleService,
-    private readonly authService: AuthService
+    private readonly generateHashUseCase: GenenerateHashUseCase
     ) {}
 
   async register(userDto: CreateUserDTO): Promise<ApiResponseInterface<User>> {
@@ -25,7 +24,7 @@ export class CreateUserRegisterUseCase {
         };
     }
 
-    const senhaHash = await this.authService.generateHash(userDto.password);
+    const senhaHash = await this.generateHashUseCase.generateHash(userDto.password);
 
     if (!senhaHash) {
         return {

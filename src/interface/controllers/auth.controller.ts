@@ -1,9 +1,11 @@
-import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiResponseInterface } from 'src/domain/interfaces/APIResponse.interface';
 import { AuthService } from 'src/application/services/auth.service';
 import { CreateUserLoginDto } from '../dtos/user/userLoginCreate.dto';
+import { AuthGuard } from '../guards/auth.guard';
+import { Request } from 'express';
 
 @ApiTags('Auth') 
 @Controller('auth')
@@ -70,9 +72,14 @@ export class AuthController {
   }
 
   @Post('change-password')
-  async changePassword(@Body('newPassword') changePasswordDto: any, @Res({ passthrough: true }) res: Response): Promise<ApiResponseInterface> {
+  @UseGuards(AuthGuard)
+  async changePassword(
+    @Body('newPassword') newPassword: string,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<ApiResponseInterface> {
     try {
-      const result = await this.authService.changePassword(changePasswordDto, res);
+      const result = await this.authService.changePassword(newPassword, req);
       return result;
     } catch (error) {
       throw new BadRequestException({

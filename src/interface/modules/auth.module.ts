@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { models } from 'src/infrastructure/database/sequelize/models/index.model';
 import { UserModule } from './user.module';
@@ -16,6 +16,7 @@ import { PasswordUseCase } from 'src/application/use-cases/auth/password.use-cas
 import { AuthSignInGoogleUseCase } from 'src/application/use-cases/auth/auth-signin-google.use-case';
 import { UserRepository } from 'src/infrastructure/repositories/user.repository';
 import { AuthChangePasswordUseCase } from 'src/application/use-cases/auth/auth-chage-password.use-case';
+import { GenenerateHashUseCase } from 'src/application/use-cases/auth/generate-hash.use-case';
 
 @Module({
   imports: [
@@ -34,11 +35,13 @@ import { AuthChangePasswordUseCase } from 'src/application/use-cases/auth/auth-c
     AuthSignInUseCase,
     AuthSignInGoogleUseCase,
     AuthChangePasswordUseCase,
+    GenenerateHashUseCase,
     FindAccessTokenUseCase,
     AuthRepository,
     UserRepository,
     TokenUseCase,
-    PasswordUseCase
+    PasswordUseCase,
+    ConfigService
   ],
   exports: [AuthService]
 })

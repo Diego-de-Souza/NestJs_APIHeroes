@@ -3,8 +3,10 @@ import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interfac
 import { AuthRepository } from "src/infrastructure/repositories/auth.repository";
 import { UserRepository } from "src/infrastructure/repositories/user.repository";
 import { TokenUseCase } from "./token.use-case";
-import { AuthService } from "src/application/services/auth.service";
-import { Response } from 'express';
+import { GenenerateHashUseCase } from "./generate-hash.use-case";
+import { Request } from 'express';
+import * as CryptoJS from 'crypto-js';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthChangePasswordUseCase {
@@ -12,13 +14,13 @@ export class AuthChangePasswordUseCase {
         private readonly authRepository: AuthRepository,
         private readonly userRepository: UserRepository,
         private readonly tokenUseCase: TokenUseCase,
-        private readonly authService: AuthService
+        private readonly generateHashUseCase: GenenerateHashUseCase,
+        private readonly configService: ConfigService
     ){}
 
-    async changePassword(newPassword: string, res: Response): Promise<ApiResponseInterface> {
+    async changePassword(newPassword: string, req: Request): Promise<ApiResponseInterface> {
         try{
-            // Extrair o ID do usuário do token de acesso (assumindo que você tenha um método para isso)
-            const userId = await this.tokenUseCase.extractUserIdFromToken(res.locals.user);
+            const userId = (req as any).user?.sub;
 
             if (!userId) {
                 return {
@@ -36,9 +38,13 @@ export class AuthChangePasswordUseCase {
                 };
             }
 
-            const hashedPassword = await this.authService.generateHash(newPassword);
+            const ENCRYPTION_KEY = this.configService.get<string>('ENCRYPTION_KEY');
+            const decryptedPassword = CryptoJS.AES.decrypt(newPassword, ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8);
 
-            await this.userRepository.updatePassword(user.id,hashedPassword);
+            console.log(decryptedPassword)
+            const hashedPassword = await this.generateHashUseCase.generateHash(decryptedPassword);
+
+            await this.userRepository.updatePassword(user.dataValues.id,hashedPassword);
 
             return {
                 status: HttpStatus.OK,

@@ -4,6 +4,7 @@ import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interfac
 import { User } from "src/infrastructure/database/sequelize/models/user.model";
 import { UserRepository } from "src/infrastructure/repositories/user.repository";
 import { UpdateUserDTO } from "src/interface/dtos/user/UserUpdate.dto";
+import { GenenerateHashUseCase } from "../auth/generate-hash.use-case";
 
 
 @Injectable()
@@ -11,7 +12,7 @@ export class UpdateUserByIdUseCase {
 
     constructor( 
         private readonly userRepository: UserRepository,
-        private readonly authService: AuthService
+        private readonly generateHashUseCase: GenenerateHashUseCase
     ){}
 
     async update(id: number, userDto: UpdateUserDTO): Promise<ApiResponseInterface<User>>{
@@ -24,7 +25,7 @@ export class UpdateUserByIdUseCase {
             };
         }
 
-        const senhaHash = await this.authService.generateHash(userDto.password);
+        const senhaHash = await this.generateHashUseCase.generateHash(userDto.password);
 
         if (!senhaHash) {
             return {

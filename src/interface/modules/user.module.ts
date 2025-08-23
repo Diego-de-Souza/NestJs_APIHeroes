@@ -11,6 +11,8 @@ import { UpdateUserByIdUseCase } from "src/application/use-cases/user/update-use
 import { FindUserAllUseCase } from "src/application/use-cases/user/find-user-all.use-case";
 import { RoleService } from "src/application/services/role.service";
 import { RoleRepository } from "src/infrastructure/repositories/role.repository";
+import { GenenerateHashUseCase } from "src/application/use-cases/auth/generate-hash.use-case";
+import { ConfigService } from "@nestjs/config";
 
 @Module({
     imports: [
@@ -24,6 +26,8 @@ import { RoleRepository } from "src/infrastructure/repositories/role.repository"
         FindUserByIdUseCase,
         UpdateUserByIdUseCase,
         FindUserAllUseCase,
+        GenenerateHashUseCase,
+        ConfigService,
         UserRepository,
         RoleService,
         RoleRepository
