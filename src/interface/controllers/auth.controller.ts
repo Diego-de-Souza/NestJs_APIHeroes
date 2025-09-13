@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiResponseInterface } from 'src/domain/interfaces/APIResponse.interface';
@@ -88,4 +88,68 @@ export class AuthController {
       });
     }
   }
+
+  @Get('qrcode/totp')
+  @UseGuards(AuthGuard)
+  async generateTotpQRCode(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<ApiResponseInterface> {
+    try {
+      const result = await this.authService.generateTotpQRCode(req);
+      return result;
+    } catch (error) {
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao gerar QR Code TOTP. (controller): ${error.message}`,
+      });
+    }
+  }
+
+  @Post('disable-2fa')
+  @UseGuards(AuthGuard)
+  async disableTwoFactorAuth(@Req() req: Request): Promise<ApiResponseInterface> {
+    try {
+      const result = await this.authService.disableTwoFactorAuth(req);
+      return result;
+    }
+    catch (error) {
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao desabilitar 2FA. (controller): ${error.message}`,
+      });
+    }
+  }
+
+  @Post('validate/totp')
+  @UseGuards(AuthGuard)
+  async validateTotpCode(@Req() req: Request, @Body('code') code: string): Promise<ApiResponseInterface> {
+    try {
+      const result = await this.authService.validateTotpCode(req, code);
+      return result;
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error; 
+      }
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao validar QR Code TOTP. (controller): ${error.message}`,
+      });
+    }
+  }
+
+  @Get('settings')
+  @UseGuards(AuthGuard)
+  async getUserSettings(
+    @Req() req: Request,
+    @Query('type') type: string
+  ): Promise<ApiResponseInterface> {
+    try {
+      const result = await this.authService.getUserSettings(req, type);
+      return result;
+    } catch (error) {
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao obter configurações do usuário. (controller): ${error.message}`,
+      });
+    }
+  }
+
 }

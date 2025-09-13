@@ -6,6 +6,9 @@ import { FindAccessTokenUseCase } from "../use-cases/auth/find-acess-toke.use-ca
 import { AuthSignInGoogleUseCase } from "../use-cases/auth/auth-signin-google.use-case";
 import { AuthChangePasswordUseCase } from "../use-cases/auth/auth-chage-password.use-case";
 import { Request } from 'express';
+import { AuthTotpQRCodeUseCase } from "../use-cases/auth/auth-generate-totp-qrcode.use-case";
+import { FindSettingsUserUseCase } from "../use-cases/auth/find-settings-user.use-case";
+import { DisableTwoFactorAuthUseCase } from "../use-cases/auth/disable-two-factor-auth.use-case";
 
 @Injectable()
 export class AuthService {
@@ -15,6 +18,9 @@ export class AuthService {
         private readonly findAccessTokenUseCase: FindAccessTokenUseCase,
         private readonly authSignInGoogleUseCase: AuthSignInGoogleUseCase,
         private readonly authChangePasswordUseCase: AuthChangePasswordUseCase,
+        private readonly authTotpQRCodeUseCase: AuthTotpQRCodeUseCase,
+        private readonly disableTwoFactorAuthUseCase: DisableTwoFactorAuthUseCase,
+        private readonly findSettingsUserUseCase: FindSettingsUserUseCase
     ){}
     
     async signIn(email: string, pass: string, res: Response): Promise<any>{
@@ -33,4 +39,21 @@ export class AuthService {
         return await this.authChangePasswordUseCase.changePassword(newPassword, req);
     }
 
+    async generateTotpQRCode(req: Request): Promise<ApiResponseInterface> {
+        return await this.authTotpQRCodeUseCase.generateTotpQRCode(req);
+    }
+
+    async disableTwoFactorAuth(req: Request): Promise<ApiResponseInterface> {
+        return await this.disableTwoFactorAuthUseCase.disableTwoFactorAuth(req);
+    }
+
+    async validateTotpCode(req: Request, code: string): Promise<ApiResponseInterface> {
+        return await this.authTotpQRCodeUseCase.validateTotpCode(req, code);
+    }
+
+    async getUserSettings(req: Request, type: string): Promise<ApiResponseInterface> {
+        return await this.findSettingsUserUseCase.getUserSettings(req, type);
+    }
+
+    
 }

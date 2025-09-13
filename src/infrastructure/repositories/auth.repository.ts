@@ -4,6 +4,7 @@ import { Injectable } from "@nestjs/common";
 import { Role } from "../database/sequelize/models/roles.model";
 import { UserSocial } from "../database/sequelize/models/user-social.model";
 import { UserInterface } from "src/domain/interfaces/user.interface";
+import { Op } from "sequelize";
 
 @Injectable()
 export class AuthRepository {
@@ -44,5 +45,20 @@ export class AuthRepository {
     async createUserSocial(data: any): Promise<UserSocial>{
         const newUserSocial = await this.userSocialModel.create(data);
         return newUserSocial ? newUserSocial.get({plain:true}): null;
+    }
+
+    async saveSecretTOTP(userId: number, secret: string): Promise<void>{
+        await this.userModel.update(
+            { totp_secret: secret },
+            { where: { id: userId } }
+        );
+    }
+
+    async deleteTotpSecret(userId: number): Promise<boolean> {
+        const [numberOfAffectedRows] = await this.userModel.update(
+            { totp_secret: null },
+            { where: { id: userId, totp_secret: { [Op.ne]: null } } }
+        );
+        return numberOfAffectedRows > 0;
     }
 }

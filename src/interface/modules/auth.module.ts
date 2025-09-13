@@ -17,6 +17,9 @@ import { AuthSignInGoogleUseCase } from 'src/application/use-cases/auth/auth-sig
 import { UserRepository } from 'src/infrastructure/repositories/user.repository';
 import { AuthChangePasswordUseCase } from 'src/application/use-cases/auth/auth-chage-password.use-case';
 import { GenenerateHashUseCase } from 'src/application/use-cases/auth/generate-hash.use-case';
+import { AuthTotpQRCodeUseCase } from 'src/application/use-cases/auth/auth-generate-totp-qrcode.use-case';
+import { FindSettingsUserUseCase } from 'src/application/use-cases/auth/find-settings-user.use-case';
+import { DisableTwoFactorAuthUseCase } from 'src/application/use-cases/auth/disable-two-factor-auth.use-case';
 
 @Module({
   imports: [
@@ -37,6 +40,9 @@ import { GenenerateHashUseCase } from 'src/application/use-cases/auth/generate-h
     AuthChangePasswordUseCase,
     GenenerateHashUseCase,
     FindAccessTokenUseCase,
+    AuthTotpQRCodeUseCase,
+    DisableTwoFactorAuthUseCase,
+    FindSettingsUserUseCase,
     AuthRepository,
     UserRepository,
     TokenUseCase,

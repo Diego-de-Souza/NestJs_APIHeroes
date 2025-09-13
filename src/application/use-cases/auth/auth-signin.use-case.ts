@@ -48,9 +48,12 @@ export class AuthSignInUseCase {
                 maxAge: 7 * 24 * 60 * 60 * 1000 // 7 dias
             });
 
+            const hasTotp = user.dataValues.totp_secret ? true : false;
+
             return {
-                access_token: accessToken
-            };        
+                access_token: accessToken,
+                has_totp: hasTotp
+            };
         }catch(error){
             console.error("Erro ao realizar login:", error.message);
 

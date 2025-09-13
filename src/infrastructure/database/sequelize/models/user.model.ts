@@ -99,6 +99,12 @@ export class User extends Model<User>{
     password: string;
 
     @Column({
+        type: DataType.STRING(255),
+        allowNull: true,
+    })
+    totp_secret: string;
+
+    @Column({
         type: DataType.DATE,
     })
     created_at: Date;
