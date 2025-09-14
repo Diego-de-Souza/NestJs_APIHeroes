@@ -61,6 +61,7 @@ export class AuthRepository {
         );
     }
 
+    //depois de analisar, talvez seja melhor criar uma tabela separada para armazenar os códigos de redefinição de senha
     async saveCodePassword(data: string, secret: string): Promise<void>{
         const whereClause = data.includes('@') ? { firstemail: data } : { cellphone: data };
         await this.userModel.update(
