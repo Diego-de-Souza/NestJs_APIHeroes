@@ -103,6 +103,12 @@ export class User extends Model<User>{
         allowNull: true,
     })
     totp_secret: string;
+    
+    @Column({
+        type: DataType.STRING(255),
+        allowNull: true,
+    })
+    mfa_secret: string;
 
     @Column({
         type: DataType.DATE,

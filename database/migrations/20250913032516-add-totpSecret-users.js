@@ -8,16 +8,16 @@ module.exports = {
       allowNull: true,
       comment: 'Segredo para autenticação TOTP (2FA)'
     });
-    await queryInterface.addColumn('users', '2fa_active', {
-      type: Sequelize.BOOLEAN,
+    await queryInterface.addColumn('users', 'mfa_secret', {
+      type: Sequelize.STRING,
       allowNull: false,
       defaultValue: false,
-      comment: 'Indica se o 2FA está ativo para o usuário'
+      comment: 'Segredo para autenticação MFA'
     });
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.removeColumn('users', 'totpSecret');
-    await queryInterface.removeColumn('users', '2fa_active');
+    await queryInterface.removeColumn('users', 'totp_secret');
+    await queryInterface.removeColumn('users', 'mfa_secret');
   }
 };

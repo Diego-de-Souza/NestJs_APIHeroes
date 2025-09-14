@@ -9,6 +9,7 @@ import { Request } from 'express';
 import { AuthTotpQRCodeUseCase } from "../use-cases/auth/auth-generate-totp-qrcode.use-case";
 import { FindSettingsUserUseCase } from "../use-cases/auth/find-settings-user.use-case";
 import { DisableTwoFactorAuthUseCase } from "../use-cases/auth/disable-two-factor-auth.use-case";
+import { AuthMFAInUseCase } from "../use-cases/auth/auth-mfa.use-case";
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,7 @@ export class AuthService {
         private readonly authSignInGoogleUseCase: AuthSignInGoogleUseCase,
         private readonly authChangePasswordUseCase: AuthChangePasswordUseCase,
         private readonly authTotpQRCodeUseCase: AuthTotpQRCodeUseCase,
+        private readonly authMFAInUseCase: AuthMFAInUseCase,
         private readonly disableTwoFactorAuthUseCase: DisableTwoFactorAuthUseCase,
         private readonly findSettingsUserUseCase: FindSettingsUserUseCase
     ){}
@@ -49,6 +51,10 @@ export class AuthService {
 
     async validateTotpCode(req: Request, code: string): Promise<ApiResponseInterface> {
         return await this.authTotpQRCodeUseCase.validateTotpCode(req, code);
+    }
+
+    async validateMfaCode(req: Request, code: string, typeCanal: string): Promise<ApiResponseInterface> {
+        return await this.authMFAInUseCase.validateMfaCode(req, code, typeCanal);
     }
 
     async getUserSettings(req: Request, type: string): Promise<ApiResponseInterface> {

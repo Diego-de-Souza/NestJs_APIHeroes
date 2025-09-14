@@ -135,6 +135,23 @@ export class AuthController {
     }
   }
 
+  @Post('validate/mfa')
+  @UseGuards(AuthGuard)
+  async validateMfaCode(@Req() req: Request, @Body('code') code: string, @Body('typeCanal') typeCanal: string): Promise<ApiResponseInterface> {
+    try {
+      const result = await this.authService.validateMfaCode(req, code, typeCanal);
+      return result;
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error; 
+      }
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao validar QR Code TOTP. (controller): ${error.message}`,
+      });
+    }
+  }
+
   @Get('settings')
   @UseGuards(AuthGuard)
   async getUserSettings(
