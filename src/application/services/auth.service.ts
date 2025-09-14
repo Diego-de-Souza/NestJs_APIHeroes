@@ -9,7 +9,7 @@ import { Request } from 'express';
 import { AuthTotpQRCodeUseCase } from "../use-cases/auth/auth-generate-totp-qrcode.use-case";
 import { FindSettingsUserUseCase } from "../use-cases/auth/find-settings-user.use-case";
 import { DisableTwoFactorAuthUseCase } from "../use-cases/auth/disable-two-factor-auth.use-case";
-import { AuthMFAInUseCase } from "../use-cases/auth/auth-mfa.use-case";
+import { GenerateCodeInUseCase } from "../use-cases/auth/auth-generate-code.use-case";
 
 @Injectable()
 export class AuthService {
@@ -20,7 +20,7 @@ export class AuthService {
         private readonly authSignInGoogleUseCase: AuthSignInGoogleUseCase,
         private readonly authChangePasswordUseCase: AuthChangePasswordUseCase,
         private readonly authTotpQRCodeUseCase: AuthTotpQRCodeUseCase,
-        private readonly authMFAInUseCase: AuthMFAInUseCase,
+        private readonly generateCodeInUseCase: GenerateCodeInUseCase,
         private readonly disableTwoFactorAuthUseCase: DisableTwoFactorAuthUseCase,
         private readonly findSettingsUserUseCase: FindSettingsUserUseCase
     ){}
@@ -45,6 +45,10 @@ export class AuthService {
         return await this.authTotpQRCodeUseCase.generateTotpQRCode(req);
     }
 
+    async generateMfaCode(req: Request, typeCanal: string): Promise<ApiResponseInterface> {
+        return await this.generateCodeInUseCase.generateMfaCode(req, typeCanal);
+    }
+
     async disableTwoFactorAuth(req: Request): Promise<ApiResponseInterface> {
         return await this.disableTwoFactorAuthUseCase.disableTwoFactorAuth(req);
     }
@@ -54,12 +58,15 @@ export class AuthService {
     }
 
     async validateMfaCode(req: Request, code: string, typeCanal: string): Promise<ApiResponseInterface> {
-        return await this.authMFAInUseCase.validateMfaCode(req, code, typeCanal);
+        return await this.generateCodeInUseCase.validateMfaCode(req, code, typeCanal);
     }
 
     async getUserSettings(req: Request, type: string): Promise<ApiResponseInterface> {
         return await this.findSettingsUserUseCase.getUserSettings(req, type);
     }
 
-    
+    async generateCodePassword(typeCanal: string, data: string): Promise<ApiResponseInterface> {
+        return await this.generateCodeInUseCase.generateCodePassword(typeCanal, data);
+    }
+
 }

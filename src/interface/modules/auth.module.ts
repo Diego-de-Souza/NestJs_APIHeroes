@@ -20,6 +20,7 @@ import { GenenerateHashUseCase } from 'src/application/use-cases/auth/generate-h
 import { AuthTotpQRCodeUseCase } from 'src/application/use-cases/auth/auth-generate-totp-qrcode.use-case';
 import { FindSettingsUserUseCase } from 'src/application/use-cases/auth/find-settings-user.use-case';
 import { DisableTwoFactorAuthUseCase } from 'src/application/use-cases/auth/disable-two-factor-auth.use-case';
+import { GenerateCodeInUseCase } from 'src/application/use-cases/auth/auth-generate-code.use-case';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { DisableTwoFactorAuthUseCase } from 'src/application/use-cases/auth/disa
     GenenerateHashUseCase,
     FindAccessTokenUseCase,
     AuthTotpQRCodeUseCase,
+    GenerateCodeInUseCase,
     DisableTwoFactorAuthUseCase,
     FindSettingsUserUseCase,
     AuthRepository,

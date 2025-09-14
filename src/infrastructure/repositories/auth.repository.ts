@@ -54,6 +54,21 @@ export class AuthRepository {
         );
     }
 
+    async saveMfaCode(userId: number, secret: string): Promise<void>{
+        await this.userModel.update(
+            { mfa_secret: secret },
+            { where: { id: userId } }
+        );
+    }
+
+    async saveCodePassword(data: string, secret: string): Promise<void>{
+        const whereClause = data.includes('@') ? { firstemail: data } : { cellphone: data };
+        await this.userModel.update(
+            { mfa_secret: secret },
+            { where: whereClause }
+        );
+    }
+
     async deleteTotpSecret(userId: number): Promise<boolean> {
         const [numberOfAffectedRows] = await this.userModel.update(
             { totp_secret: null },

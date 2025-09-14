@@ -51,6 +51,20 @@ export class User extends Model<User>{
     secondemail : string;
 
     @Column({ 
+        type: DataType.STRING(15),
+        unique: true,
+        allowNull: true,
+    })
+    phone : string;
+
+    @Column({ 
+        type: DataType.STRING(15),
+        unique: true,
+        allowNull: true,
+    })
+    cellphone : string;
+
+    @Column({ 
         type: DataType.STRING(3),
         unique: true,
         allowNull: true,

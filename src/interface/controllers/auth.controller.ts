@@ -103,6 +103,20 @@ export class AuthController {
     }
   }
 
+  @Post('generate/mfa')
+  @UseGuards(AuthGuard)
+  async generateMfaCode(@Req() req: Request,@Body('typeCanal') typeCanal: string): Promise<ApiResponseInterface> {
+    try {
+      const result = await this.authService.generateMfaCode(req, typeCanal);
+      return result;
+    } catch (error) {
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao gerar código MFA. (controller): ${error.message}`,
+      });
+    }
+  }
+
   @Post('disable-2fa')
   @UseGuards(AuthGuard)
   async disableTwoFactorAuth(@Req() req: Request): Promise<ApiResponseInterface> {
@@ -165,6 +179,19 @@ export class AuthController {
       throw new BadRequestException({
         status: 400,
         message: `Erro ao obter configurações do usuário. (controller): ${error.message}`,
+      });
+    }
+  }
+
+  @Post('generate/code-password')
+  async generateCodePassword(@Body('typeCanal') typeCanal: string, @Body('data') data: string): Promise<ApiResponseInterface> {
+    try {
+      const result = await this.authService.generateCodePassword(typeCanal, data);
+      return result;
+    } catch (error) {
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao gerar código MFA. (controller): ${error.message}`,
       });
     }
   }

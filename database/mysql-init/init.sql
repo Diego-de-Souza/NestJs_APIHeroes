@@ -51,6 +51,8 @@ CREATE TABLE IF NOT EXISTS users (
     birthdate DATE,
     firstemail VARCHAR(100) NOT NULL UNIQUE,
     secondemail VARCHAR(100),
+    phone CHAR(15),
+    cellphone CHAR(15),
     uf VARCHAR(3),
     address VARCHAR(150),
     complement VARCHAR(100),
