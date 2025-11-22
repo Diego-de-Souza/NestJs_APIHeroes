@@ -90,15 +90,21 @@ CREATE TABLE IF NOT EXISTS curiosities (
 );
 
 -- criar a tabela "articles"
-CREATE TABLE if not exists articles(
-    id int AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(100) not null,
-    caption VARCHAR(100) not null,
-    author VARCHAR(50) not null,
+CREATE TABLE IF NOT EXISTS articles(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    caption VARCHAR(100) NOT NULL,
+    summary VARCHAR(100) NOT NULL,
+    content TEXT NOT NULL,
+    thumbnail VARCHAR(100) NOT NULL,
+    keywords VARCHAR(50),
+    routes VARCHAR(100) NOT NULL,
+    author_id INT NOT NULL,
     font VARCHAR(50),
-    description_font varchar(100),
+    description_font VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    views INT DEFAULT 0,
 )
 
 -- criar a tabela "quiz"
