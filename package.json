@@ -9,7 +9,7 @@
     "build": "nest build",
     "vercel-build": "npm run build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    "start": "node dist/main",
     "start:dev": "nest start --watch",
     "start:debug": "nodemon --watch src --exec \"node --inspect=0.0.0.0:9232 -r tsconfig-paths/register -r ts-node/register src/main.ts\"",
     "start:prod": "node dist/main",
