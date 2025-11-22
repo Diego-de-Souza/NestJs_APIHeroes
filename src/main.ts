@@ -27,7 +27,7 @@ async function bootstrap() {
   SwaggerModule.setup('api-docs', app, documentFactory, {jsonDocumentUrl: 'swagger/json',});
 
   app.use(express.json());
-
+  app.setGlobalPrefix('api');
   app.enableCors({
     origin: [configService.get('FRONTEND_URL')], // Permite apenas o domínio do front-end
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
