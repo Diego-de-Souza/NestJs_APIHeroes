@@ -14,6 +14,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService);
+  const port = process.env.PORT || configService.get('PORT') || 3000;
 
   app.use(cookieParser());
 
@@ -53,8 +54,8 @@ async function bootstrap() {
     next();
   });
 
-  await app.listen(configService.get('PORT'), '0.0.0.0', ()=>{
-    console.log(`API rodando na porta ${configService.get('PORT')}!!!`)
+  await app.listen(port, '0.0.0.0', () => {
+    console.log(`🚀 API rodando na porta ${port}`);
   });
 }
 bootstrap();
