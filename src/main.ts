@@ -5,7 +5,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
-import * as express from 'express';
+// REMOVE APENAS: import * as express from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
@@ -27,10 +27,11 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, documentFactory, {jsonDocumentUrl: 'swagger/json',});
 
-  app.use(express.json());
+  // REMOVE APENAS: app.use(express.json());
+  
   app.setGlobalPrefix('api');
   app.enableCors({
-    origin: [configService.get('FRONTEND_URL')], // Permite apenas o domínio do front-end
+    origin: [configService.get('FRONTEND_URL')],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: [
       'Content-Type', 
@@ -42,6 +43,7 @@ async function bootstrap() {
   });
   app.useGlobalPipes(new ValidationPipe({transform: true, whitelist: true, forbidNonWhitelisted: true}));
   
+  // MANTÉM o middleware de logging
   app.use((req, res, next) => {
     console.log(`${req.method} ${req.url}`);
     if (req.body && req.body.data) {
@@ -54,9 +56,8 @@ async function bootstrap() {
     next();
   });
 
-  await app.listen(port, '0.0.0.0', () => {
-    console.log(`🚀 API rodando na porta ${port}`);
-  });
+  // MUDA APENAS o listen:
+  await app.listen(port);
+  console.log(`🚀 API rodando na porta ${port}`);
 }
 bootstrap();
-
