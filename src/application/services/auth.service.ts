@@ -1,15 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { AuthSignInUseCase } from "../use-cases/auth/auth-signin.use-case";
+import { AuthSignInUseCase } from "src/application/use-cases/auth/auth-signin.use-case";
 import { Response } from 'express';
-import { FindAccessTokenUseCase } from "../use-cases/auth/find-acess-toke.use-case";
-import { AuthSignInGoogleUseCase } from "../use-cases/auth/auth-signin-google.use-case";
-import { AuthChangePasswordUseCase } from "../use-cases/auth/auth-chage-password.use-case";
+import { FindAccessTokenUseCase } from "src/application/use-cases/auth/find-acess-toke.use-case";
+import { AuthSignInGoogleUseCase } from "src/application/use-cases/auth/auth-signin-google.use-case";
+import { AuthChangePasswordUseCase } from "src/application/use-cases/auth/auth-chage-password.use-case";
 import { Request } from 'express';
-import { AuthTotpQRCodeUseCase } from "../use-cases/auth/auth-generate-totp-qrcode.use-case";
-import { FindSettingsUserUseCase } from "../use-cases/auth/find-settings-user.use-case";
-import { DisableTwoFactorAuthUseCase } from "../use-cases/auth/disable-two-factor-auth.use-case";
-import { GenerateCodeInUseCase } from "../use-cases/auth/auth-generate-code.use-case";
+import { AuthTotpQRCodeUseCase } from "src/application/use-cases/auth/auth-generate-totp-qrcode.use-case";
+import { FindSettingsUserUseCase } from "src/application/use-cases/auth/find-settings-user.use-case";
+import { DisableTwoFactorAuthUseCase } from "src/application/use-cases/auth/disable-two-factor-auth.use-case";
+import { GenerateCodeInUseCase } from "src/application/use-cases/auth/auth-generate-code.use-case";
 
 @Injectable()
 export class AuthService {

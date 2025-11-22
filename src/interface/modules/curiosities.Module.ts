@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { SequelizeModule } from '@nestjs/sequelize';
 import { models } from 'src/infrastructure/database/sequelize/models/index.model';
-import { CuriositiesController } from "../controllers/curiosities.Controller";
+import { CuriositiesController } from "src/interface/controllers/curiosities.Controller";
 import { CuriosityService } from "src/application/services/curiosities.service";
 import { CuriosityRepository } from "src/infrastructure/repositories/curiosities.repository";
 import { CreateCuriosityUseCase } from "src/application/use-cases/curiosities/create-curiosities.use-case";

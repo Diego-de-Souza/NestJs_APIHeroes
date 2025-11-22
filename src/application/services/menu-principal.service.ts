@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { MenuPrincipalUseCase } from "../use-cases/menu-principal/menu-principal.use-case";
+import { MenuPrincipalUseCase } from "src/application/use-cases/menu-principal/menu-principal.use-case";
 
 @Injectable()
 export class MenuPrincipalService {

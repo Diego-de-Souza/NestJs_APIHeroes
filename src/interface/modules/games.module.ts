@@ -1,4 +1,4 @@
-import { GamesController } from "../controllers/games.controller";
+import { GamesController } from "src/interface/controllers/games.controller";
 import { models } from "src/infrastructure/database/sequelize/models/index.model";
 import { SequelizeModule } from "@nestjs/sequelize";
 import {  Module } from "@nestjs/common";

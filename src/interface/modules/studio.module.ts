@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { models } from 'src/infrastructure/database/sequelize/models/index.model';
-import { StudioController } from '../controllers/studio.controller';
+import { StudioController } from 'src/interface/controllers/studio.controller';
 import { StudioService } from 'src/application/services/studio.service';
 import { StudioRepository } from 'src/infrastructure/repositories/studio.repository';
 import { CreateStudioUseCase } from 'src/application/use-cases/studio/create-studio.use-case';

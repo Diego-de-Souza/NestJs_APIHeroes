@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { FindDataMemoryGameUseCase } from "../use-cases/games/memory-game/find-data-memory-game.use-case";
+import { FindDataMemoryGameUseCase } from "src/application/use-cases/games/memory-game/find-data-memory-game.use-case";
 
 @Injectable()
 export class GamesService {

@@ -1,8 +1,8 @@
 import { forwardRef, Module } from "@nestjs/common";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { models } from 'src/infrastructure/database/sequelize/models/index.model';
-import { AuthModule } from "../../interface/modules/auth.module";
-import { UserController } from "../controllers/user.controller";
+import { AuthModule } from "src/interface/modules/auth.module";
+import { UserController } from "src/interface/controllers/user.controller";
 import { UserService } from "src/application/services/user.service";
 import { UserRepository } from "src/infrastructure/repositories/user.repository";
 import { CreateUserRegisterUseCase } from "src/application/use-cases/user/create-user-register.use-case";

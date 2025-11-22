@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { models } from 'src/infrastructure/database/sequelize/models/index.model';
 import { UserModule } from './user.module';
-import { AuthController } from '../controllers/auth.controller';
+import { AuthController } from 'src/interface/controllers/auth.controller';
 import { jwtConstants } from 'src/shared/utils/constants/constants';
 import { AuthService } from 'src/application/services/auth.service';
 import { AuthRepository } from 'src/infrastructure/repositories/auth.repository';

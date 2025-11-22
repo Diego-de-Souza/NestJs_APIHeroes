@@ -1,14 +1,14 @@
-import { ArticleModule } from "./articles.module";
-import { AuthModule } from "./auth.module";
-import { CuriositiesModule } from "./curiosities.module";
-import { DadosHeroisModule } from "./dados-herois.module";
-import { GamesModule } from "./games.module";
-import { MenuPrincipalModule } from "./menu_principal.module";
-import { PaymentModule } from "./payment.module";
-import { QuizModule } from "./quiz.module";
-import { StudioModule } from "./studio.module";
-import { TeamModule } from "./team.module";
-import { UserModule } from "./user.module";
+import { ArticleModule } from "src/interface/modules/articles.module";
+import { AuthModule } from "src/interface/modules/auth.module";
+import { CuriositiesModule } from "src/interface/modules/curiosities.module";
+import { DadosHeroisModule } from "src/interface/modules/dados-herois.module";
+import { GamesModule } from "src/interface/modules/games.module";
+import { MenuPrincipalModule } from "src/interface/modules/menu_principal.module";
+import { PaymentModule } from "src/interface/modules/payment.module";
+import { QuizModule } from "src/interface/modules/quiz.module";
+import { StudioModule } from "src/interface/modules/studio.module";
+import { TeamModule } from "src/interface/modules/team.module";
+import { UserModule } from "src/interface/modules/user.module";
 
 export const appModules = [
   ArticleModule,

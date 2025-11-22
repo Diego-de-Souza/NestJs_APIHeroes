@@ -1,21 +1,21 @@
 import { Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
 import { CreateQuizDto } from "src/interface/dtos/quiz/quizCreate.dto";
-import { CreateQuizUseCase } from "../use-cases/quiz/create-quiz.use-case";
+import { CreateQuizUseCase } from "src/application/use-cases/quiz/create-quiz.use-case";
 import { FindProgressQuestionsByThemeUseCase } from "../use-cases/quiz/find-progress-questions-by-theme";
-import { FindQuestionByIdUseCase } from "../use-cases/quiz/find-question-by-id.use-case";
-import { ProcessAnswerQuizUseCase } from "../use-cases/quiz/process-answer-quiz.use-case";
-import { CreateQuestionUseCase } from "../use-cases/quiz/create-questions.use-case";
-import { FindAllQuizUseCase } from "../use-cases/quiz/find-all-quiz.use-case";
-import { FindAllQuizLevelByIdUseCase } from "../use-cases/quiz/find-all-quiz-level.use-case";
-import { FindAllQuizWithLevelsUseCase } from "../use-cases/quiz/find-all-quiz-with-levels.use-case";
-import { DeleteQuizByIdUseCase } from "../use-cases/quiz/delete-quiz-by-id.use-case";
-import { DeleteOneQuizUseCase } from "../use-cases/quiz/delete-one-question.use-case";
-import { DeleteAllQuestionsUseCase } from "../use-cases/quiz/delete-all-questions.use-case";
-import { FindOneQuizAndQuizLevelUseCase } from "../use-cases/quiz/find-one-quiz-and-quiz-level.use-case";
-import { UpdateQuizUseCase } from "../use-cases/quiz/update-quiz.use-case";
-import { FindAllQuestionsUseCase } from "../use-cases/quiz/find-all-questions.use-case";
-import { UpdateQuestionsUseCase } from "../use-cases/quiz/update-questions.use-case";
+import { FindQuestionByIdUseCase } from "src/application/use-cases/quiz/find-question-by-id.use-case";
+import { ProcessAnswerQuizUseCase } from "src/application/use-cases/quiz/process-answer-quiz.use-case";
+import { CreateQuestionUseCase } from "src/application/use-cases/quiz/create-questions.use-case";
+import { FindAllQuizUseCase } from "src/application/use-cases/quiz/find-all-quiz.use-case";
+import { FindAllQuizLevelByIdUseCase } from "src/application/use-cases/quiz/find-all-quiz-level.use-case";
+import { FindAllQuizWithLevelsUseCase } from "src/application/use-cases/quiz/find-all-quiz-with-levels.use-case";
+import { DeleteQuizByIdUseCase } from "src/application/use-cases/quiz/delete-quiz-by-id.use-case";
+import { DeleteOneQuizUseCase } from "src/application/use-cases/quiz/delete-one-question.use-case";
+import { DeleteAllQuestionsUseCase } from "src/application/use-cases/quiz/delete-all-questions.use-case";
+import { FindOneQuizAndQuizLevelUseCase } from "src/application/use-cases/quiz/find-one-quiz-and-quiz-level.use-case";
+import { UpdateQuizUseCase } from "src/application/use-cases/quiz/update-quiz.use-case";
+import { FindAllQuestionsUseCase } from "src/application/use-cases/quiz/find-all-questions.use-case";
+import { UpdateQuestionsUseCase } from "src/application/use-cases/quiz/update-questions.use-case";
 
 @Injectable()
 export class QuizService {

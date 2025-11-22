@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { models} from '../../infrastructure/database/sequelize/models/index.model';
-import { StudioModule } from './studio.module';
-import { TeamModule } from './team.module';
-import { DadosHeroisController } from '../controllers/dados-herois.controller';
+import { models} from 'src/infrastructure/database/sequelize/models/index.model';
+import { StudioModule } from 'src/interface/modules/studio.module';
+import { TeamModule } from 'src/interface/modules/team.module';
+import { DadosHeroisController } from 'src/interface/controllers/dados-herois.controller';
 import { DataHeroesService } from 'src/application/services/data-heroes.service';
 import { CreateHeroesUseCase } from 'src/application/use-cases/heroes/create-heroes.use-case';
 import { FindAllHeroesUseCase } from 'src/application/use-cases/heroes/find-all-heroes.use-case';

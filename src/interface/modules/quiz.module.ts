@@ -1,5 +1,5 @@
 import { Delete, Module } from '@nestjs/common';
-import { QuizController } from "../controllers/quiz.controller";
+import { QuizController } from "src/interface/controllers/quiz.controller";
 import { models } from 'src/infrastructure/database/sequelize/models/index.model';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { QuizService } from 'src/application/services/quiz.service';

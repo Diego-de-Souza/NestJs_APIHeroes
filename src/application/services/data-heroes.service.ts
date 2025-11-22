@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
 import { CreateDadosHeroisDto } from "src/interface/dtos/dados-herois/create-dados-herois.dto";
-import { CreateHeroesUseCase } from "../use-cases/heroes/create-heroes.use-case";
+import { CreateHeroesUseCase } from "src/application/use-cases/heroes/create-heroes.use-case";
 import { Heroes } from "src/infrastructure/database/sequelize/models/heroes.model";
-import { FindAllHeroesUseCase } from "../use-cases/heroes/find-all-heroes.use-case";
-import { FindHeroesByIdUseCase } from "../use-cases/heroes/find-heroes-by-id.use-case";
-import { UpdateHeroesUseCase } from "../use-cases/heroes/update-heroes.use-case";
+import { FindAllHeroesUseCase } from "src/application/use-cases/heroes/find-all-heroes.use-case";
+import { FindHeroesByIdUseCase } from "src/application/use-cases/heroes/find-heroes-by-id.use-case";
+import { UpdateHeroesUseCase } from "src/application/use-cases/heroes/update-heroes.use-case";
 import { UpdateDadosHeroisDto } from "src/interface/dtos/dados-herois/update-dados-herois.dto";
-import { DeleteHeroesUseCase } from "../use-cases/heroes/delete-heroes.use-case";
-import { FindHeroesByStudioUseCase } from "../use-cases/heroes/find-heroe-by-studio.use-case";
+import { DeleteHeroesUseCase } from "src/application/use-cases/heroes/delete-heroes.use-case";
+import { FindHeroesByStudioUseCase } from "src/application/use-cases/heroes/find-heroe-by-studio.use-case";
 
 @Injectable()
 export class DataHeroesService {
