@@ -2,7 +2,7 @@ import { Table, Column, Model, DataType, BelongsTo } from 'sequelize-typescript'
 import { Quiz } from './quiz.model';
 
 @Table({
-  tableName: "quiz_level",
+  tableName: "quiz_levels",
   timestamps: false,
 })
 export class QuizLevel extends Model<QuizLevel> {

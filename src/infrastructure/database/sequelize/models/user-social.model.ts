@@ -1,8 +1,10 @@
-import { Column, DataType, Model, Sequelize, Table } from "sequelize-typescript";
+import { Column, DataType, Model, Table, ForeignKey, BelongsTo } from "sequelize-typescript";
+import { User } from "./user.model";
 
 @Table({
   tableName: 'user_social',
-  timestamps: false,
+  timestamps: true,
+  underscored: true,
 })
 export class UserSocial extends Model<UserSocial> {
   @Column({
@@ -14,11 +16,13 @@ export class UserSocial extends Model<UserSocial> {
   })
   id: number;
 
+  @ForeignKey(() => User)
   @Column({ 
     type: DataType.INTEGER,
-    allowNull: false
+    allowNull: true,
+    field: 'user_id'
   })
-  user_id: number;
+  userId: number;
 
   @Column({ 
     type: DataType.STRING(100),
@@ -34,18 +38,23 @@ export class UserSocial extends Model<UserSocial> {
 
   @Column({ 
     type: DataType.STRING,
-    allowNull: true 
+    allowNull: true,
+    field: 'provider_user_id'
   })
-  provider_user_id: string;
-
-  @Column({
-    type: DataType.DATE    
-  })
-  created_at: Date;
+  providerUserId: string;
 
   @Column({
     type: DataType.DATE,
-    defaultValue: Sequelize.fn('NOW')
+    field: 'created_at'
   })
-  updated_at: Date
+  createdAt: Date;
+
+  @Column({
+    type: DataType.DATE,
+    field: 'updated_at'
+  })
+  updatedAt: Date;
+
+  @BelongsTo(() => User)
+  user: User;
 }

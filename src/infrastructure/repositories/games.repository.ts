@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Games } from "../database/sequelize/models/games/games.model";
-import { UserGameProgress } from "../database/sequelize/models/games/user-game-progress.model";
+import { UserGameProcess } from "../database/sequelize/models/games/user-game-progress.model";
 
 @Injectable()
 export class GamesRepository {
   
     constructor(
         @InjectModel(Games) private readonly gamesModel: typeof Games,
-        @InjectModel(UserGameProgress) private readonly userGameProgressModel: typeof UserGameProgress
+        @InjectModel(UserGameProcess) private readonly userGameProgressModel: typeof UserGameProcess
     ){}
 
     findGameByType(type: string): Promise<Games | null> {
@@ -20,7 +20,7 @@ export class GamesRepository {
         });
     }
 
-    findOneProcess(userId: number, idGame: number): Promise<UserGameProgress | null> {
+    findOneProcess(userId: number, idGame: number): Promise<UserGameProcess | null> {
         return this.userGameProgressModel.findOne({
             where: {
                 user_id: userId,

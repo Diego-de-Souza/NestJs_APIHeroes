@@ -1,5 +1,3 @@
-
-
 export interface QuizInterface {
     id: number;
     name: string;

@@ -1,58 +1,42 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { User } from '../user.model';
+import { Games } from './games.model';
 
-@Table({
-    tableName:"user_game_progress",
-    timestamps:false
-})
-export class UserGameProgress extends Model<UserGameProgress>{
-    @Column({
-        type: DataType.INTEGER,
-        allowNull:false,
-        autoIncrement:true,
-        primaryKey:true,
-        unique:true
-    })
-    id:number;
+@Table({ tableName: 'user_game_process', timestamps: false })
+export class UserGameProcess extends Model<UserGameProcess> {
+  @Column({
+    type: DataType.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  })
+  id: number;
 
-    @Column({
-        type: DataType.INTEGER,
-        allowNull:false,
-    })
-    user_id:number;
+  @ForeignKey(() => User)
+  @Column({ type: DataType.INTEGER, allowNull: false, field: 'user_id' })
+  user_id: number;
 
-    @Column({
-        type: DataType.INTEGER,
-        allowNull:false,
-    })
-    game_id:number;
+  @ForeignKey(() => Games)
+  @Column({ type: DataType.INTEGER, allowNull: false, field: 'game_id' })
+  game_id: number;
 
-    @Column({
-        type: DataType.SMALLINT,
-        allowNull:false,
-    })
-    lvl_user:number;
+  @Column({ type: DataType.SMALLINT, allowNull: false, field: 'lvl_user' })
+  lvl_user: number;
 
-    @Column({
-        type: DataType.INTEGER,
-        allowNull:false,
-    })
-    score:number;
+  @Column({ type: DataType.INTEGER })
+  score: number;
 
-    @Column({
-        type: DataType.SMALLINT,
-    })
-    attempts: number;
+  @Column({ type: DataType.SMALLINT })
+  attempts: number;
 
-    @Column({
-        type: DataType.DATE,
-        allowNull:false,
-    })
-    last_move_at: Date;
+  @Column({ type: DataType.DATE, field: 'last_move_at' })
+  last_move_at: Date;
 
-    @Column({
-        type: DataType.JSON,
-        allowNull:true,
-    })
-    metadata: any;
+  @Column({ type: DataType.JSONB })
+  metadata: object;
 
+  @BelongsTo(() => User)
+  user: User;
+
+  @BelongsTo(() => Games)
+  game: Games;
 }

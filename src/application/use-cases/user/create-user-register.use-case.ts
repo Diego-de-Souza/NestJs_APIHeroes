@@ -34,9 +34,9 @@ export class CreateUserRegisterUseCase {
     }
 
     userDto.password = senhaHash;
-
+    console.log('DTO antes do create:', userDto);
     const userCreated = await this.userRepository.create(userDto);
-    
+    console.log('Resultado do create:', userCreated);
     if (!userCreated) {
         return {
         status: HttpStatus.INTERNAL_SERVER_ERROR,

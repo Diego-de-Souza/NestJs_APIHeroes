@@ -1,48 +1,31 @@
-import {
-  Column,
-  DataType,
-  Table,
-  Model,
-  Sequelize,
-} from 'sequelize-typescript';
-import {
-  CreationOptional,
-  InferAttributes,
-  InferCreationAttributes,
-} from 'sequelize';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { User } from './user.model';
 
-@Table({
-  tableName: 'roles',
-  timestamps: false,
-})
-export class Role extends Model<
-  InferAttributes<Role>,
-  InferCreationAttributes<Role>
-> {
+@Table({ tableName: 'roles', timestamps: true })
+export class Role extends Model<Role> {
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    autoIncrement: true,
     primaryKey: true,
-    unique: true,
+    autoIncrement: true,
   })
-  declare id: CreationOptional<number>;
+  id: number;
 
-  @Column({ type: DataType.STRING })
-  declare role: string;
+  @Column({ type: DataType.STRING(50), allowNull: false })
+  role: string;
 
-  @Column({ type: DataType.INTEGER })
-  declare usuario_id: number;
+  @ForeignKey(() => User)
+  @Column({ type: DataType.INTEGER, allowNull: false })
+  usuario_id: number;
 
-  @Column({ type: DataType.STRING })
-  declare access: string;
+  @Column({ type: DataType.STRING(50), allowNull: false })
+  access: string;
 
-  @Column({ type: DataType.DATE })
-  declare created_at: CreationOptional<Date>;
+  @Column({ field: 'created_at' })
+  createdAt: Date;
 
-  @Column({
-    type: DataType.DATE,
-    defaultValue: Sequelize.fn('NOW'),
-  })
-  declare updated_at: CreationOptional<Date>;
+  @Column({ field: 'updated_at' })
+  updatedAt: Date;
+
+  @BelongsTo(() => User)
+  user: User;
 }

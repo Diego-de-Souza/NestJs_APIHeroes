@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { CreateQuizDto } from "src/interface/dtos/quiz/quizCreate.dto";
-import {Quiz, UserQuizProgress, QuizLevel, QuizQuestions} from "../database/sequelize/models/index.model";
+import {Quiz, UserQuizProgress, QuizLevel, QuizQuestion} from "../database/sequelize/models/index.model";
 
 @Injectable()
 export class QuizRepository {
@@ -10,7 +10,7 @@ export class QuizRepository {
         @InjectModel(UserQuizProgress) private readonly userQuizProgressModel: typeof UserQuizProgress,
         @InjectModel(Quiz) private readonly quizModel: typeof Quiz,
         @InjectModel(QuizLevel) private readonly quizLevelModel: typeof QuizLevel,
-        @InjectModel(QuizQuestions) private readonly quizQuestionsModel: typeof QuizQuestions
+        @InjectModel(QuizQuestion) private readonly quizQuestionsModel: typeof QuizQuestion
     ){}
 
     async createQuiz(questionDTO: any): Promise<Quiz> {
@@ -21,7 +21,7 @@ export class QuizRepository {
         return await this.quizLevelModel.create(quizLevelDTO);
     }
 
-    async createQuestion(questionDTO: any): Promise<QuizQuestions> {
+    async createQuestion(questionDTO: any): Promise<QuizQuestion> {
         return await this.quizQuestionsModel.create(questionDTO);
     }
 
@@ -61,7 +61,7 @@ export class QuizRepository {
         return _quiz_level.map(q => q.get({ plain: true }));
     }
 
-    async findQuestionQuiz(quiz_level_id:number): Promise<QuizQuestions[] | null> {
+    async findQuestionQuiz(quiz_level_id:number): Promise<QuizQuestion[] | null> {
         return await this.quizQuestionsModel.findAll({where: {quiz_level_id: quiz_level_id}})
     }
 
@@ -73,7 +73,7 @@ export class QuizRepository {
         return quizLevel ? quizLevel.quiz_id : null;
     }
 
-    async findAllQuestions(quizLevelId: number): Promise<QuizQuestions[] | null> {
+    async findAllQuestions(quizLevelId: number): Promise<QuizQuestion[] | null> {
         const questions = await this.quizQuestionsModel.findAll({ where: { quiz_level_id: quizLevelId } });
         return questions.map(q => q.get({ plain: true }));
     }

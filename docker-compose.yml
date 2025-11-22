@@ -1,55 +1,67 @@
-
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql_container
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_heroes
+    restart: unless-stopped
     ports:
-      - "3308:3306"
+      - "5432:5432"
     environment:
-      MYSQL_ROOT_PASSWORD: Platform_2025_@heroes
-      MYSQL_DATABASE: HeroesPlataform
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin@1234
+      POSTGRES_USER: heroesplataform_user
+      POSTGRES_PASSWORD: QPK4abTEM1EDMJYya0ZBephFQ7yDnjKA
+      POSTGRES_DB: heroesplataform
       TZ: "America/Sao_Paulo"
     volumes:
-      - mysql-data:/var/lib/mysql
-      - ./database/mysql-init:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/postgres-init:/docker-entrypoint-initdb.d
     networks:
       - nestjs_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U heroesplataform_user -d heroesplataform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mongodb:
-    image: mongo:6.0
-    container_name: mongodb_container
+    image: mongo:latest
+    container_name: mongodb
+    restart: unless-stopped
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin@1234
+      MONGO_INITDB_DATABASE: HeroesMongoPlataform
+      TZ: "America/Sao_Paulo"
     volumes:
-      - mongo-data:/data/db
-      # - ./database/mongo-init:/docker-entrypoint-initdb.d # Diretório para scripts de inicialização do MongoDB
+      - mongo_data:/data/db
+      - ./database/mongo-init:/docker-entrypoint-initdb.d
     networks:
       - nestjs_network
 
   minio:
-    image: minio/minio
+    image: minio/minio:latest
     container_name: minio
+    restart: unless-stopped
     ports:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin@1234
     command: server /data --console-address ":9001"
     volumes:
-      - ./minio-data:/data
+      - minio_data:/data
     networks:
       - nestjs_network
 
 volumes:
-  mysql-data:
-  mongo-data:
-  minio-data:
+  postgres_data:
+    driver: local
+  mongo_data:
+    driver: local
+  minio_data:
+    driver: local
 
 networks:
   nestjs_network:
+    driver: bridge

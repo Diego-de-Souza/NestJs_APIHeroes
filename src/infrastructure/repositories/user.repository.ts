@@ -16,14 +16,12 @@ export class UserRepository {
     return this.userModel.findOne({where: {firstemail:email}});
   }
 
-  async create(dto: CreateUserDTO): Promise<User | null>{
-    const user = new User(dto);
-    return this.userModel.create(user);
+  async create(dto: CreateUserDTO): Promise<User | null> {
+    return this.userModel.create(dto);
   }
 
-  async update(id:number, dto:UpdateUserDTO): Promise<void>{
-    const userUpdate = new User(dto);
-    this.userModel.update(userUpdate,{where: {id:id}});
+  async update(id: number, dto: UpdateUserDTO): Promise<void> {
+    await this.userModel.update(dto, { where: { id } });
   }
 
   async findAllUser(): Promise<User[] | null>{

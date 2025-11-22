@@ -1,40 +1,28 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { QuizLevel } from './quiz-level.model';
 
-@Table({
-  tableName: "quiz_questions",
-  timestamps: false,
-})
-export class QuizQuestions extends Model<QuizQuestions> {
+@Table({ tableName: 'quiz_questions', timestamps: false })
+export class QuizQuestion extends Model<QuizQuestion> {
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    autoIncrement: true,
     primaryKey: true,
-    unique: true,
+    autoIncrement: true,
   })
   id: number;
 
-  @Column({
-      type: DataType.INTEGER,
-      allowNull: false,
-  })
-  quiz_level_id : number;
+  @ForeignKey(() => QuizLevel)
+  @Column({ type: DataType.INTEGER, field: 'quiz_level_id' })
+  quiz_level_id: number;
 
-  @Column({
-    type: DataType.TEXT,
-    allowNull: false,
-  })
-  question : string;
+  @Column({ type: DataType.TEXT })
+  question: string;
 
-  @Column({
-    type: DataType.STRING(50),
-    allowNull: false
-  })
+  @Column({ type: DataType.TEXT })
   answer: string;
 
-  @Column({
-    type: DataType.JSONB,
-    allowNull: false
-  })
+  @Column({ type: DataType.JSONB })
   options: string[];
+
+  @BelongsTo(() => QuizLevel)
+  quiz_level: QuizLevel;
 }

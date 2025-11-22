@@ -16,23 +16,23 @@ export class Quiz extends Model<Quiz> {
   id: number;
 
   @Column({
-      type: DataType.STRING(100),
-      allowNull: false,
+    type: DataType.STRING(100),
+    allowNull: false,
   })
-  name : string;
+  name: string;
 
   @Column({
     type: DataType.JSON,
     allowNull: false,
   })
-  logo : string;
+  logo: string;
 
   @Column({
     type: DataType.STRING(50),
-    allowNull: false
+    allowNull: false,
   })
   theme: string;
 
-  @HasMany(() => QuizLevel, 'quiz_id')
-  quiz_levels: QuizLevel[];
+  @HasMany(() => QuizLevel, { foreignKey: 'quiz_id', as: 'levels' })
+  levels: QuizLevel[];
 }
