@@ -1,4 +1,4 @@
-import { ArticleModule } from "src/interface/modules/articles.module";
+import { ArticleModule } from "src/interface/modules/articles.Module";
 import { AuthModule } from "src/interface/modules/auth.module";
 import { CuriositiesModule } from "src/interface/modules/curiosities.module";
 import { DadosHeroisModule } from "src/interface/modules/dados-herois.module";
