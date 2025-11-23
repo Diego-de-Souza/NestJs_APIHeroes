@@ -1,6 +1,6 @@
 import { ArticleModule } from "src/interface/modules/articles.Module";
 import { AuthModule } from "src/interface/modules/auth.module";
-import { CuriositiesModule } from "src/interface/modules/curiosities.module";
+import { CuriositiesModule } from "src/interface/modules/curiosities.Module";
 import { DadosHeroisModule } from "src/interface/modules/dados-herois.module";
 import { GamesModule } from "src/interface/modules/games.module";
 import { MenuPrincipalModule } from "src/interface/modules/menu_principal.module";

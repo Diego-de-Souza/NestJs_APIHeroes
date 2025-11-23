@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { models } from 'src/infrastructure/database/sequelize/models/index.model';
-import { ArticlesController } from "src/interface/controllers/Articles.controller";
+import { ArticlesController } from "src/interface/controllers/articles.Controller";
 import { ArticlesService } from "src/application/services/articles.service";
 import { ArticlesRepository } from "src/infrastructure/repositories/articles.repository";
 import { CreateArticleUseCase } from "src/application/use-cases/articles/create-articles.use-case";
