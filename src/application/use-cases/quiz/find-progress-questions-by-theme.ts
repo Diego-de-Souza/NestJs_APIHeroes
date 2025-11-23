@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
 import { QuizWithLevelsInterface } from "src/domain/interfaces/quiz.interface";
-import { UserQuizProgressInterface } from "src/domain/interfaces/UserQuizProgress.interface";
+import { UserQuizProgressInterface } from "src/domain/interfaces/userQuizProgress.interface";
 import { QuizRepository } from "src/infrastructure/repositories/quiz.repository";
 import { Quiz } from "src/infrastructure/database/sequelize/models/quiz/quiz.model";
 
