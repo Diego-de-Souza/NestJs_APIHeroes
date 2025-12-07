@@ -22,8 +22,8 @@ export class Quiz extends Model<Quiz> {
   name: string;
 
   @Column({
-    type: DataType.JSON,
-    allowNull: false,
+    type: DataType.STRING,,
+    allowNull: true,
   })
   logo: string;
 
