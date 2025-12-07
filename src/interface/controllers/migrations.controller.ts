@@ -1,4 +1,4 @@
-import { Controller, Post, Get } from '@nestjs/common';
+import { Controller, Post, Get, Req } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { QueryTypes } from 'sequelize';
@@ -309,4 +309,65 @@ export class MigrationsController {
         };
     }
     }
+
+    @Get('debug-cookies')
+  async debugCookies(@Req() req: any): Promise<any> {
+    return {
+      success: true,
+      cookies: {
+        access_token: req.cookies?.access_token || 'NOT_FOUND',
+        refresh_token: req.cookies?.refresh_token || 'NOT_FOUND',
+        all_cookies: req.cookies || {},
+        raw_cookie_header: req.headers.cookie || 'NOT_FOUND'
+      },
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  // ✅ ROTA DE DEBUG - HEADERS COMPLETOS
+  @Get('debug-headers')
+  async debugHeaders(@Req() req: any): Promise<any> {
+    return {
+      success: true,
+      debug: {
+        method: req.method,
+        url: req.url,
+        cookies: req.cookies || {},
+        headers: {
+          cookie: req.headers.cookie,
+          authorization: req.headers.authorization,
+          'user-agent': req.headers['user-agent'],
+          origin: req.headers.origin,
+          referer: req.headers.referer,
+          'content-type': req.headers['content-type']
+        },
+        query: req.query,
+        body: req.body
+      },
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  // ✅ ROTA DE DEBUG - AUTH SIMULATION
+  @Get('debug-auth')
+  async debugAuth(@Req() req: any): Promise<any> {
+    const authHeader = req.headers.authorization;
+    const bearerToken = authHeader?.split(' ')[1];
+    const cookieAccessToken = req.cookies?.access_token;
+    const cookieRefreshToken = req.cookies?.refresh_token;
+    
+    return {
+      success: true,
+      auth_debug: {
+        has_auth_header: !!authHeader,
+        auth_header_value: authHeader || 'NOT_PRESENT',
+        bearer_token: bearerToken || 'NOT_EXTRACTED',
+        cookie_access_token: cookieAccessToken || 'NOT_FOUND',
+        cookie_refresh_token: cookieRefreshToken || 'NOT_FOUND',
+        middleware_should_use: 'COOKIES',
+        token_source: cookieAccessToken ? 'COOKIES' : (bearerToken ? 'HEADER' : 'NONE')
+      },
+      timestamp: new Date().toISOString()
+    };
+  }
 }

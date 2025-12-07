@@ -94,6 +94,17 @@ export default async (req: any, res: any) => {
       DB_NAME: process.env.DB_NAME ? 'SET' : 'NOT SET',
       DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT SET'
     });
+    console.log('🍪 RAW COOKIES:', req.headers.cookie); // ✅ ADD ISSO
+    console.log('🍪 PARSED COOKIES:', req.cookies);     // ✅ ADD ISSO
+    
+    // Handle OPTIONS primeiro
+    if (req.method === 'OPTIONS') {
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With, Cookie, Set-Cookie');
+      return res.status(200).end();
+    }
 
     const app = await createApp();
     const expressApp = app.getHttpAdapter().getInstance();
