@@ -8,6 +8,7 @@ import { UpdateArticleUseCase } from "src/application/use-cases/articles/update-
 import { FindArticleByIdUseCase } from "src/application/use-cases/articles/find-article-by-id.use-case";
 import { FindAllArticleUseCase } from "src/application/use-cases/articles/find-all-articles.use-case";
 import { DeleteArticleUseCase } from "src/application/use-cases/articles/delete-article.use-case";
+import { FindArticlesForHomepageUseCase } from "../use-cases/articles/find-articles-for-homepage.use-case";
 
 @Injectable()
 export class ArticlesService{
@@ -17,7 +18,8 @@ export class ArticlesService{
         private readonly updateArticleUseCase: UpdateArticleUseCase,
         private readonly findArticleByIdUseCase: FindArticleByIdUseCase,
         private readonly findAllArticlesUseCase: FindAllArticleUseCase,
-        private readonly deleteArticleUseCase: DeleteArticleUseCase
+        private readonly deleteArticleUseCase: DeleteArticleUseCase,
+        private readonly articlesForHomepageUseCase: FindArticlesForHomepageUseCase,
     ){}
 
     async createArticle(articleDto: CreateArticleDto): Promise<ApiResponseInterface<Article>>{
@@ -38,5 +40,9 @@ export class ArticlesService{
 
     async deleteArticle(id: number): Promise<ApiResponseInterface<number>>{
         return await this.deleteArticleUseCase.deleteArticle(id);
+    }
+
+    async articlesForHomepage(): Promise<ApiResponseInterface<Article>>{
+        return await this.articlesForHomepageUseCase.articlesForHomepage();
     }
 }

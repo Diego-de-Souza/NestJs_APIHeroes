@@ -5,5 +5,6 @@ export interface ApiResponseInterface<T = any> {
   message: string;
   data?: T[]; 
   error?: string;
-  dataUnit?: T;
+  dataUnit?: T | null; 
+  user?: any;
 }

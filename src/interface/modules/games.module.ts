@@ -1,19 +1,49 @@
-import { GamesController } from "src/interface/controllers/games.controller";
-import { models } from "src/infrastructure/database/sequelize/models/index.model";
-import { SequelizeModule } from "@nestjs/sequelize";
-import {  Module } from "@nestjs/common";
-import { GamesService } from "src/application/services/games.service";
-import { FindDataMemoryGameUseCase } from "src/application/use-cases/games/memory-game/find-data-memory-game.use-case";
-import { GamesRepository } from "src/infrastructure/repositories/games.repository";
+import { Get, Module, forwardRef } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
+import { CacheModule } from '@nestjs/cache-manager';
+import { GamesController } from '../controllers/games.controller';
+import { GamesService } from '../../application/services/games.service';
+import { FindDataMemoryGameUseCase } from '../../application/use-cases/games/memory-game/find-data-memory-game.use-case';
+import { GamesRepository } from '../../infrastructure/repositories/games.repository';
+import { ImageApiService } from '../../application/services/image-api.service';
+import { UnsplashProvider } from '../../infrastructure/providers/unsplash.provider';
+import { PexelsProvider } from '../../infrastructure/providers/pexels.provider';
+import { PixabayProvider } from '../../infrastructure/providers/pixabay.provider';
+import { GiphyProvider } from '../../infrastructure/providers/giphy.provider';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { models } from '../../infrastructure/database/sequelize/models/index.model';
+import { GetUserProgressUseCase } from 'src/application/use-cases/games/get-user-progress.use-case';
+import { SaveUserGameProgressUseCase } from 'src/application/use-cases/games/save-user-game-progress.use-case';
 
 @Module({
-  imports: [SequelizeModule.forFeature(models) ],
+  imports: [
+    SequelizeModule.forFeature(models),
+    HttpModule,
+    CacheModule.register(),
+  ],
   controllers: [GamesController],
   providers: [
     GamesService,
     FindDataMemoryGameUseCase,
     GamesRepository,
+    ImageApiService,
+    UnsplashProvider,
+    PexelsProvider,
+    PixabayProvider,
+    GiphyProvider,
+    GetUserProgressUseCase,
+    SaveUserGameProgressUseCase,  
+    {
+      provide: 'IMAGE_PROVIDERS',
+      useFactory: (
+        unsplash: UnsplashProvider,
+        pexels: PexelsProvider,
+        pixabay: PixabayProvider,
+        giphy: GiphyProvider,
+      ) => [unsplash, pexels, pixabay, giphy],
+      inject: [UnsplashProvider, PexelsProvider, PixabayProvider, GiphyProvider],
+    },
   ],
-  exports: []
+  exports: [ImageApiService],
 })
 export class GamesModule {}

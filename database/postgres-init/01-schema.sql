@@ -131,17 +131,26 @@ FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 -- =====================
 -- TABELA: articles
 -- =====================
-CREATE TABLE IF NOT EXISTS articles (
+CREATE TABLE articles (
     id SERIAL PRIMARY KEY,
+    category VARCHAR(50) NOT NULL,
     title VARCHAR(100) NOT NULL,
-    caption VARCHAR(100) NOT NULL,
-    author VARCHAR(50) NOT NULL,
-    font VARCHAR(50),
-    description_font VARCHAR(100),
+    description TEXT NOT NULL,
+    text TEXT NOT NULL,
+    summary JSONB NOT NULL,
+    thumbnail VARCHAR(255),
+    key_words TEXT[] NOT NULL,
+    route VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    views INTEGER DEFAULT 0,
+    theme VARCHAR(50),
+    theme_color VARCHAR(20),
+    image VARCHAR(255),
+    author VARCHAR(50) NOT NULL
 );
 
+-- Trigger para updated_at
 CREATE TRIGGER update_articles_updated_at 
 BEFORE UPDATE ON articles
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -211,6 +220,8 @@ CREATE TABLE IF NOT EXISTS games (
     type VARCHAR(50)
 );
 
+ALTER TABLE games ADD CONSTRAINT games_name_unique UNIQUE (name);
+
 -- =====================
 -- TABELA: user_game_process
 -- =====================
@@ -230,10 +241,6 @@ CREATE TABLE IF NOT EXISTS user_game_process (
 CREATE INDEX idx_user_game_process_user_id ON user_game_process(user_id);
 CREATE INDEX idx_user_game_process_game_id ON user_game_process(game_id);
 CREATE INDEX idx_user_game_process_metadata ON user_game_process USING gin(metadata);
-
-CREATE TRIGGER update_user_game_process_last_move_at 
-BEFORE UPDATE ON user_game_process
-FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- =====================
 -- TABELA: user_quiz_progress
@@ -276,4 +283,20 @@ CREATE INDEX idx_user_social_provider ON user_social(provider, provider_user_id)
 
 CREATE TRIGGER update_user_social_updated_at 
 BEFORE UPDATE ON user_social
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TABLE IF NOT EXISTS events (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    location VARCHAR(100),
+    date_event TIMESTAMP NOT NULL,
+    url_event VARCHAR(255),
+    url_image VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE TRIGGER update_events_updated_at 
+BEFORE UPDATE ON events
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

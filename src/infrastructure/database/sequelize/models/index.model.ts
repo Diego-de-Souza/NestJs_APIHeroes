@@ -13,6 +13,7 @@ import { QuizHeroes } from 'src/infrastructure/database/sequelize/models/quiz/qu
 import { QuizQuestion } from 'src/infrastructure/database/sequelize/models/quiz/quiz-question.model';
 import { UserQuizProgress } from 'src/infrastructure/database/sequelize/models/quiz/user-quiz-progress.model';
 import { UserSocial } from 'src/infrastructure/database/sequelize/models/user-social.model';
+import { Events } from './events.model';
 
 export { 
   Heroes, 
@@ -27,7 +28,8 @@ export {
   Games, 
   UserGameProcess, 
   UserQuizProgress,
-  UserSocial
+  UserSocial,
+  Events
 }; 
 
 export const models = [
@@ -45,7 +47,8 @@ export const models = [
   Games, 
   UserGameProcess, 
   UserQuizProgress,
-  UserSocial
+  UserSocial,
+  Events
 ];
 
 export function defineAssociations() {

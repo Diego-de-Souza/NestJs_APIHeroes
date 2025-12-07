@@ -4,6 +4,7 @@ import { Article } from "../database/sequelize/models/article.model";
 import { CreateArticleDto } from "src/interface/dtos/articles/articlesCreate.dto";
 import { UpdateArticlesDto } from "src/interface/dtos/articles/articlesUpdate.dto";
 import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
+import { Op } from "sequelize";
 
 @Injectable()
 export class ArticlesRepository {
@@ -36,4 +37,26 @@ export class ArticlesRepository {
     async DeleteArticle(id: number): Promise<number> {
         return await this.articleModel.destroy({where: {id}});
     }
+
+    async findLatestArticles(limit: number): Promise<Article[]> {
+        return await this.articleModel.findAll({
+            order: [['created_at', 'DESC']],
+            limit: limit
+        });
+    }
+
+    async findFeaturedArticles(limit: number): Promise<Article[]> {
+        return await this.articleModel.findAll({
+            order: [['views', 'DESC']],
+            limit: limit
+        });
+    }
+
+    async findArticlesByCategory(limit: number): Promise<any> {
+        return await this.articleModel.findAll({
+            order: [['category', 'DESC']],
+            limit: limit
+        })
+    }
+
 }

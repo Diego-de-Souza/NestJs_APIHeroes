@@ -28,4 +28,22 @@ export class GamesRepository {
             }
         });
     }
+
+    create(data: Partial<UserGameProcess>): Promise<UserGameProcess> {
+        return this.userGameProgressModel.create(data);
+    }
+
+    update(data: Partial<UserGameProcess>, userId: number, idGame: number): Promise<[number]> {
+        return this.userGameProgressModel.update(data, {
+            where: {
+                user_id: userId,
+                game_id: idGame
+            }
+        });
+    }
+
+    findGameByPk(id: number): Promise<Games | null> {
+        return this.gamesModel.findByPk(id);
+    }
+
 }

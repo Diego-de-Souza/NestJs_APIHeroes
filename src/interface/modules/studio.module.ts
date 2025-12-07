@@ -9,9 +9,13 @@ import { FindAllStudioUseCase } from 'src/application/use-cases/studio/find-all-
 import { DeleteStudioUseCase } from 'src/application/use-cases/studio/delete-studio.use-case';
 import { FindStudioByIdUseCase } from 'src/application/use-cases/studio/find-studio-by-id.use-case';
 import { UpdateStudioUseCase } from 'src/application/use-cases/studio/update-studio.use-case';
+import { AuthModule } from './auth.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature(models)],
+  imports: [
+    SequelizeModule.forFeature(models),
+    AuthModule
+  ],
   controllers: [StudioController],
   providers: [
     StudioService,

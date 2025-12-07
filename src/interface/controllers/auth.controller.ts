@@ -42,12 +42,28 @@ export class AuthController {
   }
   
   @Post('refresh')
-  async refresh(@Req() req: Request, @Res() res: Response) {
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Renova o access token usando o refresh token' })
+  @ApiResponse({ status: 200, description: 'Token renovado com sucesso' })
+  @ApiResponse({ status: 401, description: 'Refresh token inválido' })
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<ApiResponseInterface> {
     try {
-      return await this.authService.findAccessToken(req, res);
+      const refreshToken = req.cookies?.refresh_token;
+      
+      if (!refreshToken) {
+        throw new UnauthorizedException('Refresh token não fornecido');
+      }
+
+      const result = await this.authService.refreshToken(refreshToken, res);
+      return result;
     } catch (error) {
-      console.error('Erro ao processar o refresh token:', error);
-      throw new UnauthorizedException('Não foi possível processar o refresh token.');
+      throw new UnauthorizedException({
+        status: 401,
+        message: `Erro ao renovar token: ${error.message}`,
+      });
     }
   }
 
@@ -192,6 +208,55 @@ export class AuthController {
       throw new BadRequestException({
         status: 400,
         message: `Erro ao gerar código MFA. (controller): ${error.message}`,
+      });
+    }
+  }
+
+  @Get('me')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Retorna informações do usuário autenticado' })
+  @ApiResponse({ status: 200, description: 'Usuário autenticado encontrado' })
+  @ApiResponse({ status: 401, description: 'Não autenticado' })
+  async getMe(@Req() req: Request): Promise<ApiResponseInterface> {
+    try {
+      const user = req['user']; // Dados do token JWT injetados pelo AuthGuard
+      
+      if (!user) {
+        throw new UnauthorizedException('Usuário não autenticado');
+      }
+
+      return {
+        status: 200,
+        message: 'Usuário autenticado',
+        user: {
+          id: user.id || user.sub,
+          nickname: user.nickname,
+          email: user.email || user.firstemail,
+          role: user.role,
+        }
+      };
+    } catch (error) {
+      throw new UnauthorizedException({
+        status: 401,
+        message: `Não autenticado. (controller): ${error.message}`,
+      });
+    }
+  }
+
+  @Post('logout')
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Logout do usuário' })
+  @ApiResponse({ status: 200, description: 'Logout realizado com sucesso' })
+  @ApiResponse({ status: 401, description: 'Não autenticado' })
+  async logout(@Res({ passthrough: true }) res: Response): Promise<ApiResponseInterface> {
+    try {
+      const result = await this.authService.signOut(res);
+      return result;
+    } catch (error) {
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao fazer logout. (controller): ${error.message}`,
       });
     }
   }

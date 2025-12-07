@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
 import { AuthSignInUseCase } from "src/application/use-cases/auth/auth-signin.use-case";
 import { Response } from 'express';
-import { FindAccessTokenUseCase } from "src/application/use-cases/auth/find-acess-toke.use-case";
 import { AuthSignInGoogleUseCase } from "src/application/use-cases/auth/auth-signin-google.use-case";
 import { AuthChangePasswordUseCase } from "src/application/use-cases/auth/auth-chage-password.use-case";
 import { Request } from 'express';
@@ -10,27 +9,30 @@ import { AuthTotpQRCodeUseCase } from "src/application/use-cases/auth/auth-gener
 import { FindSettingsUserUseCase } from "src/application/use-cases/auth/find-settings-user.use-case";
 import { DisableTwoFactorAuthUseCase } from "src/application/use-cases/auth/disable-two-factor-auth.use-case";
 import { GenerateCodeInUseCase } from "src/application/use-cases/auth/auth-generate-code.use-case";
+import { AuthSignOutUseCase } from "../use-cases/auth/auth-signout.use-case";
+import { AuthRefreshTokenUseCase } from "../use-cases/auth/auth-refresh-token.use-case";
 
 @Injectable()
 export class AuthService {
     
     constructor(
         private readonly authSignInUseCase: AuthSignInUseCase,
-        private readonly findAccessTokenUseCase: FindAccessTokenUseCase,
         private readonly authSignInGoogleUseCase: AuthSignInGoogleUseCase,
         private readonly authChangePasswordUseCase: AuthChangePasswordUseCase,
         private readonly authTotpQRCodeUseCase: AuthTotpQRCodeUseCase,
         private readonly generateCodeInUseCase: GenerateCodeInUseCase,
         private readonly disableTwoFactorAuthUseCase: DisableTwoFactorAuthUseCase,
-        private readonly findSettingsUserUseCase: FindSettingsUserUseCase
+        private readonly findSettingsUserUseCase: FindSettingsUserUseCase,
+        private readonly authSignOutUseCase: AuthSignOutUseCase,
+        private readonly refreshTokenUseCase: AuthRefreshTokenUseCase
     ){}
     
     async signIn(email: string, pass: string, res: Response): Promise<any>{
         return await this.authSignInUseCase.signIn(email, pass, res);
     }
 
-    async findAccessToken(req, res): Promise<ApiResponseInterface<string>>{
-        return await this.findAccessTokenUseCase.findAccessToken(req, res);
+    async refreshToken(refreshToken: string,  res: Response): Promise<any>{
+        return await this.refreshTokenUseCase.refreshAccessToken(refreshToken, res);
     }
 
     async googleAuth(token: string, res: Response): Promise<ApiResponseInterface> {
@@ -67,6 +69,10 @@ export class AuthService {
 
     async generateCodePassword(typeCanal: string, data: string): Promise<ApiResponseInterface> {
         return await this.generateCodeInUseCase.generateCodePassword(typeCanal, data);
+    }
+
+    async signOut(res: Response): Promise<any> {
+        return await this.authSignOutUseCase.signOut(res);
     }
 
 }

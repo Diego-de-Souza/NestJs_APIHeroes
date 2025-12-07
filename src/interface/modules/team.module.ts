@@ -7,9 +7,13 @@ import { CreateTeamUseCase } from 'src/application/use-cases/team/create-team.us
 import { findTeamByIdUseCase } from 'src/application/use-cases/team/find-team-by-id.use-case';
 import { FindAllTeamUseCase } from 'src/application/use-cases/team/find-all-team.use-case';
 import { TeamRepository } from 'src/infrastructure/repositories/team.repository';
+import { AuthModule } from './auth.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature(models)],
+  imports: [
+    SequelizeModule.forFeature(models),
+    AuthModule
+  ],
     controllers: [TeamController],
     providers: [
       TeamService, 

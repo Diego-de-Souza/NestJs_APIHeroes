@@ -3,6 +3,7 @@ import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interfac
 import { CreateArticleDto } from "../dtos/articles/articlesCreate.dto";
 import { UpdateArticlesDto } from "../dtos/articles/articlesUpdate.dto";
 import { ArticlesService } from "../../application/services/articles.service"
+import { Article } from "src/infrastructure/database/sequelize/models/article.model";
 
 @Controller("articles")
 export class ArticlesController {
@@ -10,9 +11,9 @@ export class ArticlesController {
     constructor(private readonly ArticlesService : ArticlesService){}
 
     @Post()
-    async create(@Body() articlesDto: CreateArticleDto): Promise<ApiResponseInterface<CreateArticleDto>> {
+    async create(@Body() article: CreateArticleDto): Promise<ApiResponseInterface<Article>> {
         try{
-            const result = await this.ArticlesService.createArticle(articlesDto);
+            const result = await this.ArticlesService.createArticle(article);
             return result;
         }catch(error){
             return {
@@ -24,9 +25,9 @@ export class ArticlesController {
     }
 
     @Put('update/:id')
-    async update(@Body() articleDto: UpdateArticlesDto, @Param("id") id: number): Promise<ApiResponseInterface<UpdateArticlesDto>> {
+    async update(@Body() article: UpdateArticlesDto, @Param("id") id: number): Promise<ApiResponseInterface<Article>> {
         try{
-            const result = await this.ArticlesService.updateArticle(id, articleDto);
+            const result = await this.ArticlesService.updateArticle(id, article);
             return result;
         }catch(error){
             return {
@@ -38,7 +39,7 @@ export class ArticlesController {
     }
 
     @Get('find-one-article/:id')
-    async findOne(@Param("id") id: number): Promise<ApiResponseInterface<CreateArticleDto>> {
+    async findOne(@Param("id") id: number): Promise<ApiResponseInterface<Article>> {
         try{
             const result = await this.ArticlesService.findArticleById(id);
             return result; 
@@ -52,7 +53,7 @@ export class ArticlesController {
     }
 
     @Get('find-all-articles')
-    async findAll(): Promise<ApiResponseInterface<CreateArticleDto>> {
+    async findAll(): Promise<ApiResponseInterface<Article>> {
         try{
             const result = await this.ArticlesService.findAllArticles();
             return result; 
@@ -60,6 +61,20 @@ export class ArticlesController {
             return {
                 status: 500,
                 message: 'Erro inesperado ao buscar Artigo.',
+                error: error.message || error,
+            };
+        }
+    }
+
+    @Get('articles-for-homepage')
+    async articlesForHomepage(): Promise<ApiResponseInterface<Article>> {
+        try{
+            const result = await this.ArticlesService.articlesForHomepage();
+            return result;
+        }catch(error){
+            return {
+                status: 500,
+                message: 'Erro inesperado ao buscar Artigo para homepage.',
                 error: error.message || error,
             };
         }

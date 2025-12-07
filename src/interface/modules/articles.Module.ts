@@ -9,6 +9,9 @@ import { DeleteArticleUseCase } from "src/application/use-cases/articles/delete-
 import { FindAllArticleUseCase } from "src/application/use-cases/articles/find-all-articles.use-case";
 import { FindArticleByIdUseCase } from "src/application/use-cases/articles/find-article-by-id.use-case";
 import { UpdateArticleUseCase } from "src/application/use-cases/articles/update-article.use-case";
+import { FindArticlesForHomepageUseCase } from "src/application/use-cases/articles/find-articles-for-homepage.use-case";
+import { ImageService } from "src/application/services/image.service";
+import { ConverterImageUseCase } from "src/application/use-cases/images/converter-image.use-case";
 
 @Module({
     imports: [
@@ -22,7 +25,10 @@ import { UpdateArticleUseCase } from "src/application/use-cases/articles/update-
         FindArticleByIdUseCase,
         FindAllArticleUseCase,
         DeleteArticleUseCase,
-        ArticlesRepository
+        ArticlesRepository,
+        FindArticlesForHomepageUseCase,
+        ImageService,
+        ConverterImageUseCase
     ],
     exports: [ArticlesService]
 })

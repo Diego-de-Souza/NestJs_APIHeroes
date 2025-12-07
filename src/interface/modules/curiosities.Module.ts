@@ -9,10 +9,14 @@ import { DeleteCuriosityUseCase } from "src/application/use-cases/curiosities/de
 import { FindAllCuriositiesUseCase } from "src/application/use-cases/curiosities/find-all-curiosities.use-case";
 import { FindCuriosityByIdUseCase } from "src/application/use-cases/curiosities/find-curiosities-by-id.use-case";
 import { UpdateCuriosityUseCase } from "src/application/use-cases/curiosities/update-curiosities.use-case";
+import { AuthModule } from "./auth.module";
 
 
 @Module({
-    imports: [SequelizeModule.forFeature(models)],
+    imports: [
+        SequelizeModule.forFeature(models),
+        AuthModule
+    ],
     controllers: [CuriositiesController],
     providers: [
         CuriosityService,

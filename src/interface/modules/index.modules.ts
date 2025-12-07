@@ -9,6 +9,8 @@ import { QuizModule } from "src/interface/modules/quiz.module";
 import { StudioModule } from "src/interface/modules/studio.module";
 import { TeamModule } from "src/interface/modules/team.module";
 import { UserModule } from "src/interface/modules/user.module";
+import { HighlightsModule } from "./highlights.module";
+import { EventsModule } from "./events.module";
 
 export const appModules = [
   ArticleModule,
@@ -22,4 +24,6 @@ export const appModules = [
   StudioModule,
   TeamModule,
   UserModule,
+  HighlightsModule,
+  EventsModule
 ];

@@ -10,7 +10,6 @@ import { jwtConstants } from 'src/shared/utils/constants/constants';
 import { AuthService } from 'src/application/services/auth.service';
 import { AuthRepository } from 'src/infrastructure/repositories/auth.repository';
 import { AuthSignInUseCase } from 'src/application/use-cases/auth/auth-signin.use-case';
-import { FindAccessTokenUseCase } from 'src/application/use-cases/auth/find-acess-toke.use-case';
 import { TokenUseCase } from 'src/application/use-cases/auth/token.use-case';
 import { PasswordUseCase } from 'src/application/use-cases/auth/password.use-case';
 import { AuthSignInGoogleUseCase } from 'src/application/use-cases/auth/auth-signin-google.use-case';
@@ -21,6 +20,8 @@ import { AuthTotpQRCodeUseCase } from 'src/application/use-cases/auth/auth-gener
 import { FindSettingsUserUseCase } from 'src/application/use-cases/auth/find-settings-user.use-case';
 import { DisableTwoFactorAuthUseCase } from 'src/application/use-cases/auth/disable-two-factor-auth.use-case';
 import { GenerateCodeInUseCase } from 'src/application/use-cases/auth/auth-generate-code.use-case';
+import { AuthSignOutUseCase } from 'src/application/use-cases/auth/auth-signout.use-case';
+import { AuthRefreshTokenUseCase } from 'src/application/use-cases/auth/auth-refresh-token.use-case';
 
 @Module({
   imports: [
@@ -40,7 +41,7 @@ import { GenerateCodeInUseCase } from 'src/application/use-cases/auth/auth-gener
     AuthSignInGoogleUseCase,
     AuthChangePasswordUseCase,
     GenenerateHashUseCase,
-    FindAccessTokenUseCase,
+    AuthRefreshTokenUseCase,
     AuthTotpQRCodeUseCase,
     GenerateCodeInUseCase,
     DisableTwoFactorAuthUseCase,
@@ -49,8 +50,14 @@ import { GenerateCodeInUseCase } from 'src/application/use-cases/auth/auth-gener
     UserRepository,
     TokenUseCase,
     PasswordUseCase,
-    ConfigService
+    ConfigService,
+    AuthSignOutUseCase
   ],
-  exports: [AuthService]
+  exports: [
+    AuthService,
+  AuthRefreshTokenUseCase,
+  AuthRepository,
+  TokenUseCase
+]
 })
 export class AuthModule {}

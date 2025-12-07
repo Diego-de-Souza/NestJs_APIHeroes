@@ -32,33 +32,44 @@ export class AuthSignInUseCase {
                 throw new Error("Credenciais inválidas.");
             }
 
-            if(role){
-
-            }
-
-            const accessToken = await this.tokenUseCase.generateToken(user.dataValues, role.dataValues);
-
+            const accessToken = await this.tokenUseCase.generateToken(user.dataValues, role?.dataValues);
             const refreshToken = await this.tokenUseCase.generateRefreshToken(user.dataValues);
 
+            const isProduction = process.env.NODE_ENV === 'production';
+
+            // Cookie para access_token
+            res.cookie('access_token', accessToken, {
+                httpOnly: true,
+                secure: isProduction,
+                sameSite: isProduction ? 'strict' : 'lax',
+                path: '/',
+                maxAge: 15 * 60 * 1000 // 15 minutos
+            });
+
+            // Cookie para refresh_token
             res.cookie('refresh_token', refreshToken, {
                 httpOnly: true,
-                secure: true, // apenas HTTPS
-                sameSite: 'strict',
-                path: '/', // ou só na rota de refresh
+                secure: isProduction,
+                sameSite: isProduction ? 'strict' : 'lax',
+                path: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000 // 7 dias
             });
 
             const hasTotp = user.dataValues.totp_secret ? true : false;
 
             return {
-                access_token: accessToken,
-                has_totp: hasTotp
+                message: 'Login realizado com sucesso',
+                has_totp: hasTotp,
+                user: {
+                    id: user.dataValues.id,
+                    nickname: user.dataValues.nickname,
+                    email: user.dataValues.firstemail,
+                    role: role?.dataValues?.role
+                }
             };
         }catch(error){
             console.error("Erro ao realizar login:", error.message);
-
             throw new Error(`Credenciais inválidas ou usuário não encontrado: ${error}`)
         }
-    
     }
 }

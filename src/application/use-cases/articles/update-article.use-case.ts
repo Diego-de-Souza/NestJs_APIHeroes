@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
+import { ImageService } from "src/application/services/image.service";
 import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
 import { Article } from "src/infrastructure/database/sequelize/models/article.model";
 import { ArticlesRepository } from "src/infrastructure/repositories/articles.repository";
@@ -8,7 +9,8 @@ import { UpdateArticlesDto } from "src/interface/dtos/articles/articlesUpdate.dt
 export class UpdateArticleUseCase {
 
     constructor(
-        private readonly articleRepository: ArticlesRepository
+        private readonly articleRepository: ArticlesRepository,
+        private readonly imageService: ImageService
     ){}
 
     async updateArticle(id: number, articleDto:UpdateArticlesDto): Promise<ApiResponseInterface<Article>>{
@@ -21,7 +23,15 @@ export class UpdateArticleUseCase {
             }
         }
 
-        await this.articleRepository.updateArticle(id, articleDto);
+        let articleUpdate = {...articleDto};
+
+        if(articleDto.image && !articleDto.image.startsWith('http')){
+            await this.imageService.deleteImage(article.image);
+            const imageUploadResult = await this.imageService.saveImageBase64(articleDto.image, 'articles', 'images');
+            articleUpdate.image = imageUploadResult;
+        }
+
+        await this.articleRepository.updateArticle(id, articleUpdate);
 
         return{
             status:HttpStatus.OK,

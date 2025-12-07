@@ -12,12 +12,14 @@ import { UpdateHeroesUseCase } from 'src/application/use-cases/heroes/update-her
 import { DeleteHeroesUseCase } from 'src/application/use-cases/heroes/delete-heroes.use-case';
 import { HeroesRepository } from 'src/infrastructure/repositories/heroes.repository';
 import { FindHeroesByStudioUseCase } from 'src/application/use-cases/heroes/find-heroe-by-studio.use-case';
+import { AuthModule } from './auth.module';
 
 @Module({
   imports: [
     SequelizeModule.forFeature(models), 
     TeamModule, 
-    StudioModule
+    StudioModule,
+    AuthModule
   ],
   controllers: [DadosHeroisController],
   providers: [

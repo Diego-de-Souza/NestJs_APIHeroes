@@ -9,6 +9,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,6 +18,8 @@ async function bootstrap() {
   const port = process.env.PORT || configService.get('PORT') || 3000;
 
   app.use(cookieParser());
+  app.use(bodyParser.json({ limit: '20mb' }));
+  app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
 
   const config = new DocumentBuilder()
     .setTitle('Heroes Platform API')
