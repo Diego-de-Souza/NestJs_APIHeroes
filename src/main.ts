@@ -21,14 +21,21 @@ async function bootstrap() {
   app.use(bodyParser.json({ limit: '20mb' }));
   app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
 
-  const config = new DocumentBuilder()
-    .setTitle('Heroes Platform API')
-    .setDescription('Heroes Platform API for front end interaction')
-    .setVersion('1.0')
-    .addTag('Heroes Platform')
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api-docs', app, documentFactory, {jsonDocumentUrl: 'swagger/json',});
+  if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'true') {
+    const config = new DocumentBuilder()
+      .setTitle('Heroes Platform API')
+      .setDescription('Heroes Platform API for front end interaction')
+      .setVersion('1.0')
+      .addTag('Heroes Platform')
+      .build();
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api-docs', app, documentFactory, {
+      jsonDocumentUrl: 'swagger/json',
+      swaggerOptions: {
+      persistAuthorization: true, 
+    } 
+    });
+  }
 
   // REMOVE APENAS: app.use(express.json());
   
@@ -47,20 +54,33 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({transform: true, whitelist: true, forbidNonWhitelisted: true}));
   
   // MANTÉM o middleware de logging
-  app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    if (req.body && req.body.data) {
-      console.log('Body:', JSON.stringify(req.body.data, null, 2));
-    } else if (req.body) {
-      console.log('Body:', JSON.stringify(req.body, null, 2));
-    } else {
-      console.log('No body provided');
-    }
-    next();
-  });
+  if (process.env.NODE_ENV !== 'production') {
+    app.use((req, res, next) => {
+      console.log(`${req.method} ${req.url}`);
+      if (req.body && req.body.data) {
+        console.log('Body:', JSON.stringify(req.body.data, null, 2));
+      } else if (req.body) {
+        console.log('Body:', JSON.stringify(req.body, null, 2));
+      } else {
+        console.log('No body provided');
+      }
+      next();
+    });
+  }
 
+
+  await app.init();
   // MUDA APENAS o listen:
-  await app.listen(port);
-  console.log(`🚀 API rodando na porta ${port}`);
+  if (require.main === module) {
+    await app.listen(port);
+    console.log(`🚀 API rodando na porta ${port}`);
+  }
+
+  return app;
 }
-bootstrap();
+
+if (require.main === module) {
+  bootstrap();
+}
+
+export default bootstrap;
