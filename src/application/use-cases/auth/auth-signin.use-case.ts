@@ -41,7 +41,7 @@ export class AuthSignInUseCase {
             res.cookie('access_token', accessToken, {
                 httpOnly: true,
                 secure: isProduction,
-                sameSite: isProduction ? 'strict' : 'lax',
+                sameSite: 'none',
                 path: '/',
                 maxAge: 15 * 60 * 1000 // 15 minutos
             });
@@ -50,9 +50,17 @@ export class AuthSignInUseCase {
             res.cookie('refresh_token', refreshToken, {
                 httpOnly: true,
                 secure: isProduction,
-                sameSite: isProduction ? 'strict' : 'lax',
+                sameSite: 'none',
                 path: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000 // 7 dias
+            });
+
+            console.log('🍪 Cookies definidos:', {
+                access_token_length: accessToken.length,
+                refresh_token_length: refreshToken.length,
+                isProduction,
+                secure: isProduction,
+                sameSite: 'none'
             });
 
             const hasTotp = user.dataValues.totp_secret ? true : false;
