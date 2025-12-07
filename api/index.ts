@@ -86,6 +86,11 @@ export default async (req: any, res: any) => {
     console.log('🔵 Environment vars:', {
       NODE_ENV: process.env.NODE_ENV,
       FRONTEND_URL: process.env.FRONTEND_URL ? 'SET' : 'NOT SET',
+      DB_HOST: process.env.DB_HOST ? 'SET' : 'NOT SET',
+      DB_PORT: process.env.DB_PORT ? 'SET' : 'NOT SET',
+      DB_USERNAME: process.env.DB_USERNAME ? 'SET' : 'NOT SET',
+      DB_PASSWORD: process.env.DB_PASSWORD ? 'SET' : 'NOT SET',
+      DB_NAME: process.env.DB_NAME ? 'SET' : 'NOT SET',
       DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT SET'
     });
 
