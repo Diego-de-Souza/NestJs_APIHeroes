@@ -231,4 +231,82 @@ export class MigrationsController {
       };
     }
   }
+
+  @Post('delete_user')
+    async deleteUser(): Promise<any> {
+    const transaction = await this.sequelize.transaction();
+    
+    try {
+        // 1. Busca o usuário pelo email
+        const users = await this.sequelize.query(
+        'SELECT u.id, u.nickname, u.firstemail, r.role, r.access FROM users u LEFT JOIN roles r ON u.id = r.usuario_id WHERE u.firstemail = :email',
+        {
+            replacements: { email: 'plataformaheroes20250820@gmail.com' },
+            type: QueryTypes.SELECT,
+            transaction
+        }
+        ) as any[];
+
+        // 2. Verifica se o usuário existe
+        if (!users || users.length === 0) {
+        await transaction.rollback();
+        return {
+            success: false,
+            message: '❌ Usuário não encontrado!',
+            email: 'plataformaheroes20250820@gmail.com',
+            timestamp: new Date().toISOString()
+        };
+        }
+
+        const userId = users[0].id;
+        const userInfo = {
+        id: userId,
+        email: users[0].firstemail,
+        nickname: users[0].nickname,
+        role: users[0].role
+        };
+
+        // 3. Remove primeiro as roles (devido à FK constraint)
+        const deletedRoles = await this.sequelize.query(
+        'DELETE FROM roles WHERE usuario_id = :userId',
+        {
+            replacements: { userId },
+            type: QueryTypes.DELETE,
+            transaction
+        }
+        );
+
+        // 4. Remove o usuário
+        const deletedUser = await this.sequelize.query(
+        'DELETE FROM users WHERE id = :userId',
+        {
+            replacements: { userId },
+            type: QueryTypes.DELETE,
+            transaction
+        }
+        );
+
+        await transaction.commit();
+
+        return {
+        success: true,
+        message: '🗑️ Usuário ROOT removido com sucesso!',
+        deleted_user: userInfo,
+        operations: {
+            roles_deleted: deletedRoles,
+            user_deleted: deletedUser
+        },
+        timestamp: new Date().toISOString()
+        };
+
+    } catch (error) {
+        await transaction.rollback();
+        return {
+        success: false,
+        message: 'Erro ao remover usuário root',
+        error: error.message,
+        timestamp: new Date().toISOString()
+        };
+    }
+    }
 }
