@@ -22,7 +22,7 @@ export class Quiz extends Model<Quiz> {
   name: string;
 
   @Column({
-    type: DataType.STRING,,
+    type: DataType.STRING(255), 
     allowNull: true,
   })
   logo: string;
