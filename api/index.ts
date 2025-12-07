@@ -102,6 +102,9 @@ export default async (req: any, res: any) => {
     console.log('🍪 RAW COOKIES:', req.headers.cookie); // ✅ ADD ISSO
     console.log('🍪 PARSED COOKIES:', req.cookies);     // ✅ ADD ISSO
     
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Origin', 'https://heroesplatform.com.br');
+
     // Handle OPTIONS primeiro
     if (req.method === 'OPTIONS') {
       res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
@@ -113,6 +116,13 @@ export default async (req: any, res: any) => {
 
     const app = await createApp();
     const expressApp = app.getHttpAdapter().getInstance();
+
+    const originalSend = res.send;
+    res.send = function(data: any) {
+      console.log('🍪 Response headers:', res.getHeaders());
+      return originalSend.call(this, data);
+    };
+    
     return expressApp(req, res);
   } catch (error) {
     console.error('❌ Error in Vercel handler:', error);
