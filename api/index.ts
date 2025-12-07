@@ -55,7 +55,8 @@ async function createApp() {
           'Content-Type', 
           'Accept', 
           'Authorization',
-          'X-Requested-With'
+          'X-Requested-With',
+          'Cookie', 'Set-Cookie'
         ],
         credentials: true
       });

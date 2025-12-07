@@ -38,6 +38,7 @@
     "@nestjs/platform-express": "^10.4.15",
     "@nestjs/sequelize": "^10.0.1",
     "@nestjs/swagger": "^7.4.2",
+    "@types/cookie-parser": "^1.4.10",
     "bcrypt": "^5.1.1",
     "cache-manager": "^7.2.5",
     "class-transformer": "^0.5.1",
