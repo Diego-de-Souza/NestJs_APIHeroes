@@ -49,7 +49,12 @@ async function createApp() {
       console.log('🔵 Setting up CORS...');
       const frontendUrl = configService.get('FRONTEND_URL') || process.env.FRONTEND_URL;
       cachedApp.enableCors({
-        origin: frontendUrl || '*',
+        origin: [
+          'https://heroesplatform.com.br',  
+          frontendUrl,                     
+          '*',
+          'http://localhost:3001'
+        ],
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         allowedHeaders: [
           'Content-Type', 
