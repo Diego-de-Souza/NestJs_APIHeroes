@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common";
 import { SequelizeModule } from "@nestjs/sequelize";
-import { models } from 'src/infrastructure/database/sequelize/models/index.model';
+import { models } from '../../infrastructure/database/sequelize/models/index.model';
 import { HighlightsController } from "../controllers/highlights.controller";
-import { HighlightsService } from "src/application/services/highlights.service";
-import { FindHighlightsUseCase } from "src/application/use-cases/highlights/find-highlights.use-case";
-import { HighlightsRepository } from "src/infrastructure/repositories/highlights.repository";
+import { HighlightsService } from "../../application/services/highlights.service";
+import { FindHighlightsUseCase } from "../../application/use-cases/highlights/find-highlights.use-case";
+import { HighlightsRepository } from "../../infrastructure/repositories/highlights.repository";
 
 @Module({
     imports: [

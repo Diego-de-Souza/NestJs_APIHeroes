@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Query } from "@nestjs/common";
-import { GamesService } from "src/application/services/games.service";
-import { ImageApiService } from "src/application/services/image-api.service";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
+import { GamesService } from "../../application/services/games.service";
+import { ImageApiService } from "../../application/services/image-api.service";
+import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
 
 @Controller('games')
 export class GamesController {

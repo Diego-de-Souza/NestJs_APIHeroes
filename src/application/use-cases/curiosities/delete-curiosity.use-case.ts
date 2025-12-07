@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { CuriosityRepository } from "src/infrastructure/repositories/curiosities.repository";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { CuriosityRepository } from "../../../infrastructure/repositories/curiosities.repository";
 
 @Injectable()
 export class DeleteCuriosityUseCase {

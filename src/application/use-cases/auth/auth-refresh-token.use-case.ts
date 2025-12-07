@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { jwtConstants } from "src/shared/utils/constants/constants";
-import { AuthRepository } from "src/infrastructure/repositories/auth.repository";
+import { jwtConstants } from "../../../shared/utils/constants/constants";
+import { AuthRepository } from "../../../infrastructure/repositories/auth.repository";
 import { TokenUseCase } from "./token.use-case";
 import { Response } from 'express';
 

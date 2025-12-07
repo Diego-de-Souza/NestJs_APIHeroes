@@ -1,9 +1,9 @@
 import { HttpStatus, Injectable, UnauthorizedException } from "@nestjs/common";
 import { authenticator } from 'otplib';
 import * as qrcode from 'qrcode';
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Request } from 'express';
-import { AuthRepository } from "src/infrastructure/repositories/auth.repository";
+import { AuthRepository } from "../../../infrastructure/repositories/auth.repository";
 
 @Injectable()
 export class AuthTotpQRCodeUseCase{

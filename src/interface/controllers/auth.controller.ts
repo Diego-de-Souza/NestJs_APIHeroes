@@ -1,8 +1,8 @@
 import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ApiResponseInterface } from 'src/domain/interfaces/APIResponse.interface';
-import { AuthService } from 'src/application/services/auth.service';
+import { ApiResponseInterface } from '../../domain/interfaces/APIResponse.interface';
+import { AuthService } from '../../application/services/auth.service';
 import { CreateUserLoginDto } from '../dtos/user/userLoginCreate.dto';
 import { AuthGuard } from '../guards/auth.guard';
 import { Request } from 'express';

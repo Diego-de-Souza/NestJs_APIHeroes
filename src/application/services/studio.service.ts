@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
-import { CreateStudioUseCase } from "src/application/use-cases/studio/create-studio.use-case";
-import { CreateStudioDto } from "src/interface/dtos/studio/create-studio.dto";
+import { CreateStudioUseCase } from "../../application/use-cases/studio/create-studio.use-case";
+import { CreateStudioDto } from "../../interface/dtos/studio/create-studio.dto";
 import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { Studio } from "src/infrastructure/database/sequelize/models/studio.model";
-import { FindAllStudioUseCase } from "src/application/use-cases/studio/find-all-studio.use-case";
-import { DeleteStudioUseCase } from "src/application/use-cases/studio/delete-studio.use-case";
-import { FindStudioByIdUseCase } from "src/application/use-cases/studio/find-studio-by-id.use-case";
-import { UpdateStudioUseCase } from "src/application/use-cases/studio/update-studio.use-case";
+import { Studio } from "../../infrastructure/database/sequelize/models/studio.model";
+import { FindAllStudioUseCase } from "../../application/use-cases/studio/find-all-studio.use-case";
+import { DeleteStudioUseCase } from "../../application/use-cases/studio/delete-studio.use-case";
+import { FindStudioByIdUseCase } from "../../application/use-cases/studio/find-studio-by-id.use-case";
+import { UpdateStudioUseCase } from "../../application/use-cases/studio/update-studio.use-case";
 
 
 @Injectable()

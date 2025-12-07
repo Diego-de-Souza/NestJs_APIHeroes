@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
-import { CreateQuizDto } from "src/interface/dtos/quiz/quizCreate.dto";
 import {Quiz, UserQuizProgress, QuizLevel, QuizQuestion} from "../database/sequelize/models/index.model";
 
 @Injectable()

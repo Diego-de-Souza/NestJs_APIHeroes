@@ -1,6 +1,6 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { User } from 'src/infrastructure/database/sequelize/models/user.model';
-import { Games } from 'src/infrastructure/database/sequelize/models/games/games.model';
+import { User } from '../../../../../infrastructure/database/sequelize/models/user.model';
+import { Games } from '../../../../../infrastructure/database/sequelize/models/games/games.model';
 
 @Table({ tableName: 'user_game_process', timestamps: false })
 export class UserGameProcess extends Model<UserGameProcess> {

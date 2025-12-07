@@ -1,5 +1,5 @@
 import { Controller, Get } from "@nestjs/common";
-import { HighlightsService } from "src/application/services/highlights.service";
+import { HighlightsService } from "../../application/services/highlights.service";
 
 
 @Controller('highlights')

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { QuizRepository } from "src/infrastructure/repositories/quiz.repository";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { QuizRepository } from "../../../infrastructure/repositories/quiz.repository";
 
 @Injectable()
 export class UpdateQuizUseCase {

@@ -1,6 +1,6 @@
 import { Transform } from "class-transformer";
 import { IsDate, IsEmail, IsNotEmpty, IsOptional, IsString, MinDate, MinLength } from "class-validator";
-import { IsCEP } from "src/shared/validators/CepValidator";
+import { IsCEP } from "../../../shared/validators/CepValidator";
 
 export class UpdateUserDTO {
     @IsString({message: "Nome deve ser string"})

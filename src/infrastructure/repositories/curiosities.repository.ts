@@ -1,8 +1,8 @@
 import { InjectModel } from "@nestjs/sequelize";
 import { Curiosities } from "../database/sequelize/models/curiosities.model";
 import { Injectable } from "@nestjs/common";
-import { UpdateCuriositiesDto } from "src/interface/dtos/curiosities/curiositiesUpdate.dto";
-import { CreateCuriositiesDto } from "src/interface/dtos/curiosities/curiositiesCreate.dto";
+import { UpdateCuriositiesDto } from "../../interface/dtos/curiosities/curiositiesUpdate.dto";
+import { CreateCuriositiesDto } from "../../interface/dtos/curiosities/curiositiesCreate.dto";
 
 @Injectable()
 export class CuriosityRepository {

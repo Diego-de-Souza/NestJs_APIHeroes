@@ -1,9 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
+import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
 import { CreateQuizDto } from "../dtos/quiz/quizCreate.dto";
-import { QuizService } from "src/application/services/quiz.service";
+import { QuizService } from "../../application/services/quiz.service";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
-import { GetQuizDto } from "../dtos/quiz/quizget.dto";
 
 @Controller("quiz")
 export class QuizController {

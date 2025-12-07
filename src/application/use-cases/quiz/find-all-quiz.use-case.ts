@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { QuizRepository } from "src/infrastructure/repositories/quiz.repository";
+import { QuizRepository } from "../../../infrastructure/repositories/quiz.repository";
 
 @Injectable()
 export class FindAllQuizUseCase {

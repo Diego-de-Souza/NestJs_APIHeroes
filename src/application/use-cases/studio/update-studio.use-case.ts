@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { Studio } from "src/infrastructure/database/sequelize/models/studio.model";
-import { StudioRepository } from "src/infrastructure/repositories/studio.repository";
-import { CreateStudioDto } from "src/interface/dtos/studio/create-studio.dto";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { Studio } from "../../../infrastructure/database/sequelize/models/studio.model";
+import { StudioRepository } from "../../../infrastructure/repositories/studio.repository";
+import { CreateStudioDto } from "../../../interface/dtos/studio/create-studio.dto";
 
 @Injectable()
 export class UpdateStudioUseCase {

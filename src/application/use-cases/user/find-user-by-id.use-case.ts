@@ -1,8 +1,7 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { UserService } from "../../services/user.service";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { User } from "src/infrastructure/database/sequelize/models/user.model";
-import { UserRepository } from "src/infrastructure/repositories/user.repository";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { User } from "../../../infrastructure/database/sequelize/models/user.model";
+import { UserRepository } from "../../../infrastructure/repositories/user.repository";
 
 @Injectable()
 export class FindUserByIdUseCase {

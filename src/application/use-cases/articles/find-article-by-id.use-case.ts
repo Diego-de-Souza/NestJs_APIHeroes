@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { Article } from "src/infrastructure/database/sequelize/models/article.model";
-import { ArticlesRepository } from "src/infrastructure/repositories/articles.repository";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { Article } from "../../../infrastructure/database/sequelize/models/article.model";
+import { ArticlesRepository } from "../../../infrastructure/repositories/articles.repository";
 
 @Injectable()
 export class FindArticleByIdUseCase {

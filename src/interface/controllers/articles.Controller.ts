@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
+import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
 import { CreateArticleDto } from "../dtos/articles/articlesCreate.dto";
 import { UpdateArticlesDto } from "../dtos/articles/articlesUpdate.dto";
 import { ArticlesService } from "../../application/services/articles.service"
-import { Article } from "src/infrastructure/database/sequelize/models/article.model";
+import { Article } from "../../infrastructure/database/sequelize/models/article.model";
 
 @Controller("articles")
 export class ArticlesController {

@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Heroes } from "../database/sequelize/models/heroes.model";
-import { CreateDadosHeroisDto } from "src/interface/dtos/dados-herois/create-dados-herois.dto";
-import { UpdateDadosHeroisDto } from "src/interface/dtos/dados-herois/update-dados-herois.dto";
+import { CreateDadosHeroisDto } from "../../interface/dtos/dados-herois/create-dados-herois.dto";
+import { UpdateDadosHeroisDto } from "../../interface/dtos/dados-herois/update-dados-herois.dto";
 import { WhereOptions } from "sequelize";
 
 @Injectable()

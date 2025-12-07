@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { OAuth2Client } from 'google-auth-library';
 import { TokenUseCase } from "./token.use-case";
-import { AuthRepository } from "src/infrastructure/repositories/auth.repository";
-import { UserRepository } from "src/infrastructure/repositories/user.repository";
+import { AuthRepository } from "../../../infrastructure/repositories/auth.repository";
+import { UserRepository } from "../../../infrastructure/repositories/user.repository";
 import { Response } from 'express';
 import * as dotenv from 'dotenv';
 

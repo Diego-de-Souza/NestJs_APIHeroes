@@ -3,7 +3,7 @@ import { User } from "../database/sequelize/models/user.model";
 import { Injectable } from "@nestjs/common";
 import { Role } from "../database/sequelize/models/roles.model";
 import { UserSocial } from "../database/sequelize/models/user-social.model";
-import { UserInterface } from "src/domain/interfaces/user.interface";
+import { UserInterface } from "../../domain/interfaces/user.interface";
 import { Op } from "sequelize";
 
 @Injectable()

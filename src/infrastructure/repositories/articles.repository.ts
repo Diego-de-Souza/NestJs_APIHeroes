@@ -1,10 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Article } from "../database/sequelize/models/article.model";
-import { CreateArticleDto } from "src/interface/dtos/articles/articlesCreate.dto";
-import { UpdateArticlesDto } from "src/interface/dtos/articles/articlesUpdate.dto";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { Op } from "sequelize";
+import { CreateArticleDto } from "../../interface/dtos/articles/articlesCreate.dto";
+import { UpdateArticlesDto } from "../../interface/dtos/articles/articlesUpdate.dto";
 
 @Injectable()
 export class ArticlesRepository {

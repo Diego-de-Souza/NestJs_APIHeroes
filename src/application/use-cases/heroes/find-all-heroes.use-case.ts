@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { Heroes } from "src/infrastructure/database/sequelize/models/heroes.model";
-import { HeroesRepository } from "src/infrastructure/repositories/heroes.repository";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { Heroes } from "../../../infrastructure/database/sequelize/models/heroes.model";
+import { HeroesRepository } from "../../../infrastructure/repositories/heroes.repository";
 
 @Injectable()
 export class FindAllHeroesUseCase {

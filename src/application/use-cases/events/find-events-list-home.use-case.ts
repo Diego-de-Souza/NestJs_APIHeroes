@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { Events } from "src/infrastructure/database/sequelize/models/events.model";
-import { EventsRepository } from "src/infrastructure/repositories/events.repository";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { Events } from "../../../infrastructure/database/sequelize/models/events.model";
+import { EventsRepository } from "../../../infrastructure/repositories/events.repository";
 
 
 @Injectable()

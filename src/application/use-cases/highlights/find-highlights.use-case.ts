@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { HighlightsRepository } from "src/infrastructure/repositories/highlights.repository";
+import { HighlightsRepository } from "../../../infrastructure/repositories/highlights.repository";
 
 
 @Injectable()

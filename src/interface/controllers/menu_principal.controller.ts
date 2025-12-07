@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { MenuPrincipalService } from 'src/application/services/menu-principal.service';
-import { ApiResponseInterface } from 'src/domain/interfaces/APIResponse.interface';
+import { MenuPrincipalService } from '../../application/services/menu-principal.service';
+import { ApiResponseInterface } from '../../domain/interfaces/APIResponse.interface';
 
 @Controller('menu_principal')
 export class MenuPrincipalController {

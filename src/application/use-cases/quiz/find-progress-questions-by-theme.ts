@@ -1,9 +1,9 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { QuizWithLevelsInterface } from "src/domain/interfaces/quizConst.Interface";
-import { UserQuizProgressInterface } from "src/domain/interfaces/UserQuizProgress.interface";
-import { QuizRepository } from "src/infrastructure/repositories/quiz.repository";
-import { Quiz } from "src/infrastructure/database/sequelize/models/quiz/quiz.model";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { QuizWithLevelsInterface } from "../../../domain/interfaces/quizConst.Interface";
+import { UserQuizProgressInterface } from "../../../domain/interfaces/UserQuizProgress.interface";
+import { QuizRepository } from "../../../infrastructure/repositories/quiz.repository";
+import { Quiz } from "../../../infrastructure/database/sequelize/models/quiz/quiz.model";
 
 @Injectable()
 export class FindProgressQuestionsByThemeUseCase {

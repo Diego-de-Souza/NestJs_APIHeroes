@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { AuthRepository } from "src/infrastructure/repositories/auth.repository";
+import { AuthRepository } from "../../../infrastructure/repositories/auth.repository";
 import { PasswordUseCase } from "./password.use-case";
 import { TokenUseCase } from "./token.use-case";
 import { Response } from 'express';

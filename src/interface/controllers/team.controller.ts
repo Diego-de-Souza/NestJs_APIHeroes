@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ConflictException, ParseIntPipe, UseGuards } from '@nestjs/common';
-import { ApiResponseInterface } from 'src/domain/interfaces/APIResponse.interface';
+import { Controller, Get, Post, Body, Param, ConflictException, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { ApiResponseInterface } from '../../domain/interfaces/APIResponse.interface';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { TeamService } from 'src/application/services/team.service';
+import { TeamService } from '../../application/services/team.service';
 import { CreateTeamDto } from '../dtos/team/create-team.dto';
 import { AuthGuard } from '../guards/auth.guard';
 

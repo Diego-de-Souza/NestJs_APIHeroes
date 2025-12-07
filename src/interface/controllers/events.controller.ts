@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
-import { EventsService } from "src/application/services/events.service";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
+import { EventsService } from "../../application/services/events.service";
+import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
 
 
 @Controller('events')

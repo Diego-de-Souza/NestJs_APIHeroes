@@ -1,7 +1,7 @@
 import { InjectModel } from "@nestjs/sequelize";
 import { Studio } from "../database/sequelize/models/studio.model";
 import { Injectable } from "@nestjs/common";
-import { CreateStudioDto } from "src/interface/dtos/studio/create-studio.dto";
+import { CreateStudioDto } from "../../interface/dtos/studio/create-studio.dto";
 
 @Injectable()
 export class StudioRepository {

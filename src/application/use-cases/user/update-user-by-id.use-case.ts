@@ -1,9 +1,8 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { AuthService } from "src/application/services/auth.service";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { User } from "src/infrastructure/database/sequelize/models/user.model";
-import { UserRepository } from "src/infrastructure/repositories/user.repository";
-import { UpdateUserDTO } from "src/interface/dtos/user/UserUpdate.dto";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { User } from "../../../infrastructure/database/sequelize/models/user.model";
+import { UserRepository } from "../../../infrastructure/repositories/user.repository";
+import { UpdateUserDTO } from "../../../interface/dtos/user/UserUpdate.dto";
 import { GenenerateHashUseCase } from "../auth/generate-hash.use-case";
 
 

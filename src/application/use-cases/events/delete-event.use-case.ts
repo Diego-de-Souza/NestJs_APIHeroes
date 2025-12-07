@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ImageService } from "src/application/services/image.service";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { EventsRepository } from "src/infrastructure/repositories/events.repository";
+import { ImageService } from "../../../application/services/image.service";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { EventsRepository } from "../../../infrastructure/repositories/events.repository";
 
 
 @Injectable()

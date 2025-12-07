@@ -12,8 +12,8 @@ import { PixabayProvider } from '../../infrastructure/providers/pixabay.provider
 import { GiphyProvider } from '../../infrastructure/providers/giphy.provider';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { models } from '../../infrastructure/database/sequelize/models/index.model';
-import { GetUserProgressUseCase } from 'src/application/use-cases/games/get-user-progress.use-case';
-import { SaveUserGameProgressUseCase } from 'src/application/use-cases/games/save-user-game-progress.use-case';
+import { GetUserProgressUseCase } from '../../application/use-cases/games/get-user-progress.use-case';
+import { SaveUserGameProgressUseCase } from '../../application/use-cases/games/save-user-game-progress.use-case';
 
 @Module({
   imports: [

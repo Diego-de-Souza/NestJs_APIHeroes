@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { Curiosities } from "src/infrastructure/database/sequelize/models/curiosities.model";
-import { CuriosityRepository } from "src/infrastructure/repositories/curiosities.repository";
-import { UpdateCuriositiesDto } from "src/interface/dtos/curiosities/curiositiesUpdate.dto";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { Curiosities } from "../../../infrastructure/database/sequelize/models/curiosities.model";
+import { CuriosityRepository } from "../../../infrastructure/repositories/curiosities.repository";
+import { UpdateCuriositiesDto } from "../../../interface/dtos/curiosities/curiositiesUpdate.dto";
 
 @Injectable()
 export class UpdateCuriosityUseCase {

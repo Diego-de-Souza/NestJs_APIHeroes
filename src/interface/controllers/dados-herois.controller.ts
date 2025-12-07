@@ -3,9 +3,9 @@ import {FilesInterceptor } from '@nestjs/platform-express';
 import {ApiResponseInterface} from '../../domain/interfaces/APIResponse.interface';
 import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../guards/auth.guard';
-import { DataHeroesService } from 'src/application/services/data-heroes.service';
+import { DataHeroesService } from '../../application/services/data-heroes.service';
 import { CreateDadosHeroisDto } from '../dtos/dados-herois/create-dados-herois.dto';
-import { LogInterceptor } from 'src/shared/interceptors/LogInterceptor';
+import { LogInterceptor } from '../../shared/interceptors/LogInterceptor';
 import { UpdateDadosHeroisDto } from '../dtos/dados-herois/update-dados-herois.dto';
 
 @ApiTags('Herois')

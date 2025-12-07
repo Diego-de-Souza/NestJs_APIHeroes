@@ -1,13 +1,13 @@
 import { Injectable } from "@nestjs/common";
-import { CreateCuriosityUseCase } from "src/application/use-cases/curiosities/create-curiosities.use-case";
-import { CreateCuriositiesDto } from "src/interface/dtos/curiosities/curiositiesCreate.dto";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { Curiosities } from "src/infrastructure/database/sequelize/models/curiosities.model";
-import { UpdateCuriositiesDto } from "src/interface/dtos/curiosities/curiositiesUpdate.dto";
-import { UpdateCuriosityUseCase } from "src/application/use-cases/curiosities/update-curiosities.use-case";
-import { FindCuriosityByIdUseCase } from "src/application/use-cases/curiosities/find-curiosities-by-id.use-case";
-import { FindAllCuriositiesUseCase } from "src/application/use-cases/curiosities/find-all-curiosities.use-case";
-import { DeleteCuriosityUseCase } from "src/application/use-cases/curiosities/delete-curiosity.use-case";
+import { CreateCuriosityUseCase } from "../../application/use-cases/curiosities/create-curiosities.use-case";
+import { CreateCuriositiesDto } from "../../interface/dtos/curiosities/curiositiesCreate.dto";
+import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
+import { Curiosities } from "../../infrastructure/database/sequelize/models/curiosities.model";
+import { UpdateCuriositiesDto } from "../../interface/dtos/curiosities/curiositiesUpdate.dto";
+import { UpdateCuriosityUseCase } from "../../application/use-cases/curiosities/update-curiosities.use-case";
+import { FindCuriosityByIdUseCase } from "../../application/use-cases/curiosities/find-curiosities-by-id.use-case";
+import { FindAllCuriositiesUseCase } from "../../application/use-cases/curiosities/find-all-curiosities.use-case";
+import { DeleteCuriosityUseCase } from "../../application/use-cases/curiosities/delete-curiosity.use-case";
 
 @Injectable()
 export class CuriosityService {

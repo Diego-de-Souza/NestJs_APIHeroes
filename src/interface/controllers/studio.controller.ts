@@ -1,8 +1,8 @@
 
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiResponseInterface } from 'src/domain/interfaces/APIResponse.interface';
+import { ApiResponseInterface } from '../../domain/interfaces/APIResponse.interface';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { StudioService } from 'src/application/services/studio.service';
+import { StudioService } from '../../application/services/studio.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { CreateStudioDto } from '../dtos/studio/create-studio.dto';
 

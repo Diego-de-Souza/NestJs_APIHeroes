@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { MenuPrincipalRepository } from "src/infrastructure/repositories/menu-principal.repository";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { MenuPrincipalRepository } from "../../../infrastructure/repositories/menu-principal.repository";
 
 @Injectable()
 export class MenuPrincipalUseCase {

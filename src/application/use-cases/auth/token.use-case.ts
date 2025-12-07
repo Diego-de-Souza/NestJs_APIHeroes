@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { jwtConstants } from "src/shared/utils/constants/constants";
+import { jwtConstants } from "../../../shared/utils/constants/constants";
 
 @Injectable()
 export class TokenUseCase {

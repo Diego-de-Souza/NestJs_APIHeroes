@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { StudioRepository } from "src/infrastructure/repositories/studio.repository";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { StudioRepository } from "../../../infrastructure/repositories/studio.repository";
 
 @Injectable()
 export class DeleteStudioUseCase {

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { appModules } from 'src/interface/modules/index.modules';
+import { appModules } from './interface/modules/index.modules';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { sequelizeConfig } from 'src/config/sequelize.config';
+import { sequelizeConfig } from './config/sequelize.config';
 import { ConfigModule } from '@nestjs/config';
-import { ArticleModule } from 'src/interface/modules/articles.Module';
+import { ArticleModule } from './interface/modules/articles.Module';
 
 @Module({
   imports: [

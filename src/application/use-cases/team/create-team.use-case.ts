@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { Team } from "src/infrastructure/database/sequelize/models/index.model";
-import { TeamRepository } from "src/infrastructure/repositories/team.repository";
-import { CreateTeamDto } from "src/interface/dtos/team/create-team.dto";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { Team } from "../../../infrastructure/database/sequelize/models/index.model";
+import { TeamRepository } from "../../../infrastructure/repositories/team.repository";
+import { CreateTeamDto } from "../../../interface/dtos/team/create-team.dto";
 
 
 @Injectable()

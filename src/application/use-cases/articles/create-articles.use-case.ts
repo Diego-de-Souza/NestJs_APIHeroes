@@ -1,9 +1,9 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ImageService } from "src/application/services/image.service";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { Article } from "src/infrastructure/database/sequelize/models/article.model";
-import { ArticlesRepository } from "src/infrastructure/repositories/articles.repository";
-import { CreateArticleDto } from "src/interface/dtos/articles/articlesCreate.dto";
+import { ImageService } from "../../../application/services/image.service";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { Article } from "../../../infrastructure/database/sequelize/models/article.model";
+import { ArticlesRepository } from "../../../infrastructure/repositories/articles.repository";
+import { CreateArticleDto } from "../../../interface/dtos/articles/articlesCreate.dto";
 
 @Injectable()
 export class CreateArticleUseCase {

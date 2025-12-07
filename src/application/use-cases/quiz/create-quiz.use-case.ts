@@ -1,7 +1,6 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { QuizRepository } from "src/infrastructure/repositories/quiz.repository";
-import { CreateQuizDto } from "src/interface/dtos/quiz/quizCreate.dto";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { QuizRepository } from "../../../infrastructure/repositories/quiz.repository";
 
 @Injectable()
 export class CreateQuizUseCase {

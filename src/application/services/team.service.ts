@@ -1,11 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { Team } from "src/infrastructure/database/sequelize/models/equipes.model";
-import { TeamRepository } from "src/infrastructure/repositories/team.repository";
-import { CreateTeamDto } from "src/interface/dtos/team/create-team.dto";
-import { CreateTeamUseCase } from "src/application/use-cases/team/create-team.use-case";
-import { findTeamByIdUseCase } from "src/application/use-cases/team/find-team-by-id.use-case";
-import { FindAllTeamUseCase } from "src/application/use-cases/team/find-all-team.use-case";
+import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
+import { Team } from "../../infrastructure/database/sequelize/models/equipes.model";
+import { CreateTeamDto } from "../../interface/dtos/team/create-team.dto";
+import { CreateTeamUseCase } from "../../application/use-cases/team/create-team.use-case";
+import { findTeamByIdUseCase } from "../../application/use-cases/team/find-team-by-id.use-case";
+import { FindAllTeamUseCase } from "../../application/use-cases/team/find-all-team.use-case";
 
 
 @Injectable()

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { FindDataMemoryGameUseCase } from "src/application/use-cases/games/memory-game/find-data-memory-game.use-case";
+import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
+import { FindDataMemoryGameUseCase } from "../../application/use-cases/games/memory-game/find-data-memory-game.use-case";
 import { GetUserProgressUseCase } from "../use-cases/games/get-user-progress.use-case";
 import { SaveUserGameProgressUseCase } from "../use-cases/games/save-user-game-progress.use-case";
 

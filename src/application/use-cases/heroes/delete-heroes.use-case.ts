@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { HeroesRepository } from "src/infrastructure/repositories/heroes.repository";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { HeroesRepository } from "../../../infrastructure/repositories/heroes.repository";
 
 @Injectable()
 export class DeleteHeroesUseCase {

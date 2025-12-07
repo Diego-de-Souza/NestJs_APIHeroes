@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ImageService } from "src/application/services/image.service";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { ArticlesRepository } from "src/infrastructure/repositories/articles.repository";
+import { ImageService } from "../../../application/services/image.service";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { ArticlesRepository } from "../../../infrastructure/repositories/articles.repository";
 
 @Injectable()
 export class DeleteArticleUseCase {

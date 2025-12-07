@@ -1,7 +1,7 @@
 import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { UserGameProcess } from "src/infrastructure/database/sequelize/models/index.model";
-import { GamesRepository } from "src/infrastructure/repositories/games.repository";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { UserGameProcess } from "../../../infrastructure/database/sequelize/models/index.model";
+import { GamesRepository } from "../../../infrastructure/repositories/games.repository";
 
 @Injectable()
 export class SaveUserGameProgressUseCase {

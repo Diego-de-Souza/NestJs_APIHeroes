@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { ArticlesRepository } from "src/infrastructure/repositories/articles.repository";
+import { ArticlesRepository } from "../../../infrastructure/repositories/articles.repository";
 
 
 @Injectable()

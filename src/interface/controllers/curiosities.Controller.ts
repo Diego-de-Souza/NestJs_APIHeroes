@@ -1,10 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
+import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
 import { AuthGuard } from "../guards/auth.guard";
-import { CuriosityService } from "src/application/services/curiosities.service";
+import { CuriosityService } from "../../application/services/curiosities.service";
 import { CreateCuriositiesDto } from "../dtos/curiosities/curiositiesCreate.dto";
 import { UpdateCuriositiesDto } from "../dtos/curiosities/curiositiesUpdate.dto";
-import { Curiosities } from "src/infrastructure/database/sequelize/models/curiosities.model";
+import { Curiosities } from "../../infrastructure/database/sequelize/models/curiosities.model";
 
 @Controller("curiosities")
 export class CuriositiesController {

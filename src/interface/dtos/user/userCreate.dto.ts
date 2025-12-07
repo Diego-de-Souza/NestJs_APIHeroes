@@ -1,6 +1,6 @@
 import { Transform } from "class-transformer";
-import { IsDate, IsEmail, isEmail, IsNotEmpty, IsOptional, IsString, MinDate, MinLength } from "class-validator";
-import { IsCEP } from "src/shared/validators/CepValidator";
+import { IsDate, IsEmail, IsNotEmpty, IsOptional, IsString, MinDate, MinLength } from "class-validator";
+import { IsCEP } from "../../../shared/validators/CepValidator";
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDTO{

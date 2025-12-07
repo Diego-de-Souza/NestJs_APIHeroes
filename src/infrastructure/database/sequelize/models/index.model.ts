@@ -1,18 +1,18 @@
-import { Heroes } from 'src/infrastructure/database/sequelize/models/heroes.model';
-import { Studio } from 'src/infrastructure/database/sequelize/models/studio.model';
-import { Team } from 'src/infrastructure/database/sequelize/models/equipes.model';
-import { User } from 'src/infrastructure/database/sequelize/models/user.model';
-import { Role } from 'src/infrastructure/database/sequelize/models/roles.model';
-import { Curiosities } from 'src/infrastructure/database/sequelize/models/curiosities.model';
-import { Article } from 'src/infrastructure/database/sequelize/models/article.model';
-import { Quiz } from 'src/infrastructure/database/sequelize/models/quiz/quiz.model';
-import { UserGameProcess } from 'src/infrastructure/database/sequelize/models/games/user-game-progress.model';
-import { Games } from 'src/infrastructure/database/sequelize/models/games/games.model';
-import { QuizLevel } from 'src/infrastructure/database/sequelize/models/quiz/quiz-level.model';
-import { QuizHeroes } from 'src/infrastructure/database/sequelize/models/quiz/quiz-heroes.model';
-import { QuizQuestion } from 'src/infrastructure/database/sequelize/models/quiz/quiz-question.model';
-import { UserQuizProgress } from 'src/infrastructure/database/sequelize/models/quiz/user-quiz-progress.model';
-import { UserSocial } from 'src/infrastructure/database/sequelize/models/user-social.model';
+import { Heroes } from './heroes.model';
+import { Studio } from './studio.model';
+import { Team } from './equipes.model';
+import { User } from './user.model';
+import { Role } from './roles.model';
+import { Curiosities } from './curiosities.model';
+import { Article } from './article.model';
+import { Quiz } from './quiz/quiz.model';
+import { UserGameProcess } from './games/user-game-progress.model';
+import { Games } from './games/games.model';
+import { QuizLevel } from './quiz/quiz-level.model';
+import { QuizHeroes } from './quiz/quiz-heroes.model';
+import { QuizQuestion } from './quiz/quiz-question.model';
+import { UserQuizProgress } from './quiz/user-quiz-progress.model';
+import { UserSocial } from './user-social.model';
 import { Events } from './events.model';
 
 export { 
