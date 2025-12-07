@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MigrationsController } from './interface/controllers/migrations.controller';
+import { GenenerateHashUseCase } from './application/use-cases/auth/generate-hash.use-case';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { MigrationsController } from './interface/controllers/migrations.control
     ...appModules
   ],
   controllers: [AppController, MigrationsController],
-  providers: [AppService],
+  providers: [AppService, GenenerateHashUseCase],
 })
 export class AppModule  {}
