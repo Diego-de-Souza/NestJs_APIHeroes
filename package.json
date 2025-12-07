@@ -8,7 +8,7 @@
   "scripts": {
     "postinstall": "echo 'PostgreSQL check:' && npm list pg",
     "build": "nest build",
-    "vercel-build": "npm run build",
+    "vercel-build": "npm run build && npm run migrations:run",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/main",
     "start:dev": "nest start --watch",

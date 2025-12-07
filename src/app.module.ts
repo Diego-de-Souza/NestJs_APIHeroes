@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ArticleModule } from './interface/modules/articles.Module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { MigrationsController } from './interface/controllers/migrations.controller';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { AppService } from './app.service';
     SequelizeModule.forRoot(sequelizeConfig),
     ...appModules
   ],
-  controllers: [AppController],
+  controllers: [AppController, MigrationsController],
   providers: [AppService],
 })
 export class AppModule  {}
