@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiResponseInterface } from '../../domain/interfaces/APIResponse.interface';
@@ -21,7 +21,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Login realizado com sucesso' })
   @ApiResponse({ status: 400, description: 'Email ou senha não fornecidos' })
   @ApiResponse({ status: 401, description: 'Credenciais inválidas' })
-  async signIn(@Body("data") signInDto: CreateUserLoginDto, @Res({ passthrough: true }) res: Response): Promise<ApiResponseInterface> {
+  async signIn(@Body("data") signInDto: CreateUserLoginDto, @Req() req: Request): Promise<ApiResponseInterface> {
     try {
       if(!signInDto.email || !signInDto.password){
         return {
@@ -30,8 +30,7 @@ export class AuthController {
         };
       }
 
-      const result = await this.authService.signIn(signInDto.email, signInDto.password, res);
-
+      const result = await this.authService.signIn(signInDto.email, signInDto.password, req);
       return result;
     } catch (error) {
       throw new BadRequestException({
@@ -217,28 +216,32 @@ export class AuthController {
   @ApiOperation({ summary: 'Retorna informações do usuário autenticado' })
   @ApiResponse({ status: 200, description: 'Usuário autenticado encontrado' })
   @ApiResponse({ status: 401, description: 'Não autenticado' })
-  async getMe(@Req() req: Request): Promise<ApiResponseInterface> {
+  async getMe(@Req() req: Request): Promise<any> {
     try {
-      const user = req['user']; // Dados do token JWT injetados pelo AuthGuard
+      const user = req['user'];
+      const sessionToken = req.headers['x-session-token'] || 
+                        req.query.session_token || 
+                        req.body.session_token;
       
       if (!user) {
         throw new UnauthorizedException('Usuário não autenticado');
       }
 
       return {
-        status: 200,
-        message: 'Usuário autenticado',
+        message: 'Usuário autenticado com sucesso',
+        has_totp: false,
+        session_token: sessionToken,
         user: {
           id: user.id || user.sub,
           nickname: user.nickname,
           email: user.email || user.firstemail,
-          role: user.role,
+          role: user.role
         }
       };
     } catch (error) {
       throw new UnauthorizedException({
         status: 401,
-        message: `Não autenticado. (controller): ${error.message}`,
+        message: `Não autenticado: ${error.message}`,
       });
     }
   }
@@ -249,9 +252,9 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout do usuário' })
   @ApiResponse({ status: 200, description: 'Logout realizado com sucesso' })
   @ApiResponse({ status: 401, description: 'Não autenticado' })
-  async logout(@Res({ passthrough: true }) res: Response): Promise<ApiResponseInterface> {
+  async logout(@Res({ passthrough: true }) res: Response, @Req() req: Request): Promise<ApiResponseInterface> {
     try {
-      const result = await this.authService.signOut(res);
+      const result = await this.authService.signOut(res, req);
       return result;
     } catch (error) {
       throw new BadRequestException({
@@ -261,4 +264,73 @@ export class AuthController {
     }
   }
 
+  @Post('logout-session')
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Logout apenas da sessão atual' })
+  @ApiResponse({ status: 200, description: 'Logout da sessão realizado com sucesso' })
+  @ApiResponse({ status: 401, description: 'Não autenticado' })
+  async logoutCurrentSession(@Req() req: Request): Promise<any> {
+    try{
+      const result = await this.authService.signOutCurrentSession(req);
+      return result;
+    }catch(error){
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao fazer logout. (controller): ${error.message}`,
+      });
+    }
+  }
+
+  @Post('logout-session/:id')
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Logout apenas da sessão atual' })
+  @ApiResponse({ status: 200, description: 'Logout da sessão realizado com sucesso' })
+  @ApiResponse({ status: 401, description: 'Não autenticado' })
+  async logoutCurrentSessionById(@Param('id') id: string, @Req() req: Request): Promise<any> {
+    try{
+      const result = await this.authService.signOutCurrentSessionById(id, req);
+      return result;
+    }catch(error){
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao fazer logout. (controller): ${error.message}`,
+      });
+    }
+  }
+
+  @Get('active-sessions')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Obtém todas as sessões ativas do usuário' })
+  @ApiResponse({ status: 200, description: 'Sessões ativas obtidas com sucesso' })
+  @ApiResponse({ status: 401, description: 'Não autenticado' })
+  async getActiveSessions(@Req() req: Request): Promise<any> {
+    try {
+      const user = req['user'];
+      const currentSessionToken = req.headers['x-session-token'] as string;
+      
+      if (!user) {
+        throw new UnauthorizedException('Usuário não autenticado');
+      }
+
+      const userId = user.id || user.sub || user.userId;
+      
+      console.log('🔍 User object:', user);
+      console.log('🔍 User ID encontrado:', userId);
+      
+      if (!userId) {
+        throw new Error('ID do usuário não encontrado no token JWT');
+      }
+
+      const result = await this.authService.getActiveSessions(userId, currentSessionToken);
+      return result;
+    } catch (error) {
+      console.error('❌ Erro no controller getActiveSessions:', error);
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao obter sessões ativas. (controller): ${error.message}`,
+      });
+    }
+  }
 }

@@ -1,8 +1,6 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 import { jwtConstants } from "../../../shared/utils/constants/constants";
-
 @Injectable()
 export class TokenUseCase {
 
@@ -45,5 +43,9 @@ export class TokenUseCase {
         } catch (err) {
             throw new UnauthorizedException('Refresh token inválido ou expirado');
         }
+    }
+
+    async generateBinario(number: number): Promise<string> {
+        return number.toString(2);
     }
 }

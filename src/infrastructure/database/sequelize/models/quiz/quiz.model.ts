@@ -4,6 +4,7 @@ import { QuizLevel } from './quiz-level.model';
 @Table({
   tableName: "quiz",
   timestamps: false,
+  underscored: false
 })
 export class Quiz extends Model<Quiz> {
   @Column({
@@ -28,11 +29,11 @@ export class Quiz extends Model<Quiz> {
   logo: string;
 
   @Column({
-    type: DataType.STRING(50),
+    type: DataType.STRING(20),
     allowNull: false,
   })
   theme: string;
 
-  @HasMany(() => QuizLevel, { foreignKey: 'quiz_id', as: 'levels' })
-  levels: QuizLevel[];
+  @HasMany(() => QuizLevel, { foreignKey: 'quiz_id', as: 'quiz_levels' })
+  quiz_levels: QuizLevel[];
 }

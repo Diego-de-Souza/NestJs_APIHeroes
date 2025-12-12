@@ -48,7 +48,7 @@ async function bootstrap() {
       'Accept', 
       'Authorization',
       'X-Requested-With',
-      'Cookie', 'Set-Cookie'
+      'x-session-token' 
     ],
     credentials: true
   });

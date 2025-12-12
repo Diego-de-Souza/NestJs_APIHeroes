@@ -37,4 +37,8 @@ export class CreateQuizDto {
     @IsString({ message: "tema deve ser string" })
     @MaxLength(50, { message: "tema deve conter menos de 50 caracteres" })
     readonly theme: string;
+
+    @IsString({ message: "url_logo deve ser string" })
+    @MaxLength(255, { message: "url_logo deve conter menos de 255 caracteres" })
+    readonly url_logo: string;
 }

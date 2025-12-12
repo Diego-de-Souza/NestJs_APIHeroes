@@ -14,6 +14,7 @@ import { QuizQuestion } from './quiz/quiz-question.model';
 import { UserQuizProgress } from './quiz/user-quiz-progress.model';
 import { UserSocial } from './user-social.model';
 import { Events } from './events.model';
+import { Validation } from './validation.model';
 
 export { 
   Heroes, 
@@ -29,7 +30,8 @@ export {
   UserGameProcess, 
   UserQuizProgress,
   UserSocial,
-  Events
+  Events, 
+  Validation
 }; 
 
 export const models = [
@@ -48,7 +50,8 @@ export const models = [
   UserGameProcess, 
   UserQuizProgress,
   UserSocial,
-  Events
+  Events,
+  Validation
 ];
 
 export function defineAssociations() {
@@ -81,6 +84,9 @@ export function defineAssociations() {
 
   User.hasMany(UserQuizProgress, { foreignKey: 'user_id', as: 'user_quiz_progress_user' });
   UserQuizProgress.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+  User.hasMany(UserSocial, {foreignKey: 'user_id', as: 'user_social'})
+  UserSocial.belongsTo(User, {foreignKey: 'user_id', as: 'user'})
 
   User.hasMany(UserSocial, {foreignKey: 'user_id', as: 'user_social'})
   UserSocial.belongsTo(User, {foreignKey: 'user_id', as: 'user'})

@@ -18,3 +18,4 @@ export interface QuizLevelInterface {
     questions: number;
     xp_reward: number;
 }
+

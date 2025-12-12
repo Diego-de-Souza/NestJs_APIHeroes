@@ -12,7 +12,7 @@ export class CreateQuizUseCase {
         try{
             const dataQuiz = {
                 name: quizDTO.name,
-                logo: quizDTO.logo != null ? quizDTO.logo : 'teste',
+                logo: quizDTO.url_logo != null ? quizDTO.url_logo : 'teste',
                 theme: quizDTO.theme,
             }
 

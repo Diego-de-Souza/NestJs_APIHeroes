@@ -19,7 +19,7 @@ export class FindProgressQuestionsByThemeUseCase {
                 name: q.name,
                 logo: q.logo,
                 theme: q.theme,
-                quiz_levels: q.levels,
+                quiz_levels: q.quiz_levels,
             }));
 
             if (dataQuizzes.length === 0) {

@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS quiz (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     logo VARCHAR(255),
-    color VARCHAR(20)
+    theme VARCHAR(20)
 );
 
 -- =====================
@@ -299,4 +299,29 @@ CREATE TABLE IF NOT EXISTS events (
 
 CREATE TRIGGER update_events_updated_at 
 BEFORE UPDATE ON events
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TABLE IF NOT EXISTS validations (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    access_token VARCHAR(255),
+    refresh_token VARCHAR(255),
+    expires_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    token_id VARCHAR(32) NOT NULL UNIQUE,  -- ID binário/hash que será retornado
+    is_active BOOLEAN DEFAULT TRUE,        -- Para invalidar tokens
+    device_info VARCHAR(255),              -- Para segurança (user-agent)
+    ip_address INET,                       -- Para segurança
+    last_used_at TIMESTAMP,                -- Para limpar tokens antigos
+    
+    CONSTRAINT fk_validations_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_validations_user_id ON validations(user_id);
+CREATE INDEX idx_validations_token_id ON validations(token_id);
+CREATE INDEX idx_validations_expires_at ON validations(expires_at);
+
+CREATE TRIGGER update_validations_updated_at 
+BEFORE UPDATE ON validations
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

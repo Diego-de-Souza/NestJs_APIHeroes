@@ -11,6 +11,7 @@ import { DisableTwoFactorAuthUseCase } from "../../application/use-cases/auth/di
 import { GenerateCodeInUseCase } from "../../application/use-cases/auth/auth-generate-code.use-case";
 import { AuthSignOutUseCase } from "../use-cases/auth/auth-signout.use-case";
 import { AuthRefreshTokenUseCase } from "../use-cases/auth/auth-refresh-token.use-case";
+import { AuthGetActiveSessionsUseCase } from "../use-cases/auth/auth-get-active-sessions.use-case";
 
 @Injectable()
 export class AuthService {
@@ -24,11 +25,12 @@ export class AuthService {
         private readonly disableTwoFactorAuthUseCase: DisableTwoFactorAuthUseCase,
         private readonly findSettingsUserUseCase: FindSettingsUserUseCase,
         private readonly authSignOutUseCase: AuthSignOutUseCase,
-        private readonly refreshTokenUseCase: AuthRefreshTokenUseCase
+        private readonly refreshTokenUseCase: AuthRefreshTokenUseCase,
+        private readonly authGetActiveSessionsUseCase: AuthGetActiveSessionsUseCase
     ){}
     
-    async signIn(email: string, pass: string, res: Response): Promise<any>{
-        return await this.authSignInUseCase.signIn(email, pass, res);
+    async signIn(email: string, pass: string, req: Request): Promise<any>{
+        return await this.authSignInUseCase.signIn(email, pass, req);
     }
 
     async refreshToken(refreshToken: string,  res: Response): Promise<any>{
@@ -71,8 +73,20 @@ export class AuthService {
         return await this.generateCodeInUseCase.generateCodePassword(typeCanal, data);
     }
 
-    async signOut(res: Response): Promise<any> {
-        return await this.authSignOutUseCase.signOut(res);
+    async signOut(res: Response, req: Request): Promise<any> {
+        return await this.authSignOutUseCase.signOut(res, req);
+    }
+
+    async signOutCurrentSession(req: Request): Promise<any> {
+        return await this.authSignOutUseCase.signOutCurrentSession(req);
+    }
+
+    async signOutCurrentSessionById(id: string, req: Request): Promise<any> {
+        return await this.authSignOutUseCase.signOutCurrentSessionById(id, req);
+    }
+
+    async getActiveSessions(userId: number, currentSessionToken?: string): Promise<any> {
+        return await this.authGetActiveSessionsUseCase.getActiveSessions(userId, currentSessionToken);
     }
 
 }
