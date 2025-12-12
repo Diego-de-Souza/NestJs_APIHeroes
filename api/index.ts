@@ -51,6 +51,7 @@ async function createApp() {
       cachedApp.enableCors({
         origin: [
           'https://heroesplatform.com.br',  
+          'https://www.heroesplatform.com.br', 
           frontendUrl,                     
           '*',
           'http://localhost:3001'
@@ -115,7 +116,10 @@ export default async (req: any, res: any) => {
       res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
       res.setHeader('Access-Control-Allow-Credentials', 'true');
       res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With, Cookie, Set-Cookie');
+      res.setHeader(
+        'Access-Control-Allow-Headers', 
+        'Content-Type, Accept, Authorization, X-Requested-With, Cookie, Set-Cookie, x-session-token'
+      );
       return res.status(200).end();
     }
 
