@@ -61,7 +61,12 @@ async function createApp() {
           'Accept', 
           'Authorization',
           'X-Requested-With',
-          'Cookie', 'Set-Cookie'
+          'Cookie', 'Set-Cookie',
+          'x-session-token'
+        ],
+        exposedHeaders: [
+          'x-session-token',
+          'Authorization'
         ],
         credentials: true
       });
