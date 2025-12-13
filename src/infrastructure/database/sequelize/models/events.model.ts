@@ -21,7 +21,7 @@ export class Events extends Model<Events>{
     title:string;
 
     @Column({
-        type: DataType.STRING(100),
+        type: DataType.TEXT,
         allowNull:false,
     })
     description:string;

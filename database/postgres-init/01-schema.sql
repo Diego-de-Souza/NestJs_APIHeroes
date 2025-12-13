@@ -288,7 +288,7 @@ FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TABLE IF NOT EXISTS events (
     id SERIAL PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
-    description VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
     location VARCHAR(100),
     date_event TIMESTAMP NOT NULL,
     url_event VARCHAR(255),
