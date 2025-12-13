@@ -370,4 +370,43 @@ export class MigrationsController {
       timestamp: new Date().toISOString()
     };
   }
+
+  @Post('alter-table-events')
+  async executeAlterTableEvents(): Promise<any> {
+    const transaction = await this.sequelize.transaction();
+    
+    try {
+      console.log('🔧 Alterando coluna description para TEXT...');
+
+      // ✅ ALTERAR APENAS A COLUNA DESCRIPTION PARA TEXT
+      await this.sequelize.query(
+        'ALTER TABLE events ALTER COLUMN description TYPE TEXT',
+        {
+          type: QueryTypes.RAW,
+          transaction
+        }
+      );
+
+      console.log('✅ Coluna description alterada para TEXT');
+
+      await transaction.commit();
+
+      return {
+        success: true,
+        message: '🚀 Coluna description alterada para TEXT com sucesso!',
+        timestamp: new Date().toISOString()
+      };
+
+    } catch (error) {
+      await transaction.rollback();
+      console.error('❌ Erro ao alterar coluna description:', error);
+      
+      return {
+        success: false,
+        message: 'Erro ao alterar coluna description',
+        error: error.message,
+        timestamp: new Date().toISOString()
+      };
+    }
+  }
 }
