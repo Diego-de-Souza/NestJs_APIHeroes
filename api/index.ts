@@ -45,6 +45,8 @@ async function createApp() {
       cachedApp.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
 
       cachedApp.setGlobalPrefix('api');
+
+      cachedApp.use('/api/payment/webhook', express.raw({ type: '*/*' }));
       
       console.log('🔵 Setting up CORS...');
       const frontendUrl = configService.get('FRONTEND_URL') || process.env.FRONTEND_URL;
