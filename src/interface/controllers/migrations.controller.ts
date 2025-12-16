@@ -374,36 +374,63 @@ export class MigrationsController {
   @Post('alter-table-events')
   async executeAlterTableEvents(): Promise<any> {
     const transaction = await this.sequelize.transaction();
-    
     try {
-      console.log('🔧 Alterando coluna description para TEXT...');
+      // 2. Criar tabela subscription se não existir
+      console.log('🔧 Criando tabela subscription se não existir...');
+      await this.sequelize.query(`
+        CREATE TABLE IF NOT EXISTS subscription (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER NOT NULL REFERENCES users(id),
+          stripe_customer_id VARCHAR(100) NOT NULL,
+          stripe_subscription_id VARCHAR(100) NOT NULL,
+          stripe_price_id VARCHAR(100) NOT NULL,
+          status VARCHAR(20) NOT NULL DEFAULT 'incomplete',
+          current_period_start TIMESTAMP NOT NULL,
+          current_period_end TIMESTAMP NOT NULL,
+          cancel_at_period_end BOOLEAN NOT NULL DEFAULT FALSE,
+          canceled_at TIMESTAMP,
+          price NUMERIC(10,2) NOT NULL,
+          currency VARCHAR(3) NOT NULL DEFAULT 'BRL',
+          plan_type VARCHAR(20) NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+        );
+      `, { type: QueryTypes.RAW, transaction });
+      console.log('✅ Tabela subscription criada ou já existia');
 
-      // ✅ ALTERAR APENAS A COLUNA DESCRIPTION PARA TEXT
-      await this.sequelize.query(
-        'ALTER TABLE events ALTER COLUMN description TYPE TEXT',
-        {
-          type: QueryTypes.RAW,
-          transaction
-        }
-      );
-
-      console.log('✅ Coluna description alterada para TEXT');
+      // 3. Criar tabela payments se não existir
+      console.log('🔧 Criando tabela payments se não existir...');
+      await this.sequelize.query(`
+        CREATE TABLE IF NOT EXISTS payments (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER NOT NULL REFERENCES users(id),
+          stripe_payment_intent_id VARCHAR(100) NOT NULL,
+          stripe_charge_id VARCHAR(100),
+          amount NUMERIC(10,2) NOT NULL,
+          currency VARCHAR(3) NOT NULL DEFAULT 'BRL',
+          status VARCHAR(20) NOT NULL DEFAULT 'pending',
+          payment_method VARCHAR(50) NOT NULL,
+          failure_reason TEXT,
+          metadata JSONB,
+          paid_at TIMESTAMP,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+        );
+      `, { type: QueryTypes.RAW, transaction });
+      console.log('✅ Tabela payments criada ou já existia');
 
       await transaction.commit();
-
       return {
         success: true,
-        message: '🚀 Coluna description alterada para TEXT com sucesso!',
+        message: '🚀 Migração concluída: tabelas criadas!',
         timestamp: new Date().toISOString()
       };
-
     } catch (error) {
       await transaction.rollback();
-      console.error('❌ Erro ao alterar coluna description:', error);
-      
+      console.error('❌ Erro na migração:', error);
       return {
         success: false,
-        message: 'Erro ao alterar coluna description',
+        message: 'Erro ao executar migração',
         error: error.message,
         timestamp: new Date().toISOString()
       };
