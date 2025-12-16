@@ -53,11 +53,12 @@ export class PaymentController {
 
   @Post('webhook')
   async handleWebhook(
-    @Req() req: RawBodyRequest<Request>,
+    @Req() req: any,
     @Headers('stripe-signature') signature: string
   ) {
-    console.log('Stripe Webhook recebido:', { signature, body: req.rawBody?.toString() });
-    return await this.paymentService.handleWebhook(req.rawBody, signature);
+    // req.body será um Buffer devido ao express.raw
+    console.log('Stripe Webhook recebido:', { signature, body: req.body });
+    return await this.paymentService.handleWebhook(req.body, signature);
   }
 
   @Get('health')
