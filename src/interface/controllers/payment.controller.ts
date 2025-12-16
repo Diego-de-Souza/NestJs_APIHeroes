@@ -56,6 +56,7 @@ export class PaymentController {
     @Req() req: RawBodyRequest<Request>,
     @Headers('stripe-signature') signature: string
   ) {
+    console.log('Stripe Webhook recebido:', { signature, body: req.rawBody?.toString() });
     return await this.paymentService.handleWebhook(req.rawBody, signature);
   }
 
