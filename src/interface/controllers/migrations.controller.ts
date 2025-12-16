@@ -436,4 +436,32 @@ export class MigrationsController {
       };
     }
   }
+
+  @Post('alter-table-subscription')
+  async executeAlterTableSubscription(): Promise<any> {
+    const transaction = await this.sequelize.transaction();
+    try {
+      console.log('🔧 Renomeando tabela subscription para subscriptions...');
+      await this.sequelize.query(`
+        ALTER TABLE subscription RENAME TO subscriptions;
+      `, { type: QueryTypes.RAW, transaction });
+      console.log('✅ Tabela renomeada para subscriptions');
+      await transaction.commit();
+      return {
+        success: true,
+        message: '🚀 Migração concluída: tabela renomeada!',
+        timestamp: new Date().toISOString()
+      };
+    }
+    catch (error) {
+      await transaction.rollback();
+      console.error('❌ Erro na migração:', error);
+      return {
+        success: false,
+        message: 'Erro ao executar migração',
+        error: error.message,
+        timestamp: new Date().toISOString()
+      };
+    }
+  }
 }

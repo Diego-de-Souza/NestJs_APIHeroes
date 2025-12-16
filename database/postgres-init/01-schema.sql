@@ -327,7 +327,7 @@ BEFORE UPDATE ON validations
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Tabela de assinaturas (subscription)
-CREATE TABLE IF NOT EXISTS subscription (
+CREATE TABLE IF NOT EXISTS subscriptions (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id),
     stripe_customer_id VARCHAR(100) NOT NULL,
