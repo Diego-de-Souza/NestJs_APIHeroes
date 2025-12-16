@@ -40,13 +40,13 @@ async function createApp() {
       console.log('🔵 Getting ConfigService...');
       const configService = cachedApp.get(ConfigService);
 
+      cachedApp.use('/api/payment/webhook', express.raw({ type: '*/*' }));
+
       cachedApp.use(cookieParser());
       cachedApp.use(bodyParser.json({ limit: '20mb' }));
       cachedApp.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
 
       cachedApp.setGlobalPrefix('api');
-
-      cachedApp.use('/api/payment/webhook', express.raw({ type: '*/*' }));
       
       console.log('🔵 Setting up CORS...');
       const frontendUrl = configService.get('FRONTEND_URL') || process.env.FRONTEND_URL;

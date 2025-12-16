@@ -18,11 +18,11 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = process.env.PORT || configService.get('PORT') || 3000;
 
+  app.use('/api/payment/webhook', express.raw({ type: '*/*' }));
+  
   app.use(cookieParser());
   app.use(bodyParser.json({ limit: '20mb' }));
   app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
-
-  app.use('/api/payment/webhook', express.raw({ type: '*/*' }));
 
   if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'true') {
     const config = new DocumentBuilder()
