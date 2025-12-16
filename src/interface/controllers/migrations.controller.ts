@@ -464,4 +464,29 @@ export class MigrationsController {
       };
     }
   }
+
+  // Endpoint para checar se uma tabela existe
+  @Get('check-table/:name')
+  async checkTableExists(@Req() req: any): Promise<any> {
+    const tableName = req.params.name;
+    try {
+      const queryInterface = this.sequelize.getQueryInterface();
+      const tables = await queryInterface.showAllTables();
+      const exists = tables.includes(tableName);
+      return {
+        success: true,
+        table: tableName,
+        exists,
+        all_tables: tables,
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Erro ao checar tabela',
+        error: error.message,
+        timestamp: new Date().toISOString()
+      };
+    }
+  }
 }
