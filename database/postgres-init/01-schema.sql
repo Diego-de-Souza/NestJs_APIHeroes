@@ -346,7 +346,7 @@ CREATE TABLE IF NOT EXISTS subscription (
 );
 
 -- Tabela de pagamentos (payment)
-CREATE TABLE IF NOT EXISTS payment (
+CREATE TABLE IF NOT EXISTS payments (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id),
     stripe_payment_intent_id VARCHAR(100) NOT NULL,

@@ -26,7 +26,7 @@ export class PaymentService {
       const paymentIntent = await this.stripe.paymentIntents.create({
         amount: Math.round(amount * 100), // Stripe usa centavos
         currency,
-        payment_method_types: ['card'],
+        payment_method_types: ['card', 'boleto'],
         metadata: {
           userId: userId.toString(),
           planType,
