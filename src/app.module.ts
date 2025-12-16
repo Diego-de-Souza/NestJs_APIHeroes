@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { appModules } from './interface/modules/index.modules';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { sequelizeConfig } from './config/sequelize.config';
@@ -11,6 +12,7 @@ import { GenenerateHashUseCase } from './application/use-cases/auth/generate-has
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ScheduleModule.forRoot(), 
     SequelizeModule.forRoot(sequelizeConfig),
     ...appModules
   ],

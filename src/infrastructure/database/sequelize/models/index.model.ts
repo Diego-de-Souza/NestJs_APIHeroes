@@ -15,6 +15,8 @@ import { UserQuizProgress } from './quiz/user-quiz-progress.model';
 import { UserSocial } from './user-social.model';
 import { Events } from './events.model';
 import { Validation } from './validation.model';
+import { Subscription } from './subscription.model';
+import { Payment } from './payment.model';
 
 export { 
   Heroes, 
@@ -31,7 +33,9 @@ export {
   UserQuizProgress,
   UserSocial,
   Events, 
-  Validation
+  Validation,
+  Subscription,
+  Payment
 }; 
 
 export const models = [
@@ -51,7 +55,9 @@ export const models = [
   UserQuizProgress,
   UserSocial,
   Events,
-  Validation
+  Validation,
+  Subscription,
+  Payment
 ];
 
 export function defineAssociations() {
@@ -88,6 +94,10 @@ export function defineAssociations() {
   User.hasMany(UserSocial, {foreignKey: 'user_id', as: 'user_social'})
   UserSocial.belongsTo(User, {foreignKey: 'user_id', as: 'user'})
 
-  User.hasMany(UserSocial, {foreignKey: 'user_id', as: 'user_social'})
-  UserSocial.belongsTo(User, {foreignKey: 'user_id', as: 'user'})
+  // ✅ Payment System Associations
+  User.hasMany(Subscription, { foreignKey: 'user_id', as: 'subscriptions' });
+  Subscription.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+  User.hasMany(Payment, { foreignKey: 'user_id', as: 'payments' });
+  Payment.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 }

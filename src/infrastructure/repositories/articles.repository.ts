@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
+import { Op } from "sequelize";
 import { Article } from "../database/sequelize/models/article.model";
 import { CreateArticleDto } from "../../interface/dtos/articles/articlesCreate.dto";
 import { UpdateArticlesDto } from "../../interface/dtos/articles/articlesUpdate.dto";
@@ -55,6 +56,30 @@ export class ArticlesRepository {
             order: [['category', 'DESC']],
             limit: limit
         })
+    }
+
+    // ✅ Métodos para sincronização automática
+    async findByTitle(title: string): Promise<Article | null> {
+        return await this.articleModel.findOne({
+            where: { title }
+        });
+    }
+
+    async deleteAllExceptIds(idsToKeep: number[]): Promise<number> {
+        return await this.articleModel.destroy({
+            where: {
+                id: {
+                    [Op.notIn]: idsToKeep
+                }
+            }
+        });
+    }
+
+    async deleteAll(): Promise<number> {
+        return await this.articleModel.destroy({
+            where: {},
+            truncate: true
+        });
     }
 
 }

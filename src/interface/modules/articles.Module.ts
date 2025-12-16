@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { SequelizeModule } from "@nestjs/sequelize";
+import { HttpModule } from "@nestjs/axios";
 import { models } from '../../infrastructure/database/sequelize/models/index.model';
 import { ArticlesController } from "../../interface/controllers/articles.Controller";
 import { ArticlesService } from "../../application/services/articles.service";
@@ -10,23 +11,30 @@ import { FindAllArticleUseCase } from "../../application/use-cases/articles/find
 import { FindArticleByIdUseCase } from "../../application/use-cases/articles/find-article-by-id.use-case";
 import { UpdateArticleUseCase } from "../../application/use-cases/articles/update-article.use-case";
 import { FindArticlesForHomepageUseCase } from "../../application/use-cases/articles/find-articles-for-homepage.use-case";
+import { AutomaticContentCreateUseCase } from "../../application/use-cases/articles/automatic_content_create.use-case";
 import { ImageService } from "../../application/services/image.service";
 import { ConverterImageUseCase } from "../../application/use-cases/images/converter-image.use-case";
 
+
 @Module({
     imports: [
-        SequelizeModule.forFeature(models)
+        SequelizeModule.forFeature(models),
+        HttpModule.register({
+            timeout: 30000, // 30 segundos timeout global
+            maxRedirects: 3
+        })
     ],
     controllers: [ArticlesController],
     providers: [
         ArticlesService,
+        ArticlesRepository,
         CreateArticleUseCase,
         UpdateArticleUseCase,
         FindArticleByIdUseCase,
         FindAllArticleUseCase,
         DeleteArticleUseCase,
-        ArticlesRepository,
         FindArticlesForHomepageUseCase,
+        AutomaticContentCreateUseCase,
         ImageService,
         ConverterImageUseCase
     ],

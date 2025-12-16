@@ -325,3 +325,39 @@ CREATE INDEX idx_validations_expires_at ON validations(expires_at);
 CREATE TRIGGER update_validations_updated_at 
 BEFORE UPDATE ON validations
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Tabela de assinaturas (subscription)
+CREATE TABLE IF NOT EXISTS subscription (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    stripe_customer_id VARCHAR(100) NOT NULL,
+    stripe_subscription_id VARCHAR(100) NOT NULL,
+    stripe_price_id VARCHAR(100) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'incomplete',
+    current_period_start TIMESTAMP NOT NULL,
+    current_period_end TIMESTAMP NOT NULL,
+    cancel_at_period_end BOOLEAN NOT NULL DEFAULT FALSE,
+    canceled_at TIMESTAMP,
+    price NUMERIC(10,2) NOT NULL,
+    currency VARCHAR(3) NOT NULL DEFAULT 'BRL',
+    plan_type VARCHAR(20) NOT NULL, -- 'mensal', 'trimestral', 'semestral', 'anual'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+-- Tabela de pagamentos (payment)
+CREATE TABLE IF NOT EXISTS payment (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    stripe_payment_intent_id VARCHAR(100) NOT NULL,
+    stripe_charge_id VARCHAR(100),
+    amount NUMERIC(10,2) NOT NULL,
+    currency VARCHAR(3) NOT NULL DEFAULT 'BRL',
+    status VARCHAR(20) NOT NULL DEFAULT 'pending',
+    payment_method VARCHAR(50) NOT NULL,
+    failure_reason TEXT,
+    metadata JSONB,
+    paid_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
