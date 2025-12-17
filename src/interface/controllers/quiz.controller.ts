@@ -232,13 +232,13 @@ export class QuizController {
         }
     }
 
-    @Put('/:id/level/:id_quiz_level')
+    @Put('/:id')
     @ApiOperation({ summary: 'Atualizar um quiz' })
     @ApiResponse({ status: 200, description: 'Atualização efetuada com sucesso' })
     @ApiResponse({ status: 500, description: 'Erro ao atualizar quiz' })
-    async updateQuiz(@Param('id') id: number, @Param('id_quiz_level') idQuizLevel: number, @Body() quizDto: any): Promise<ApiResponseInterface<any>> {
+    async updateQuiz(@Param('id') id: number, @Body() quizDto: any): Promise<ApiResponseInterface<any>> {
         try {
-            const result = await this.quizService.updateQuiz(id, idQuizLevel, quizDto);
+            const result = await this.quizService.updateQuiz(id, quizDto);
             return result;
         } catch (error) {
             return {

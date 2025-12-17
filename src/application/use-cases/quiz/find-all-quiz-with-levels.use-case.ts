@@ -34,7 +34,8 @@ export class FindAllQuizWithLevelsUseCase {
                         level_name: level.name,
                         questions_count: level.questions,
                         xp_reward: level.xp_reward,
-                        has_questions: false
+                        has_questions: false,
+                        unlocked: level.unlocked,
                     }
 
                     if(_hasQuestions.length > 0 && _hasQuestions){

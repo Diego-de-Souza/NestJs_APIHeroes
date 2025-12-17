@@ -9,28 +9,40 @@ export class UpdateQuizUseCase {
         private readonly quizRepository: QuizRepository
     ){}
 
-    async updateQuiz(id: number, id_quiz_level:number, quizDto: any): Promise<ApiResponseInterface<any>> {
+    async updateQuiz(id: number, quizDto: any): Promise<ApiResponseInterface<any>> {
         try {
             const _payloadQuiz = {
                 name: quizDto.name,
                 theme: quizDto.theme
-            }
+            };
             const _updatedQuiz = await this.quizRepository.updateQuiz(id, _payloadQuiz);
 
-            const _payloadQuizLevel = {
-                quiz_id: id,
-                name: quizDto.quiz_levels[0].name_quiz_level,
-                difficulty: quizDto.quiz_levels[0].difficulty,
-                unlocked: false,
-                questions: quizDto.quiz_levels[0].questions_count,
-                xp_reward: quizDto.quiz_levels[0].xp_reward
-            }
-            const _updateQuizLevel = await this.quizRepository.updateQuizLevel(id_quiz_level, _payloadQuizLevel);
+            const quizLevelsDto = quizDto.quiz_levels || [];
+            const updatedLevels = [];
+            const createdLevels = [];
 
-            if(_updatedQuiz <= 0 && _updateQuizLevel <0){
+            for (const lvl of quizLevelsDto) {
+                const payload = {
+                    quiz_id: id,
+                    name: lvl.name_quiz_level,
+                    difficulty: lvl.difficulty,
+                    unlocked: typeof lvl.unlocked === 'boolean' ? lvl.unlocked : false,
+                    questions: lvl.questions_count,
+                    xp_reward: lvl.xp_reward
+                };
+                if (lvl.id && lvl.id !== null) {
+                    // Atualizar nível existente
+                    updatedLevels.push(await this.quizRepository.updateQuizLevel(lvl.id, payload));
+                } else {
+                    // Criar novo nível
+                    createdLevels.push(await this.quizRepository.createQuizLevel(payload));
+                }
+            }
+
+            if (_updatedQuiz <= 0 && updatedLevels.length === 0 && createdLevels.length === 0) {
                 return {
                     status: 400,
-                    message: 'Nenhum registro foi atualizado',
+                    message: 'Nenhum registro foi atualizado ou criado',
                     data: null
                 };
             }

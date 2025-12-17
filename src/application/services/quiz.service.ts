@@ -90,8 +90,8 @@ export class QuizService {
         return await this.deleteAllQuestionsUseCase.deleteAllQuestions(quizLevelId);
     }
 
-    async updateQuiz(id: number, id_quiz_level:number, quizDto: any): Promise<ApiResponseInterface<any>> {
-        return await this.updateQuizUseCase.updateQuiz(id, id_quiz_level, quizDto);
+    async updateQuiz(id: number, quizDto: any): Promise<ApiResponseInterface<any>> {
+        return await this.updateQuizUseCase.updateQuiz(id, quizDto);
     }
 
     async updateQuestions(dataDto: any): Promise<ApiResponseInterface<any>> {
