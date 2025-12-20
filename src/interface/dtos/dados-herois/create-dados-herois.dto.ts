@@ -78,10 +78,10 @@ export class CreateDadosHeroisDto {
     @IsNotEmpty({message: "genero não pode estar vazio"})
     readonly genre : string;
 
-    //variaveis para salvar as imagens
+    //variaveis para salvar as imagens (recebe Buffer, mas será convertido para URL string após upload)
     @ApiProperty()
-    image1?: Buffer; // Alterado de Express.Multer.File para Buffer
+    image1?: Buffer; // Buffer recebido, será substituído pela URL após upload no CloudFlare
     @ApiProperty()
-    image2?: Buffer;
+    image2?: Buffer; // Buffer recebido, será substituído pela URL após upload no CloudFlare
 
 }

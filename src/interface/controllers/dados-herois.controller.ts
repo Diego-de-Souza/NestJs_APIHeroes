@@ -207,5 +207,77 @@ export class DadosHeroisController {
           };
       }
   }
+
+  @ApiTags('Get Heroes by Team')
+  @ApiOperation({ summary: 'Busca heróis por Team' })
+  @ApiParam({ name: 'name', type: String, description: 'Nome do Team' })
+  @ApiResponse({ status: 200, description: 'Lista de heróis do Team' })
+  @Get("team/:name")
+  async findHeroesByTeam(@Param("name") teamName: string) : Promise<ApiResponseInterface>{
+      try {
+          const result = await this.dadosHeroisService.findHeroesByTeam(teamName);
+          return result;
+      } catch (error) {
+          return {
+              status: 500,
+              message: 'Erro inesperado ao buscar heróis por team.',
+              error: error.message || error,
+          };
+      }
+  }
+
+  @ApiTags('Get Heroes by Release Year')
+  @ApiOperation({ summary: 'Busca heróis por ano de lançamento' })
+  @ApiParam({ name: 'anoLancamento', type: Number, description: 'Ano de lançamento' })
+  @ApiResponse({ status: 200, description: 'Lista de heróis do ano de lançamento' })
+  @Get("ano_lancamento/:anoLancamento")
+  async findHeroesByReleaseYear(@Param("anoLancamento", ParseIntPipe) anoLancamento: number) : Promise<ApiResponseInterface>{
+      try {
+          const result = await this.dadosHeroisService.findHeroesByReleaseYear(anoLancamento);
+          return result;
+      } catch (error) {
+          return {
+              status: 500,
+              message: 'Erro inesperado ao buscar heróis por ano de lançamento.',
+              error: error.message || error,
+          };
+      }
+  }
+
+  @ApiTags('Get Heroes by Morality')
+  @ApiOperation({ summary: 'Busca heróis por moralidade' })
+  @ApiParam({ name: 'morality', type: String, description: 'Moralidade do herói (herói/vilão)' })
+  @ApiResponse({ status: 200, description: 'Lista de heróis pela moralidade' })
+  @Get("morality/:morality")
+  async findHeroesByMorality(@Param("morality") morality: string) : Promise<ApiResponseInterface>{
+      try {
+          const result = await this.dadosHeroisService.findHeroesByMorality(morality);
+          return result;
+      } catch (error) {
+          return {
+              status: 500,
+              message: 'Erro inesperado ao buscar heróis por moralidade.',
+              error: error.message || error,
+          };
+      }
+  }
+
+  @ApiTags('Get Heroes by Genre')
+  @ApiOperation({ summary: 'Busca heróis por gênero' })
+  @ApiParam({ name: 'genre', type: String, description: 'Gênero do herói' })
+  @ApiResponse({ status: 200, description: 'Lista de heróis pelo gênero' })
+  @Get("genre/:genre")
+  async findHeroesByGenre(@Param("genre") genre: string) : Promise<ApiResponseInterface>{
+      try {
+          const result = await this.dadosHeroisService.findHeroesByGenre(genre);
+          return result;
+      } catch (error) {
+          return {
+              status: 500,
+              message: 'Erro inesperado ao buscar heróis por gênero.',
+              error: error.message || error,
+          };
+      }
+  }
       
 }

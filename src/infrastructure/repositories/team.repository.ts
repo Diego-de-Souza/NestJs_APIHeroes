@@ -23,4 +23,8 @@ export class TeamRepository {
     async findAllTeam(): Promise<Team[] | null>{
         return await this.teamModel.findAll();
     }
+
+    async findIdByName(name: string): Promise<number | null> {
+        return this.teamModel.findOne({where: {name}}).then(team => team?.id || null);
+    }
 }

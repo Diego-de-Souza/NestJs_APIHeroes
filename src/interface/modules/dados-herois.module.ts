@@ -12,7 +12,13 @@ import { UpdateHeroesUseCase } from '../../application/use-cases/heroes/update-h
 import { DeleteHeroesUseCase } from '../../application/use-cases/heroes/delete-heroes.use-case';
 import { HeroesRepository } from '../../infrastructure/repositories/heroes.repository';
 import { FindHeroesByStudioUseCase } from '../../application/use-cases/heroes/find-heroe-by-studio.use-case';
+import { FindHeroesByTeamUseCase } from '../../application/use-cases/heroes/find-heroes-by-team.use-case';
+import { FindHeroesByReleaseYearUseCase } from '../../application/use-cases/heroes/find-heroes-by-release-year.use-case';
+import { FindHeroesByMoralityUseCase } from '../../application/use-cases/heroes/find-heroes-by-morality.use-case';
+import { FindHeroesByGenreUseCase } from '../../application/use-cases/heroes/find-heroes-by-genre.use-case';
 import { AuthModule } from './auth.module';
+import { ImageService } from '../../application/services/image.service';
+import { ConverterImageUseCase } from '../../application/use-cases/images/converter-image.use-case';
 
 @Module({
   imports: [
@@ -30,7 +36,13 @@ import { AuthModule } from './auth.module';
     UpdateHeroesUseCase,
     DeleteHeroesUseCase, 
     HeroesRepository, 
-    FindHeroesByStudioUseCase
+    FindHeroesByStudioUseCase,
+    FindHeroesByTeamUseCase,
+    FindHeroesByReleaseYearUseCase,
+    FindHeroesByMoralityUseCase,
+    FindHeroesByGenreUseCase,
+    ImageService,
+    ConverterImageUseCase
   ],
   exports: [DataHeroesService],
 })

@@ -49,11 +49,11 @@ export class Heroes extends Model<Heroes> {
   @Column({ type: DataType.STRING(50) })
   genre: string;
 
-  @Column({ type: DataType.BLOB, field: 'image1' })
-  image1: Buffer;
+  @Column({ type: DataType.STRING(500), field: 'image1', allowNull: true })
+  image1: string;
 
-  @Column({ type: DataType.BLOB, field: 'image2' })
-  image2: Buffer;
+  @Column({ type: DataType.STRING(500), field: 'image2', allowNull: true })
+  image2: string;
 
   @BelongsTo(() => Studio)
   studio: Studio;

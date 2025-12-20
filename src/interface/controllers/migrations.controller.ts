@@ -489,4 +489,34 @@ export class MigrationsController {
       };
     }
   }
+
+  @Post('atualizacao1')
+  async alterBanck(): Promise<any>{
+    const transaction = await this.sequelize.transaction();
+    try {
+      await this.sequelize.query(`
+        ALTER TABLE heroes 
+          ALTER COLUMN image1 TYPE VARCHAR(500) USING NULL,
+          ALTER COLUMN image2 TYPE VARCHAR(500) USING NULL;
+      `, { type: QueryTypes.RAW, transaction });
+      await transaction.commit();
+      console.log('dados da tabela heroes atualizada')
+
+      return {
+        success: true,
+        message: '🚀 Migração concluída: tabela renomeada!',
+        timestamp: new Date().toISOString()
+      };
+    }
+    catch (error) {
+      await transaction.rollback();
+      console.error('❌ Erro na migração:', error);
+      return {
+        success: false,
+        message: 'Erro ao executar migração',
+        error: error.message,
+        timestamp: new Date().toISOString()
+      };
+    }
+  }
 }

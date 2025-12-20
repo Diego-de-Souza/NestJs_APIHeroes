@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS heroes (
     story VARCHAR(255),
     team_id INTEGER,
     genre VARCHAR(50),
-    image1 BYTEA,
-    image2 BYTEA,
+    image1 VARCHAR(500),
+    image2 VARCHAR(500),
     CONSTRAINT fk_heroes_studio FOREIGN KEY (studio_id) REFERENCES studios(id) ON DELETE CASCADE,
     CONSTRAINT fk_heroes_team FOREIGN KEY (team_id) REFERENCES team(id) ON DELETE SET NULL
 );

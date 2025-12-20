@@ -13,6 +13,8 @@ export class MenuPrincipalUseCase {
         const dadosMenu = await Promise.all([
             this.menuPrincipalRepository.findAllStudio(),
             this.menuPrincipalRepository.findAllTeam(),
+            this.menuPrincipalRepository.findAllMorality(),
+            this.menuPrincipalRepository.findAllGenre()
         ]);
 
         if (dadosMenu.some(result => !result)) {
