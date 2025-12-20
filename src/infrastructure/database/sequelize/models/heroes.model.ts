@@ -39,7 +39,7 @@ export class Heroes extends Model<Heroes> {
   @Column({ type: DataType.STRING(100) })
   affiliation: string;
 
-  @Column({ type: DataType.STRING(255) })
+  @Column({ type: DataType.TEXT })
   story: string;
 
   @ForeignKey(() => Team)

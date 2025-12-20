@@ -495,9 +495,7 @@ export class MigrationsController {
     const transaction = await this.sequelize.transaction();
     try {
       await this.sequelize.query(`
-        ALTER TABLE heroes 
-          ALTER COLUMN image1 TYPE VARCHAR(500) USING NULL,
-          ALTER COLUMN image2 TYPE VARCHAR(500) USING NULL;
+        ALTER TABLE heroes ALTER COLUMN story TYPE TEXT;
       `, { type: QueryTypes.RAW, transaction });
       await transaction.commit();
       console.log('dados da tabela heroes atualizada')

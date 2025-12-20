@@ -62,7 +62,6 @@ export class CreateDadosHeroisDto {
 
     @ApiProperty()
     @IsString({message: "historia deve ser string"})
-    @MinLength(20, {message: "historia deve Conter mais de vinte caracteres"})
     @IsNotEmpty({message: "historia não pode estar vazio"})
     readonly story : string;
 

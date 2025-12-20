@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS heroes (
     creator VARCHAR(50),
     weak_point VARCHAR(100),
     affiliation VARCHAR(100),
-    story VARCHAR(255),
+    story TEXT,
     team_id INTEGER,
     genre VARCHAR(50),
     image1 VARCHAR(500),
