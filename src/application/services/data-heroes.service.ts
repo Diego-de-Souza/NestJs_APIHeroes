@@ -13,6 +13,7 @@ import { FindHeroesByTeamUseCase } from "../use-cases/heroes/find-heroes-by-team
 import { FindHeroesByReleaseYearUseCase } from "../use-cases/heroes/find-heroes-by-release-year.use-case";
 import { FindHeroesByMoralityUseCase } from "../use-cases/heroes/find-heroes-by-morality.use-case";
 import { FindHeroesByGenreUseCase } from "../use-cases/heroes/find-heroes-by-genre.use-case";
+import { HeroesData } from "src/domain/interfaces/card_heroes.interface";
 
 @Injectable()
 export class DataHeroesService {
@@ -38,7 +39,7 @@ export class DataHeroesService {
         return await this.findAllHeroesUseCase.findAllHeroes();
     }
 
-    async findHeroesById(id: number): Promise<ApiResponseInterface<Heroes>>{
+    async findHeroesById(id: number): Promise<ApiResponseInterface<HeroesData>>{
         return await this.findHeroesByIdUseCase.findHeroesById(id);
     }
 
