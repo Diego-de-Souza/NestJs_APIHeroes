@@ -32,6 +32,37 @@ O formato segue as convenções de [Keep a Changelog](https://keepachangelog.co
 
 ---
 
+# **[1.1.1]- 2026-01-02**
+
+### **✨ Added**
+
+- Suporte para variável de ambiente `SUPABASE_SERVICE_ROLE_KEY` na configuração do Sequelize.
+- Configuração para uso automático da service_role_key do Supabase quando disponível, permitindo bypass do RLS (Row Level Security).
+
+### **🛠️ Changed**
+
+- Modificação da configuração do Sequelize para priorizar `SUPABASE_SERVICE_ROLE_KEY` sobre a senha da `DATABASE_URL` quando definida.
+- Ajuste na configuração para usar usuário 'postgres' quando service_role_key estiver configurada.
+
+### **🐛 Fixed**
+
+- Adição de `IF NOT EXISTS` nos índices da tabela `validations` para evitar erros de duplicação durante migrações.
+- Correção na configuração de acesso ao banco de dados Supabase com RLS ativado.
+
+### **⚠️ Deprecated**
+
+-
+
+### **❌ Removed**
+
+-
+
+### **🛑 Security**
+
+- Implementação de acesso seguro ao banco Supabase utilizando service_role_key para operações server-side, mantendo RLS ativo para outras conexões.
+
+---
+
 # **[1.1.0]- 2025-08-23**
 
 ### **✨ Added**
