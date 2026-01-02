@@ -318,9 +318,9 @@ CREATE TABLE IF NOT EXISTS validations (
     CONSTRAINT fk_validations_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_validations_user_id ON validations(user_id);
-CREATE INDEX idx_validations_token_id ON validations(token_id);
-CREATE INDEX idx_validations_expires_at ON validations(expires_at);
+CREATE INDEX IF NOT EXISTS idx_validations_user_id ON validations(user_id);
+CREATE INDEX IF NOT EXISTS idx_validations_token_id ON validations(token_id);
+CREATE INDEX IF NOT EXISTS idx_validations_expires_at ON validations(expires_at);
 
 CREATE TRIGGER update_validations_updated_at 
 BEFORE UPDATE ON validations

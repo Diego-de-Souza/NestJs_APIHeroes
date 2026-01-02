@@ -14,30 +14,38 @@ function loadPostgresDriver() {
 }
 
 export const sequelizeConfig: SequelizeModuleOptions = isProduction && process.env.DATABASE_URL
-  ? {
-      dialect: 'postgres',
-      dialectModule: loadPostgresDriver(),
-      host: new URL(process.env.DATABASE_URL).hostname,
-      port: parseInt(new URL(process.env.DATABASE_URL).port, 10) || 5432,
-      username: new URL(process.env.DATABASE_URL).username,
-      password: new URL(process.env.DATABASE_URL).password,
-      database: new URL(process.env.DATABASE_URL).pathname.slice(1),
-      autoLoadModels: true,
-      synchronize: false,
-      dialectOptions: {
-        ssl: {
-          require: true,
-          rejectUnauthorized: false,
+  ? (() => {
+      const dbUrl = new URL(process.env.DATABASE_URL);
+      // Se SUPABASE_SERVICE_ROLE_KEY estiver definida, usa ela para bypassar o RLS
+      const password = process.env.SUPABASE_SERVICE_ROLE_KEY || dbUrl.password;
+      // No Supabase, o usuário geralmente é 'postgres'
+      const username = process.env.SUPABASE_SERVICE_ROLE_KEY ? 'postgres' : dbUrl.username;
+      
+      return {
+        dialect: 'postgres',
+        dialectModule: loadPostgresDriver(),
+        host: dbUrl.hostname,
+        port: parseInt(dbUrl.port, 10) || 5432,
+        username: username,
+        password: password,
+        database: dbUrl.pathname.slice(1),
+        autoLoadModels: true,
+        synchronize: false,
+        dialectOptions: {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false,
+          },
         },
-      },
-      logging: false,
-      pool: {
-        max: 10,
-        min: 2,
-        acquire: 30000,
-        idle: 10000,
-      },
-    }
+        logging: false,
+        pool: {
+          max: 10,
+          min: 2,
+          acquire: 30000,
+          idle: 10000,
+        },
+      };
+    })()
   : {
       dialect: 'postgres',
       dialectModule: loadPostgresDriver(),
