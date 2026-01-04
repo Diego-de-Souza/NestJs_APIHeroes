@@ -10,7 +10,7 @@ export class FindAllQuizLevelByIdUseCase {
         private readonly quizRepository: QuizRepository
     ){}
 
-    async getAllQuizLevelsById(id: number): Promise<ApiResponseInterface<{ id: number; name: string; questionCount: number }[]>> {
+    async getAllQuizLevelsById(id: number): Promise<ApiResponseInterface<{ id: number; name: string; questionCount: number }>> {
         try{
             this.logger.debug(`Buscando níveis de quiz para ID: ${id}`);
             const quizLevels = await this.quizRepository.findAllQuizLevelsById(id);

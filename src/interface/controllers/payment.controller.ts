@@ -2,6 +2,7 @@ import { Controller, Post, Body, UseGuards, Request, Get, Headers, RawBodyReques
 import { PaymentService } from '../../application/services/payment.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { CreatePaymentIntentDto } from '../dtos/payment/payment.dto';
+import { Request as ExpressRequest } from 'express';
 
 @Controller('payment')
 export class PaymentController {
@@ -55,12 +56,13 @@ export class PaymentController {
 
   @Post('webhook')
   async handleWebhook(
-    @Req() req: RawBodyRequest<Request>,
+    @Req() req: RawBodyRequest<ExpressRequest>,
     @Headers('stripe-signature') signature: string
   ) {
-    // req.body será um Buffer devido ao express.raw
-    this.logger.debug('Stripe Webhook recebido:', { signature, body: req.body });
-    return await this.paymentService.handleWebhook(req.body, signature);
+    // req.body será um Buffer devido ao express.raw configurado no main.ts
+    const body = req.body as Buffer;
+    this.logger.debug('Stripe Webhook recebido:', { signature, bodyLength: body?.length });
+    return await this.paymentService.handleWebhook(body, signature);
   }
 
   @Get('health')

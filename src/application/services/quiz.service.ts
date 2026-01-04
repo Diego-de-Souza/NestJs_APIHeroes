@@ -66,7 +66,7 @@ export class QuizService {
         return await this.findAllQuizUseCase.getAllQuiz();
     }
 
-    async getAllQuizLevelsById(id: number): Promise<ApiResponseInterface<{ id: number; name: string; questionCount: number }[]>> {
+    async getAllQuizLevelsById(id: number): Promise<ApiResponseInterface<{ id: number; name: string; questionCount: number }>> {
         return await this.findAllQuizLevelsByIdUseCase.getAllQuizLevelsById(id);
     }
     

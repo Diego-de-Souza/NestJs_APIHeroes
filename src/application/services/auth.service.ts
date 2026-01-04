@@ -4,7 +4,7 @@ import { SignOutResponse } from "../../domain/interfaces/auth.interface";
 import { AuthSignInUseCase } from "../../application/use-cases/auth/auth-signin.use-case";
 import { AuthSignInGoogleUseCase } from "../../application/use-cases/auth/auth-signin-google.use-case";
 import { AuthChangePasswordUseCase } from "../../application/use-cases/auth/auth-chage-password.use-case";
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { AuthTotpQRCodeUseCase } from "../../application/use-cases/auth/auth-generate-totp-qrcode.use-case";
 import { FindSettingsUserUseCase } from "../../application/use-cases/auth/find-settings-user.use-case";
 import { DisableTwoFactorAuthUseCase } from "../../application/use-cases/auth/disable-two-factor-auth.use-case";
