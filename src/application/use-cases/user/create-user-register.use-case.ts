@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, HttpStatus, Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { User } from "../../../infrastructure/database/sequelize/models/user.model";
 import { CreateUserDTO } from "../../../interface/dtos/user/userCreate.dto";
@@ -8,6 +8,8 @@ import { GenenerateHashUseCase } from "../auth/generate-hash.use-case";
 
 @Injectable()
 export class CreateUserRegisterUseCase {
+  private readonly logger = new Logger(CreateUserRegisterUseCase.name);
+
   constructor(
     private readonly userRepository: UserRepository,
     private readonly roleService: RoleService,
@@ -18,30 +20,21 @@ export class CreateUserRegisterUseCase {
     const exists = await this.userRepository.findByEmail(userDto.firstemail);
 
     if (exists) {
-        return {
-        status: HttpStatus.CONFLICT,
-        message: 'Usuário já existe',
-        };
+        throw new ConflictException('Usuário já existe');
     }
 
     const senhaHash = await this.generateHashUseCase.generateHash(userDto.password);
 
     if (!senhaHash) {
-        return {
-        status: HttpStatus.BAD_REQUEST,
-        message: 'Erro ao gerar hash da senha.',
-        };
+        throw new BadRequestException('Erro ao gerar hash da senha.');
     }
 
     userDto.password = senhaHash;
-    console.log('DTO antes do create:', userDto);
+    this.logger.debug('DTO antes do create:', userDto);
     const userCreated = await this.userRepository.create(userDto);
-    console.log('Resultado do create:', userCreated);
+    this.logger.debug('Resultado do create:', userCreated);
     if (!userCreated) {
-        return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: 'Erro ao criar o usuário.',
-        };
+        throw new InternalServerErrorException('Erro ao criar o usuário.');
     }
 
     await this.roleService.assignDefaultRole(userCreated.id); 

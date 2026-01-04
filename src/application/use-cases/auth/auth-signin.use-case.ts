@@ -1,11 +1,13 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { AuthRepository } from "../../../infrastructure/repositories/auth.repository";
 import { PasswordUseCase } from "./password.use-case";
 import { TokenUseCase } from "./token.use-case";
 import { Request } from 'express';
+import { SignInResponse } from "../../../domain/interfaces/auth.interface";
 
 @Injectable()
 export class AuthSignInUseCase {
+    private readonly logger = new Logger(AuthSignInUseCase.name);
 
     constructor(
         private readonly authRepository: AuthRepository,
@@ -13,7 +15,7 @@ export class AuthSignInUseCase {
         private readonly tokenUseCase: TokenUseCase
     ){}
 
-    async signIn(email: string, pass: string, req: Request): Promise<any> {
+    async signIn(email: string, pass: string, req: Request): Promise<SignInResponse> {
         try{
             const user = await this.authRepository.findByEmail(email);
 
@@ -37,26 +39,8 @@ export class AuthSignInUseCase {
             const accessToken = await this.tokenUseCase.generateToken(user.dataValues, role?.dataValues);
             const refreshToken = await this.tokenUseCase.generateRefreshToken(user.dataValues);
 
-            const isProduction = process.env.NODE_ENV === 'production';
-
-            //no vercel não esta funcionando o set cookie, por isso foi comentado temporariamente
-            // // Cookie para access_token
-            // res.cookie('access_token', accessToken, {
-            //     httpOnly: true,
-            //     secure: isProduction,
-            //     sameSite: 'none',
-            //     path: '/',
-            //     maxAge: 15 * 60 * 1000 // 15 minutos
-            // });
-
-            // // Cookie para refresh_token
-            // res.cookie('refresh_token', refreshToken, {
-            //     httpOnly: true,
-            //     secure: isProduction,
-            //     sameSite: 'none',
-            //     path: '/',
-            //     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 dias
-            // });
+            // Cookies desabilitados temporariamente porque o Vercel não aceita cookies
+            // A autenticação é feita via header 'x-session-token' retornado na resposta
 
             const tokenId = await this.tokenUseCase.generateBinario(user.dataValues.id);
 
@@ -97,7 +81,7 @@ export class AuthSignInUseCase {
                 }
             };
         }catch(error){
-            console.error("Erro ao realizar login:", error.message);
+            this.logger.error("Erro ao realizar login:", error.message);
             throw new Error(`Credenciais inválidas ou usuário não encontrado: ${error}`)
         }
     }

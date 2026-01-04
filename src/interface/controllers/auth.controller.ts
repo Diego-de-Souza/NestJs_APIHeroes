@@ -1,7 +1,8 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Logger, Param, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiResponseInterface } from '../../domain/interfaces/APIResponse.interface';
+import { SignInResponse, SignOutResponse } from '../../domain/interfaces/auth.interface';
 import { AuthService } from '../../application/services/auth.service';
 import { CreateUserLoginDto } from '../dtos/user/userLoginCreate.dto';
 import { AuthGuard } from '../guards/auth.guard';
@@ -10,6 +11,8 @@ import { Request } from 'express';
 @ApiTags('Auth') 
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
+
   constructor(
     private readonly authService: AuthService
   ) {}
@@ -216,7 +219,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Retorna informações do usuário autenticado' })
   @ApiResponse({ status: 200, description: 'Usuário autenticado encontrado' })
   @ApiResponse({ status: 401, description: 'Não autenticado' })
-  async getMe(@Req() req: Request): Promise<any> {
+  async getMe(@Req() req: Request): Promise<SignInResponse> {
     try {
       const user = req['user'];
       const sessionToken = req.headers['x-session-token'] || 
@@ -252,9 +255,9 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout do usuário' })
   @ApiResponse({ status: 200, description: 'Logout realizado com sucesso' })
   @ApiResponse({ status: 401, description: 'Não autenticado' })
-  async logout(@Res({ passthrough: true }) res: Response, @Req() req: Request): Promise<ApiResponseInterface> {
+  async logout(@Req() req: Request): Promise<SignOutResponse> {
     try {
-      const result = await this.authService.signOut(res, req);
+      const result = await this.authService.signOut(req);
       return result;
     } catch (error) {
       throw new BadRequestException({
@@ -270,7 +273,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout apenas da sessão atual' })
   @ApiResponse({ status: 200, description: 'Logout da sessão realizado com sucesso' })
   @ApiResponse({ status: 401, description: 'Não autenticado' })
-  async logoutCurrentSession(@Req() req: Request): Promise<any> {
+  async logoutCurrentSession(@Req() req: Request): Promise<SignOutResponse> {
     try{
       const result = await this.authService.signOutCurrentSession(req);
       return result;
@@ -288,7 +291,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout apenas da sessão atual' })
   @ApiResponse({ status: 200, description: 'Logout da sessão realizado com sucesso' })
   @ApiResponse({ status: 401, description: 'Não autenticado' })
-  async logoutCurrentSessionById(@Param('id') id: string, @Req() req: Request): Promise<any> {
+  async logoutCurrentSessionById(@Param('id') id: string, @Req() req: Request): Promise<SignOutResponse> {
     try{
       const result = await this.authService.signOutCurrentSessionById(id, req);
       return result;
@@ -305,7 +308,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Obtém todas as sessões ativas do usuário' })
   @ApiResponse({ status: 200, description: 'Sessões ativas obtidas com sucesso' })
   @ApiResponse({ status: 401, description: 'Não autenticado' })
-  async getActiveSessions(@Req() req: Request): Promise<any> {
+  async getActiveSessions(@Req() req: Request): Promise<ApiResponseInterface> {
     try {
       const user = req['user'];
       const currentSessionToken = req.headers['x-session-token'] as string;
@@ -316,8 +319,8 @@ export class AuthController {
 
       const userId = user.id || user.sub || user.userId;
       
-      console.log('🔍 User object:', user);
-      console.log('🔍 User ID encontrado:', userId);
+      this.logger.debug('🔍 User object:', user);
+      this.logger.debug('🔍 User ID encontrado:', userId);
       
       if (!userId) {
         throw new Error('ID do usuário não encontrado no token JWT');
@@ -326,7 +329,7 @@ export class AuthController {
       const result = await this.authService.getActiveSessions(userId, currentSessionToken);
       return result;
     } catch (error) {
-      console.error('❌ Erro no controller getActiveSessions:', error);
+      this.logger.error('❌ Erro no controller getActiveSessions:', error);
       throw new BadRequestException({
         status: 400,
         message: `Erro ao obter sessões ativas. (controller): ${error.message}`,

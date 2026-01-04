@@ -1,14 +1,16 @@
 import { SequelizeModuleOptions } from '@nestjs/sequelize';
+import { Logger } from '@nestjs/common';
 
+const logger = new Logger('SequelizeConfig');
 const isProduction = process.env.NODE_ENV === 'production';
 
 function loadPostgresDriver() {
   try {
     const pg = require('pg');
-    console.log('✅ PostgreSQL driver loaded successfully');
+    logger.log('✅ PostgreSQL driver loaded successfully');
     return pg;
   } catch (error) {
-    console.error('❌ Failed to load PostgreSQL driver:', error.message);
+    logger.error('❌ Failed to load PostgreSQL driver:', error.message);
     throw error;
   }
 }
@@ -59,7 +61,7 @@ export const sequelizeConfig: SequelizeModuleOptions = isProduction && process.e
       dialectOptions: {
         ssl: false,
       },
-      logging: console.log,
+      logging: (msg: string) => logger.debug(msg),
       pool: {
         max: 5,
         min: 0,

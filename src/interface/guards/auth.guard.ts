@@ -3,6 +3,7 @@ import {
     CanActivate,
     ExecutionContext,
     Injectable,
+    Logger,
     UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -13,6 +14,8 @@ import { AuthRepository } from 'src/infrastructure/repositories/auth.repository'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+    private readonly logger = new Logger(AuthGuard.name);
+
     constructor(
         private jwtService: JwtService,
         private authRefreshTokenUseCase: AuthRefreshTokenUseCase,
@@ -45,7 +48,7 @@ export class AuthGuard implements CanActivate {
                 const refreshTokenValid = await this.isRefreshTokenValid(validation.refresh_token);
                 
                 if (!refreshTokenValid) {
-                    console.log('❌ Refresh token também expirado');
+                    this.logger.warn('❌ Refresh token também expirado');
                     await this.authRepository.deactivateValidation(sessionToken);
                     throw new UnauthorizedException('Sessão completamente expirada. Faça login novamente.');
                 }
@@ -53,7 +56,7 @@ export class AuthGuard implements CanActivate {
                 const renewResult = await this.authRefreshTokenUseCase.refreshAccessToken(validation.refresh_token, response);
                 
                 if (!renewResult || renewResult.status !== 200) {
-                    console.log('❌ Falha ao renovar token');
+                    this.logger.warn('❌ Falha ao renovar token');
                     await this.authRepository.deactivateValidation(sessionToken);
                     throw new UnauthorizedException('Falha ao renovar sessão');
                 }
@@ -74,7 +77,7 @@ export class AuthGuard implements CanActivate {
                 return true;
 
             } catch (error) {
-                console.error('❌ Erro ao renovar token:', error);
+                this.logger.error('❌ Erro ao renovar token:', error);
                 await this.authRepository.deactivateValidation(sessionToken);
                 throw new UnauthorizedException('Erro ao renovar sessão. Faça login novamente.');
             }
@@ -93,7 +96,7 @@ export class AuthGuard implements CanActivate {
             return true;
             
         } catch (error) {
-            console.error('❌ Token de acesso corrompido:', error);
+            this.logger.error('❌ Token de acesso corrompido:', error);
             await this.authRepository.deactivateValidation(sessionToken);
             throw new UnauthorizedException('Token de acesso inválido');
         }
@@ -107,7 +110,7 @@ export class AuthGuard implements CanActivate {
             
             return true; 
         } catch (error) {
-            console.log('❌ Refresh token inválido:', error.message);
+            this.logger.warn('❌ Refresh token inválido:', error.message);
             return false;
         }
     }

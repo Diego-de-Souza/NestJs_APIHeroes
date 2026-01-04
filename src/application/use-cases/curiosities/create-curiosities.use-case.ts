@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { ConflictException, HttpStatus, Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Curiosities } from "../../../infrastructure/database/sequelize/models/curiosities.model";
 import { CuriosityRepository } from "../../../infrastructure/repositories/curiosities.repository";
@@ -15,10 +15,7 @@ export class CreateCuriosityUseCase {
         const curiosityExist = await this.curiositiesRepository.findCuriosityByName(curiosityDto.title);
 
         if(curiosityExist){
-            return{
-                status: HttpStatus.CONFLICT,
-                message: "Está curiosidade já existe."
-            }
+            throw new ConflictException("Esta curiosidade já existe.");
         }
 
         await this.curiositiesRepository.createCuriositity(curiosityDto);

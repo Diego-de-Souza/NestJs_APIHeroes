@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { MenuPrincipalRepository } from "../../../infrastructure/repositories/menu-principal.repository";
 
@@ -9,7 +9,7 @@ export class MenuPrincipalUseCase {
         private readonly menuPrincipalRepository: MenuPrincipalRepository
     ){}
 
-    async findData(): Promise<ApiResponseInterface<any>>{
+    async findData(): Promise<ApiResponseInterface<unknown>>{
         const dadosMenu = await Promise.all([
             this.menuPrincipalRepository.findAllStudio(),
             this.menuPrincipalRepository.findAllTeam(),
@@ -18,10 +18,7 @@ export class MenuPrincipalUseCase {
         ]);
 
         if (dadosMenu.some(result => !result)) {
-            return{
-                status:HttpStatus.NOT_FOUND,
-                message: "Alguns dados do banco não retornaram"
-            }
+            throw new NotFoundException("Alguns dados do banco não retornaram");
         }
 
         return{

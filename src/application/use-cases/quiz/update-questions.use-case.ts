@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { QuizRepository } from "../../../infrastructure/repositories/quiz.repository";
+import { UpdateQuestionsDto } from "../../../interface/dtos/quiz/update-questions.dto";
 
 @Injectable()
 export class UpdateQuestionsUseCase {
@@ -9,10 +10,10 @@ export class UpdateQuestionsUseCase {
         private readonly quizRepository: QuizRepository,
     ){}
 
-    async updateQuestions(dataDto: any[]): Promise<ApiResponseInterface<any>> {
+    async updateQuestions(dataDto: UpdateQuestionsDto): Promise<ApiResponseInterface<{ totalUpdated: number }>> {
         try {
             let totalUpdated = 0;
-            for (const question of dataDto) {
+            for (const question of dataDto.questions) {
                 const updated = await this.quizRepository.updateQuestions(question.quiz_level_id, question);
                 totalUpdated += updated;
             }

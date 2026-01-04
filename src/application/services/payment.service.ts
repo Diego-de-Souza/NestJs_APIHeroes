@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import Stripe from 'stripe';
 import { PaymentRepository } from '../../infrastructure/repositories/payment.repository';
-import { PlanType, SUBSCRIPTION_PLANS, isValidPlan } from '../../shared/utils/subscription-plans.utils';
+import { PlanType } from '../../domain/interfaces/subscription-plans.interface';
+import { SUBSCRIPTION_PLANS, isValidPlan } from '../../shared/utils/subscription-plans.utils';
 
 @Injectable()
 export class PaymentService {
@@ -144,7 +145,7 @@ export class PaymentService {
   }
 
   // ✅ PROCESSAR WEBHOOK
-  async handleWebhook(body: any, signature: string) {
+  async handleWebhook(body: Buffer | string, signature: string): Promise<{ received: boolean }> {
     try {
       const event = this.stripe.webhooks.constructEvent(
         body,

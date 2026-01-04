@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { QuizRepository } from "../../../infrastructure/repositories/quiz.repository";
+import { UpdateQuizDto } from "../../../interface/dtos/quiz/update-quiz.dto";
 
 @Injectable()
 export class UpdateQuizUseCase {
@@ -9,7 +10,7 @@ export class UpdateQuizUseCase {
         private readonly quizRepository: QuizRepository
     ){}
 
-    async updateQuiz(id: number, quizDto: any): Promise<ApiResponseInterface<any>> {
+    async updateQuiz(id: number, quizDto: UpdateQuizDto): Promise<ApiResponseInterface<unknown>> {
         try {
             const _payloadQuiz = {
                 name: quizDto.name,

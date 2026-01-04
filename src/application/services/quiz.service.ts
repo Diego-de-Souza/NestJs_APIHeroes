@@ -1,6 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
 import { CreateQuizDto } from "../../interface/dtos/quiz/quizCreate.dto";
+import { CreateQuestionsDto } from "../../interface/dtos/quiz/create-questions.dto";
+import { AnswerQuizDto } from "../../interface/dtos/quiz/answer-quiz.dto";
+import { UpdateQuizDto } from "../../interface/dtos/quiz/update-quiz.dto";
+import { UpdateQuestionsDto } from "../../interface/dtos/quiz/update-questions.dto";
 import { CreateQuizUseCase } from "../../application/use-cases/quiz/create-quiz.use-case";
 import { FindProgressQuestionsByThemeUseCase } from "../use-cases/quiz/find-progress-questions-by-theme";
 import { FindQuestionByIdUseCase } from "../../application/use-cases/quiz/find-question-by-id.use-case";
@@ -42,7 +46,7 @@ export class QuizService {
         return await this.createQuizUseCase.createQuiz(quizDTO);
     }
 
-    async createQuestions(questionsDTO: any[]): Promise<ApiResponseInterface<string>> {
+    async createQuestions(questionsDTO: CreateQuestionsDto): Promise<ApiResponseInterface<string>> {
         return await this.createQuestionUseCase.createQuestions(questionsDTO);
     }
 
@@ -50,51 +54,51 @@ export class QuizService {
         return await this.findProgressQuestionsByTheme.getProgressQuiz(userId);
     }
 
-    async getQuestionQuiz(id: number): Promise<any> {
+    async getQuestionQuiz(id: number): Promise<ApiResponseInterface> {
         return await this.findQuestionByIdUseCase.findQuestionById(id);
     }
 
-    async answerQuiz(answerDto: any): Promise<any> {
+    async answerQuiz(answerDto: AnswerQuizDto): Promise<ApiResponseInterface<string>> {
         return await this.processAnswerQuizUseCase.processAnswer(answerDto);
     }
 
-    async getAllQuiz(): Promise<any> {
+    async getAllQuiz(): Promise<ApiResponseInterface> {
         return await this.findAllQuizUseCase.getAllQuiz();
     }
 
-    async getAllQuizLevelsById(id: number): Promise<any> {
+    async getAllQuizLevelsById(id: number): Promise<ApiResponseInterface<{ id: number; name: string; questionCount: number }[]>> {
         return await this.findAllQuizLevelsByIdUseCase.getAllQuizLevelsById(id);
     }
     
-    async getAllQuizWithLevels(): Promise<ApiResponseInterface<any>> {
+    async getAllQuizWithLevels(): Promise<ApiResponseInterface<unknown>> {
         return await this.findAllQuizWithLevelsUseCase.getAllQuizWithLevels();
     }
 
-    async getQuizWithLevels(id: number, levelId: number): Promise<ApiResponseInterface<any>> {
+    async getQuizWithLevels(id: number, levelId: number): Promise<ApiResponseInterface<unknown>> {
         return await this.findOneQuizAndQuizLevelUseCase.findOneQuizAndQuizLevel(id, levelId);
     }
 
-    async getQuizQuestions(id: number): Promise<ApiResponseInterface<any>> {
+    async getQuizQuestions(id: number): Promise<ApiResponseInterface<unknown>> {
         return await this.findAllQuestionsUseCase.findAllQuestions(id);
     }
 
-    async deleteQuizById(id: number, levelId: number): Promise<ApiResponseInterface<any>> {
+    async deleteQuizById(id: number, levelId: number): Promise<ApiResponseInterface<unknown>> {
         return await this.deleteQuizByIdUseCase.deleteQuizById(id, levelId);
     }
 
-    async deleteOneQuestion(quizLevelId: number, questionNumber: number): Promise<ApiResponseInterface<any>> {
+    async deleteOneQuestion(quizLevelId: number, questionNumber: number): Promise<ApiResponseInterface<unknown>> {
         return await this.deleteOneQuizUseCase.deleteOneQuestion(quizLevelId, questionNumber);
     }
 
-    async deleteAllQuestions(quizLevelId: number): Promise<ApiResponseInterface<any>> {
+    async deleteAllQuestions(quizLevelId: number): Promise<ApiResponseInterface<unknown>> {
         return await this.deleteAllQuestionsUseCase.deleteAllQuestions(quizLevelId);
     }
 
-    async updateQuiz(id: number, quizDto: any): Promise<ApiResponseInterface<any>> {
+    async updateQuiz(id: number, quizDto: UpdateQuizDto): Promise<ApiResponseInterface<unknown>> {
         return await this.updateQuizUseCase.updateQuiz(id, quizDto);
     }
 
-    async updateQuestions(dataDto: any): Promise<ApiResponseInterface<any>> {
+    async updateQuestions(dataDto: UpdateQuestionsDto): Promise<ApiResponseInterface<{ totalUpdated: number }>> {
         return await this.updateQuestionsUseCase.updateQuestions(dataDto);
     }
 }

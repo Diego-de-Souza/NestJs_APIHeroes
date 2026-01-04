@@ -1,30 +1,20 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { Response, Request } from 'express';
 import { AuthRepository } from "src/infrastructure/repositories/auth.repository";
+import { SignOutResponse } from "../../../domain/interfaces/auth.interface";
 
 @Injectable()
 export class AuthSignOutUseCase {
+    private readonly logger = new Logger(AuthSignOutUseCase.name);
+
     constructor(
         private readonly authRepository: AuthRepository
     ){}
 
-    async signOut(res: Response, req: Request): Promise<any> {
+    async signOut(req: Request): Promise<SignOutResponse> {
         try {
-            //invalidado temporariamente porque o vercel não aceita os cookies
-            // // Limpa os cookies
-            // res.clearCookie('access_token', { 
-            //     path: '/',
-            //     httpOnly: true,
-            //     secure: process.env.NODE_ENV === 'production',
-            //     sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
-            // });
-            
-            // res.clearCookie('refresh_token', { 
-            //     path: '/',
-            //     httpOnly: true,
-            //     secure: process.env.NODE_ENV === 'production',
-            //     sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
-            // });
+            // Cookies desabilitados temporariamente porque o Vercel não aceita cookies
+            // A autenticação é feita via header 'x-session-token'
 
             const sessionToken = req.headers['x-session-token'] || 
                                req.query.session_token ||
@@ -44,7 +34,7 @@ export class AuthSignOutUseCase {
                 // ✅ REMOVE TODAS AS SESSÕES DO USUÁRIO (LOGOUT DE TODOS OS DISPOSITIVOS)
                 await this.authRepository.deleteAllUserValidations(validation.user_id);
                 
-                console.log(`Logout realizado para usuário ID: ${validation.user_id}`);
+                this.logger.log(`Logout realizado para usuário ID: ${validation.user_id}`);
             }
 
             return {
@@ -52,12 +42,12 @@ export class AuthSignOutUseCase {
                 message: 'Logout realizado com sucesso'
             };
         } catch (error) {
-            console.error("Erro ao realizar logout:", error.message);
+            this.logger.error("Erro ao realizar logout:", error.message);
             throw new Error(`Erro ao realizar logout: ${error.message}`);
         }
     }
 
-    async signOutCurrentSession(req: Request): Promise<any> {
+    async signOutCurrentSession(req: Request): Promise<SignOutResponse> {
         try {
             const sessionToken = req.headers['x-session-token'] || 
                                req.query.session_token ||
@@ -78,12 +68,12 @@ export class AuthSignOutUseCase {
                 message: 'Logout da sessão atual realizado com sucesso'
             };
         } catch (error) {
-            console.error("Erro ao realizar logout da sessão:", error.message);
+            this.logger.error("Erro ao realizar logout da sessão:", error.message);
             throw new Error(`Erro ao realizar logout: ${error.message}`);
         }
     }
 
-    async signOutCurrentSessionById(id: string, req: Request): Promise<any> {
+    async signOutCurrentSessionById(id: string, req: Request): Promise<SignOutResponse> {
         try {
             await this.authRepository.deleteValidationById(id);
             return {
@@ -91,7 +81,7 @@ export class AuthSignOutUseCase {
                 message: 'Logout da sessão especificada realizado com sucesso'
             };
         } catch (error) {
-            console.error("Erro ao realizar logout da sessão especificada:", error.message);
+            this.logger.error("Erro ao realizar logout da sessão especificada:", error.message);
             throw new Error(`Erro ao realizar logout: ${error.message}`);
         }
     }

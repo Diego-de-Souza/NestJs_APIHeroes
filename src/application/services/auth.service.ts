@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
+import { SignOutResponse } from "../../domain/interfaces/auth.interface";
 import { AuthSignInUseCase } from "../../application/use-cases/auth/auth-signin.use-case";
-import { Response } from 'express';
 import { AuthSignInGoogleUseCase } from "../../application/use-cases/auth/auth-signin-google.use-case";
 import { AuthChangePasswordUseCase } from "../../application/use-cases/auth/auth-chage-password.use-case";
 import { Request } from 'express';
@@ -73,15 +73,15 @@ export class AuthService {
         return await this.generateCodeInUseCase.generateCodePassword(typeCanal, data);
     }
 
-    async signOut(res: Response, req: Request): Promise<any> {
-        return await this.authSignOutUseCase.signOut(res, req);
+    async signOut(req: Request): Promise<SignOutResponse> {
+        return await this.authSignOutUseCase.signOut(req);
     }
 
-    async signOutCurrentSession(req: Request): Promise<any> {
+    async signOutCurrentSession(req: Request): Promise<SignOutResponse> {
         return await this.authSignOutUseCase.signOutCurrentSession(req);
     }
 
-    async signOutCurrentSessionById(id: string, req: Request): Promise<any> {
+    async signOutCurrentSessionById(id: string, req: Request): Promise<SignOutResponse> {
         return await this.authSignOutUseCase.signOutCurrentSessionById(id, req);
     }
 

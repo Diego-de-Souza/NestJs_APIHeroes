@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { ConverterImageUseCase } from "../use-cases/images/converter-image.use-case";
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
@@ -6,6 +6,7 @@ import * as process from "process";
 
 @Injectable()
 export class ImageService {
+    private readonly logger = new Logger(ImageService.name);
     private readonly connection_s3: S3Client;
     constructor(
         private readonly converterImageUseCase: ConverterImageUseCase
@@ -41,7 +42,7 @@ export class ImageService {
             imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
             return imageUrl;
         }catch(error){
-            console.error("Error saving image:", error);
+            this.logger.error("Error saving image:", error);
         }
 
     }
@@ -85,7 +86,7 @@ export class ImageService {
             imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
             return imageUrl;
         }catch(error){
-            console.error("Error saving image from buffer:", error);
+            this.logger.error("Error saving image from buffer:", error);
             throw error;
         }
     }
@@ -100,7 +101,7 @@ export class ImageService {
                 Key: key
             }));
         }catch(error){
-            console.error("Error deleting image:", error);
+            this.logger.error("Error deleting image:", error);
         }
     }
 }

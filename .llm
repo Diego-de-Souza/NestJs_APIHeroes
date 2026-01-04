@@ -1,0 +1,172 @@
+## TypeScript Best Practices
+- Use strict type checking (`strict: true` in tsconfig.json)
+- Prefer type inference when the type is obvious
+- Avoid the `any` type; use `unknown` when type is uncertain
+- Always explicitly type function return values
+- Use `readonly` for properties that should not be modified
+- Prefer `interface` over `type` for object shapes (except when extending unions/intersections)
+- Use enums for fixed sets of constants
+- Leverage TypeScript utility types (`Partial`, `Pick`, `Omit`, `Record`, etc.)
+
+## NestJS Best Practices
+- Follow Clean Architecture principles with clear separation of concerns
+- Use dependency injection consistently throughout the application
+- Implement proper error handling with NestJS exception filters
+- Use class-validator and class-transformer for DTO validation
+- Leverage NestJS interceptors for cross-cutting concerns (logging, transformation, caching)
+- Use guards for authentication and authorization
+- Implement proper HTTP status codes in responses
+- Use pipes for data transformation and validation
+- Leverage NestJS modules for feature organization
+- Use `@Injectable()` decorator for all services, use cases, and repositories
+- Prefer async/await over Promises chains
+- Use NestJS built-in caching mechanisms when appropriate
+- Implement proper logging using NestJS Logger
+- Use environment variables with ConfigModule for configuration
+- Leverage NestJS lifecycle hooks when needed
+
+## Architecture & File Organization
+- Follow the layered architecture: Domain → Application → Infrastructure → Interface
+- Domain layer (`domain/`) contains only interfaces and domain models
+- Application layer (`application/`) contains services and use cases
+- Infrastructure layer (`infrastructure/`) contains repositories and external integrations
+- Interface layer (`interface/`) contains controllers, DTOs, guards, and modules
+- Keep each file focused on a single responsibility
+- Use consistent naming conventions: `*.service.ts`, `*.use-case.ts`, `*.controller.ts`, `*.repository.ts`, `*.dto.ts`, `*.interface.ts`
+
+## Interfaces & Types
+- **MUST NOT** define interfaces inside services, use cases, controllers, repositories, or any file outside `domain/interfaces/`
+- **ONLY** define interfaces in files within `src/domain/interfaces/` directory
+- All interfaces must be exported from `domain/interfaces/` and imported where needed
+- Use interfaces for contracts and type definitions
+- Interface files must follow the naming pattern: `*.interface.ts`
+- Do not create inline interfaces or types in service/use-case files
+
+## Services
+- Services should orchestrate use cases, not contain business logic
+- Services are thin wrappers that delegate to use cases
+- Use constructor injection for dependencies
+- Mark all services with `@Injectable()` decorator
+- Services should return `ApiResponseInterface<T>` for consistency
+- Keep services focused on a single domain/feature
+- Do not access repositories directly from services; use use cases instead
+- Services should not contain interfaces or type definitions
+
+## Use Cases
+- Use cases contain the business logic and orchestration
+- Each use case should represent a single business operation
+- Use cases can inject repositories and other services/use cases
+- Mark all use cases with `@Injectable()` decorator
+- Use cases should return `ApiResponseInterface<T>` for consistency
+- Handle business validations within use cases
+- Use cases should not contain interfaces or type definitions
+- Keep use cases pure and testable
+- Avoid side effects when possible; use transactions for data consistency
+
+## Controllers
+- Controllers handle HTTP requests and responses
+- Controllers should be thin and delegate to services
+- Use appropriate HTTP decorators (`@Get()`, `@Post()`, `@Put()`, `@Delete()`, etc.)
+- Implement proper error handling with try-catch blocks
+- Use DTOs for request/response validation
+- Use guards for route protection (`@UseGuards()`)
+- Document endpoints with Swagger decorators (`@ApiTags()`, `@ApiOperation()`, `@ApiResponse()`)
+- Use pipes for parameter validation (`ParseIntPipe`, `ParseUUIDPipe`, etc.)
+- Controllers should not contain interfaces or type definitions
+
+## DTOs (Data Transfer Objects)
+- DTOs should be in `interface/dtos/` directory
+- Use class-validator decorators for validation (`@IsString()`, `@IsEmail()`, `@IsNotEmpty()`, etc.)
+- Use class-transformer decorators when needed (`@Transform()`, `@Exclude()`, etc.)
+- Create separate DTOs for create, update, and query operations
+- DTOs should not contain business logic
+- Use `PartialType()` from `@nestjs/mapped-types` for update DTOs
+- DTOs should not contain interfaces or type definitions
+
+## Repositories
+- Repositories abstract data access logic
+- Repositories should be in `infrastructure/repositories/` directory
+- Mark all repositories with `@Injectable()` decorator
+- Repositories should only interact with database/models
+- Keep repositories focused on CRUD operations
+- Use Sequelize or Mongoose models appropriately
+- Repositories should not contain interfaces or type definitions
+- Return domain entities or models, not DTOs
+
+## Performance & Optimization
+- Use database indexes for frequently queried fields
+- Implement pagination for list endpoints
+- Use caching for expensive operations (Redis, in-memory cache)
+- Avoid N+1 query problems; use eager loading or batch queries
+- Use database transactions for multi-step operations
+- Implement connection pooling for database connections
+- Use async/await properly; avoid blocking operations
+- Leverage NestJS built-in caching with `@nestjs/cache-manager`
+- Use compression middleware for responses
+- Implement rate limiting for API endpoints
+- Use lazy loading for modules when appropriate
+- Optimize database queries; avoid selecting unnecessary fields
+- Use database query optimization techniques (indexes, query analysis)
+
+## Error Handling
+- Use NestJS built-in exceptions (`BadRequestException`, `NotFoundException`, `UnauthorizedException`, etc.)
+- Create custom exception filters for consistent error responses
+- Always return proper HTTP status codes
+- Include meaningful error messages
+- Log errors appropriately using NestJS Logger
+- Do not expose sensitive information in error messages
+- Use `ApiResponseInterface` for error responses
+
+## Security Best Practices
+- Always validate and sanitize user input
+- Use authentication guards for protected routes
+- Implement proper authorization checks
+- Hash passwords using bcrypt or similar
+- Use JWT tokens for authentication
+- Validate JWT tokens in guards
+- Implement rate limiting to prevent abuse
+- Use HTTPS in production
+- Sanitize database queries to prevent SQL injection
+- Validate file uploads (type, size, content)
+- Use environment variables for sensitive data (never commit secrets)
+
+## Testing
+- Write unit tests for services and use cases
+- Write integration tests for controllers
+- Use NestJS testing utilities (`@nestjs/testing`)
+- Mock external dependencies in tests
+- Aim for high test coverage
+- Test error scenarios, not just happy paths
+- Use descriptive test names
+
+## Code Quality
+- Remove console.log statements; use NestJS Logger instead
+- Remove commented-out code
+- Keep functions small and focused
+- Use meaningful variable and function names
+- Follow consistent code formatting (use Prettier)
+- Use ESLint for code quality checks
+- Write self-documenting code with clear naming
+- Add JSDoc comments for complex functions
+- Keep imports organized and remove unused imports
+
+## Database
+- Use migrations for schema changes
+- Never modify database schema directly in production
+- Use transactions for data consistency
+- Implement soft deletes when appropriate
+- Use proper data types for database columns
+- Add indexes for foreign keys and frequently queried fields
+- Use database constraints (unique, foreign keys, etc.)
+- Optimize queries and avoid full table scans
+
+## API Design
+- Use RESTful conventions for endpoints
+- Use proper HTTP methods (GET, POST, PUT, DELETE, PATCH)
+- Use plural nouns for resource names in URLs
+- Implement consistent response format using `ApiResponseInterface`
+- Use query parameters for filtering, sorting, and pagination
+- Version APIs when making breaking changes
+- Document all endpoints with Swagger/OpenAPI
+- Use appropriate HTTP status codes
+

@@ -1,10 +1,12 @@
-import { Controller, Post, Body, UseGuards, Request, Get, Headers, RawBodyRequest, Req } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, Get, Headers, RawBodyRequest, Req, Logger } from '@nestjs/common';
 import { PaymentService } from '../../application/services/payment.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { CreatePaymentIntentDto } from '../dtos/payment/payment.dto';
 
 @Controller('payment')
 export class PaymentController {
+  private readonly logger = new Logger(PaymentController.name);
+
   constructor(private readonly paymentService: PaymentService) {}
 
   @Post('create-payment-intent')
@@ -53,11 +55,11 @@ export class PaymentController {
 
   @Post('webhook')
   async handleWebhook(
-    @Req() req: any,
+    @Req() req: RawBodyRequest<Request>,
     @Headers('stripe-signature') signature: string
   ) {
     // req.body será um Buffer devido ao express.raw
-    console.log('Stripe Webhook recebido:', { signature, body: req.body });
+    this.logger.debug('Stripe Webhook recebido:', { signature, body: req.body });
     return await this.paymentService.handleWebhook(req.body, signature);
   }
 

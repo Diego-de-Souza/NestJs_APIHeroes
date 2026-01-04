@@ -1,5 +1,6 @@
 import {
     Injectable,
+    Logger,
     NestInterceptor,
     ExecutionContext,
     CallHandler,
@@ -8,12 +9,14 @@ import {
   
   @Injectable()
   export class LogInterceptor implements NestInterceptor {
-    intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    private readonly logger = new Logger(LogInterceptor.name);
+
+    intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
       const request = context.switchToHttp().getRequest();
       const { body, files } = request;
   
-      console.log('Dados do corpo da requisição:', body);
-      console.log('Arquivos recebidos:', files);
+      this.logger.debug('Dados do corpo da requisição:', body);
+      this.logger.debug('Arquivos recebidos:', files);
   
       return next.handle();
     }

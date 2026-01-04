@@ -2,7 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Subscription } from "../database/sequelize/models/subscription.model";
 import { Payment } from "../database/sequelize/models/payment.model";
-import { PlanType, calculateExpirationDate } from "../../shared/utils/subscription-plans.utils";
+import { PlanType } from "../../domain/interfaces/subscription-plans.interface";
+import { calculateExpirationDate } from "../../shared/utils/subscription-plans.utils";
+import { CreateSubscriptionData, UpdateSubscriptionData, CreatePaymentData, UpdatePaymentData } from "../../domain/interfaces/payment.interface";
 
 @Injectable()
 export class PaymentRepository {
@@ -13,7 +15,7 @@ export class PaymentRepository {
     ) {}
 
     // SUBSCRIPTION METHODS
-    async createSubscription(subscriptionData: any): Promise<Subscription> {
+    async createSubscription(subscriptionData: CreateSubscriptionData): Promise<Subscription> {
         return await this.subscriptionModel.create(subscriptionData);
     }
 
@@ -29,7 +31,7 @@ export class PaymentRepository {
         });
     }
 
-    async updateSubscription(id: number, updateData: any): Promise<void> {
+    async updateSubscription(id: number, updateData: UpdateSubscriptionData): Promise<void> {
         await this.subscriptionModel.update(updateData, {
             where: { id }
         });
@@ -46,7 +48,7 @@ export class PaymentRepository {
     }
 
     // PAYMENT METHODS
-    async createPayment(paymentData: any): Promise<Payment> {
+    async createPayment(paymentData: CreatePaymentData): Promise<Payment> {
         return await this.paymentModel.create(paymentData);
     }
 
@@ -56,7 +58,7 @@ export class PaymentRepository {
         });
     }
 
-    async updatePayment(id: number, updateData: any): Promise<void> {
+    async updatePayment(id: number, updateData: UpdatePaymentData): Promise<void> {
         await this.paymentModel.update(updateData, {
             where: { id }
         });

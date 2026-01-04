@@ -1,9 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, InternalServerErrorException } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { QuizRepository } from "../../../infrastructure/repositories/quiz.repository";
 
 @Injectable()
 export class DeleteOneQuizUseCase {
+    private readonly logger = new Logger(DeleteOneQuizUseCase.name);
     
     constructor(
         private readonly quizRepository: QuizRepository
@@ -14,10 +15,7 @@ export class DeleteOneQuizUseCase {
             const questions = await this.quizRepository.findQuestionQuiz(quizLevelId);
 
             if(!questions || questions.length === 0) {
-                return {
-                    status: 404,
-                    message: 'Pergunta não encontrada',
-                };
+                throw new NotFoundException('Pergunta não encontrada');
             }
 
             const registerDelete = questions[questionNumber-1].dataValues;
@@ -28,12 +26,11 @@ export class DeleteOneQuizUseCase {
                 message: 'Pergunta deletada com sucesso',
             };
         }catch(error){
-            console.error('Erro ao deletar pergunta:', error);
-            return {
-                status: 500,
-                message: 'Erro ao deletar pergunta',
-                error: error.message || error
-            };
+            this.logger.error('Erro ao deletar pergunta:', error);
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Erro ao deletar pergunta');
         }
     }
 }

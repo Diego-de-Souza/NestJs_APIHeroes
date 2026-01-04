@@ -11,14 +11,14 @@ export class MenuPrincipalController {
   @ApiOperation({ summary: 'BUsca de dados para menu principal' })
   @ApiResponse({ status: 201, description: 'Dados encontrados com sucesso' })
   @ApiResponse({ status: 500, description: 'Erro inesperado ao buscar dados do menu principal' })
-  async getDadosMenu(): Promise<ApiResponseInterface<any>>  {
+  async getDadosMenu(): Promise<ApiResponseInterface<unknown>>  {
     try {
       const result = await this.menuPrincipalService.findData();
-      return result
+      return result;
     }catch(err){
       return {
         status: 500,
-        message: 'Erro inesperado ao registrar estúdio.',
+        message: 'Erro inesperado ao buscar dados do menu principal.',
         error: err.message || err,
       };
     }

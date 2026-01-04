@@ -1,10 +1,6 @@
 import { BadRequestException, FileTypeValidatorOptions, FileValidator } from "@nestjs/common";
 import { IFile } from "@nestjs/common/pipes/file/interfaces";
-
-export interface MinFileSizeValidatorOptions{
-    //minSize em bytes
-    minSize: number; 
-}
+import { MinFileSizeValidatorOptions } from "../../domain/interfaces/file-validator.interface";
 
 export class MinFileSizeValidator extends FileValidator<MinFileSizeValidatorOptions,IFile> {
 
@@ -27,12 +23,7 @@ export class MinFileSizeValidator extends FileValidator<MinFileSizeValidatorOpti
 
     }
     
-    buildErrorMessage(file: any): string {
+    buildErrorMessage(file: IFile | IFile[]): string {
         return `O tamanho do arquivo deve ser no mínimo ${this.validationOptions.minSize} bytes.`;
     }
-        
-
-
-    
-
 }

@@ -3,9 +3,8 @@ dotenv.config();
 
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 
-// REMOVE APENAS: import * as express from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
@@ -14,6 +13,7 @@ import * as express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const logger = new Logger('Bootstrap');
 
   const configService = app.get(ConfigService);
   const port = process.env.PORT || configService.get('PORT') || 3000;
@@ -40,8 +40,6 @@ async function bootstrap() {
     });
   }
 
-  // REMOVE APENAS: app.use(express.json());
-  
   app.setGlobalPrefix('api');
   app.enableCors({
     origin: [configService.get('FRONTEND_URL')],
@@ -60,13 +58,13 @@ async function bootstrap() {
   // MANTÉM o middleware de logging
   if (process.env.NODE_ENV !== 'production') {
     app.use((req, res, next) => {
-      console.log(`${req.method} ${req.url}`);
+      logger.debug(`${req.method} ${req.url}`);
       if (req.body && req.body.data) {
-        console.log('Body:', JSON.stringify(req.body.data, null, 2));
+        logger.debug('Body:', JSON.stringify(req.body.data, null, 2));
       } else if (req.body) {
-        console.log('Body:', JSON.stringify(req.body, null, 2));
+        logger.debug('Body:', JSON.stringify(req.body, null, 2));
       } else {
-        console.log('No body provided');
+        logger.debug('No body provided');
       }
       next();
     });
@@ -74,10 +72,9 @@ async function bootstrap() {
 
 
   await app.init();
-  // MUDA APENAS o listen:
   if (require.main === module) {
     await app.listen(port);
-    console.log(`🚀 API rodando na porta ${port}`);
+    logger.log(`🚀 API rodando na porta ${port}`);
   }
 
   return app;

@@ -1,5 +1,5 @@
 import { IsString, IsNumber, IsOptional, IsEnum, Min } from 'class-validator';
-import { PlanType } from '../../../shared/utils/subscription-plans.utils';
+import { PlanType } from '../../../domain/interfaces/subscription-plans.interface';
 
 export class CreatePaymentIntentDto {
     @IsEnum(PlanType, { 

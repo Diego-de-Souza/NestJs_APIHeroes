@@ -1,6 +1,7 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { QuizRepository } from "../../../infrastructure/repositories/quiz.repository";
+import { AnswerQuizDto } from "../../../interface/dtos/quiz/answer-quiz.dto";
 
 @Injectable()
 export class ProcessAnswerQuizUseCase {
@@ -9,22 +10,22 @@ export class ProcessAnswerQuizUseCase {
         private readonly quizRepository: QuizRepository
     ){}
 
-    async processAnswer(answerDto: any): Promise<ApiResponseInterface<string>> {
+    async processAnswer(answerDto: AnswerQuizDto): Promise<ApiResponseInterface<string>> {
         try {
             const { user_id, answers, quiz_level_id } = answerDto;
 
             if (!user_id || !answers || !quiz_level_id) {
-                return { status: 400, message: 'Dados insuficientes.' };
+                throw new BadRequestException('Dados insuficientes.');
             }
 
             const questions = await this.quizRepository.findQuestionQuiz(quiz_level_id);
             if (!questions || questions.length === 0) {
-                return { status: 404, message: 'Questões não encontradas.' };
+                throw new NotFoundException('Questões não encontradas.');
             }
 
             const quizLevel = await this.quizRepository.findQuizLevelById(quiz_level_id);
             if (!quizLevel) {
-                return { status: 404, message: 'Nível do quiz não encontrado.' };
+                throw new NotFoundException('Nível do quiz não encontrado.');
             }
 
             const progress = this.processPoints(answers, questions, quizLevel.xp_reward);
@@ -51,8 +52,7 @@ export class ProcessAnswerQuizUseCase {
                     await this.quizRepository.createProgress(dataUserProgress);
                 }
             } catch (error) {
-                // Adicione log ou rethrow
-                return { status: 500, message: 'Erro ao salvar progresso.', error: error.message || error };
+                throw new InternalServerErrorException('Erro ao salvar progresso.');
             }
 
             return {
@@ -62,17 +62,16 @@ export class ProcessAnswerQuizUseCase {
             };
 
         } catch (error) {
-            return {
-                status: 500,
-                message: 'Erro ao processar resposta do quiz',
-                error: error.message || error
-            };
+            if (error instanceof BadRequestException || error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Erro ao processar resposta do quiz');
         }
     }
 
     processPoints(
-        AnswerUser: any[],
-        dataquestions: any[],
+        AnswerUser: AnswerQuizDto['answers'],
+        dataquestions: Array<{ dataValues: { id: number; answer: string } }>,
         totalPoints: number
     ): { score: number; answered: number; notAnswered: number } {
         const numQuestions = dataquestions.length;

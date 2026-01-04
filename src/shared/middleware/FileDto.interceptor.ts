@@ -5,7 +5,7 @@ import { Observable } from "rxjs";
 //Interceptor para validar o tamanho e tipo de arquivo de imagens
 @Injectable()
 export class FileDtoInterceptor implements NestInterceptor{
-    intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
         //Pega a requisição
         const request = context.switchToHttp().getRequest();
         //Pega os arquivos e o body da requisição
