@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS heroes (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     studio_id INTEGER NOT NULL,
-    power_type VARCHAR(50),
+    power_type VARCHAR(100),
     morality VARCHAR(50),
     first_appearance VARCHAR(255),
     release_date DATE,
