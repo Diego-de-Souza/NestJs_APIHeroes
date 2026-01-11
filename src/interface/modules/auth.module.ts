@@ -23,7 +23,10 @@ import { GenerateCodeInUseCase } from '../../application/use-cases/auth/auth-gen
 import { AuthSignOutUseCase } from '../../application/use-cases/auth/auth-signout.use-case';
 import { AuthRefreshTokenUseCase } from '../../application/use-cases/auth/auth-refresh-token.use-case';
 import { AuthGetActiveSessionsUseCase } from 'src/application/use-cases/auth/auth-get-active-sessions.use-case';
+import { AuthRegisterAcessoUserUseCase } from 'src/application/use-cases/auth/auth-register-acesso-user.use-case';
 import { HttpModule } from '@nestjs/axios';
+import { AccessLogModule } from './access-log.module';
+import { AuthGuard } from '../../interface/guards/auth.guard';
 
 @Module({
   imports: [
@@ -35,7 +38,8 @@ import { HttpModule } from '@nestjs/axios';
     ConfigModule,
     SequelizeModule.forFeature(models),
     forwardRef(() => UserModule),
-    HttpModule
+    HttpModule,
+    AccessLogModule
   ],
   controllers: [AuthController],
   providers: [
@@ -56,13 +60,16 @@ import { HttpModule } from '@nestjs/axios';
     ConfigService,
     AuthSignOutUseCase,
     AuthRepository,
-    AuthGetActiveSessionsUseCase
+    AuthGetActiveSessionsUseCase,
+    AuthRegisterAcessoUserUseCase,
+    AuthGuard
   ],
   exports: [
     AuthService,
-  AuthRefreshTokenUseCase,
-  AuthRepository,
-  TokenUseCase
-]
+    AuthRefreshTokenUseCase,
+    AuthRepository,
+    TokenUseCase,
+    AuthGuard
+  ]
 })
 export class AuthModule {}

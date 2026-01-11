@@ -336,4 +336,19 @@ export class AuthController {
       });
     }
   }
+
+  @Post('register-acesso-user')
+  @ApiOperation({ summary: 'Registra acesso à página home (com controle de duplicatas)' })
+  @ApiResponse({ status: 200, description: 'Acesso registrado ou já foi registrado recentemente' })
+  async registerAcessoUser(@Req() req: Request): Promise<ApiResponseInterface<{ registered: boolean; message: string }>> {
+    try {
+      const result = await this.authService.registerAcessoUser(req);
+      return result;
+    } catch (error) {
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao registrar acesso do usuário. (controller): ${error.message}`,
+      });
+    }
+  }
 }

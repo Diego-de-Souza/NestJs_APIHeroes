@@ -63,6 +63,88 @@ export class MigrationsController {
     }
   }
 
+  @Post('create-access-logs-table')
+  async createAccessLogsTable(): Promise<any> {
+    const queryInterface = this.sequelize.getQueryInterface();
+    
+    try {
+      // Verifica se a tabela já existe
+      const tables = await queryInterface.showAllTables();
+      const tableExists = tables.includes('access_logs');
+
+      if (tableExists) {
+        return {
+          success: true,
+          message: 'Tabela access_logs já existe',
+          table_exists: true,
+          timestamp: new Date().toISOString()
+        };
+      }
+
+      // Cria o ENUM se não existir
+      await this.sequelize.query(`
+        DO $$ BEGIN
+          CREATE TYPE action_type_enum AS ENUM ('page_view', 'login', 'api_call', 'other');
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+      `);
+
+      // Cria a tabela access_logs usando SQL raw
+      await this.sequelize.query(`
+        CREATE TABLE IF NOT EXISTS access_logs (
+          id SERIAL PRIMARY KEY,
+          route VARCHAR(500) NOT NULL,
+          method VARCHAR(10) NOT NULL,
+          ip VARCHAR(45) NOT NULL,
+          user_agent TEXT,
+          user_id INTEGER,
+          timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          status_code INTEGER,
+          response_time INTEGER,
+          action_type action_type_enum NOT NULL DEFAULT 'other',
+          created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          CONSTRAINT fk_access_logs_user 
+            FOREIGN KEY (user_id) 
+            REFERENCES users(id) 
+            ON UPDATE CASCADE 
+            ON DELETE SET NULL
+        );
+      `);
+
+      // Cria índices para melhor performance
+      await this.sequelize.query(`
+        CREATE INDEX IF NOT EXISTS idx_access_logs_user_id ON access_logs(user_id);
+        CREATE INDEX IF NOT EXISTS idx_access_logs_timestamp ON access_logs(timestamp);
+        CREATE INDEX IF NOT EXISTS idx_access_logs_action_type ON access_logs(action_type);
+        CREATE INDEX IF NOT EXISTS idx_access_logs_route ON access_logs(route);
+        CREATE INDEX IF NOT EXISTS idx_access_logs_action_timestamp ON access_logs(action_type, timestamp);
+      `);
+
+      return {
+        success: true,
+        message: '✅ Tabela access_logs criada com sucesso!',
+        table_created: true,
+        indexes_created: [
+          'idx_access_logs_user_id',
+          'idx_access_logs_timestamp',
+          'idx_access_logs_action_type',
+          'idx_access_logs_route',
+          'idx_access_logs_action_timestamp'
+        ],
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: '❌ Erro ao criar tabela access_logs',
+        error: error.message,
+        timestamp: new Date().toISOString()
+      };
+    }
+  }
+
   @Post('create-root-user')
   async createRootUser(): Promise<any> {
     const transaction = await this.sequelize.transaction();
@@ -517,4 +599,6 @@ export class MigrationsController {
       };
     }
   }
+
+  
 }

@@ -12,6 +12,7 @@ import { GenerateCodeInUseCase } from "../../application/use-cases/auth/auth-gen
 import { AuthSignOutUseCase } from "../use-cases/auth/auth-signout.use-case";
 import { AuthRefreshTokenUseCase } from "../use-cases/auth/auth-refresh-token.use-case";
 import { AuthGetActiveSessionsUseCase } from "../use-cases/auth/auth-get-active-sessions.use-case";
+import { AuthRegisterAcessoUserUseCase } from "../use-cases/auth/auth-register-acesso-user.use-case";
 
 @Injectable()
 export class AuthService {
@@ -26,7 +27,8 @@ export class AuthService {
         private readonly findSettingsUserUseCase: FindSettingsUserUseCase,
         private readonly authSignOutUseCase: AuthSignOutUseCase,
         private readonly refreshTokenUseCase: AuthRefreshTokenUseCase,
-        private readonly authGetActiveSessionsUseCase: AuthGetActiveSessionsUseCase
+        private readonly authGetActiveSessionsUseCase: AuthGetActiveSessionsUseCase,
+        private readonly authRegisterAcessoUserUseCase: AuthRegisterAcessoUserUseCase
     ){}
     
     async signIn(email: string, pass: string, req: Request): Promise<any>{
@@ -87,6 +89,10 @@ export class AuthService {
 
     async getActiveSessions(userId: number, currentSessionToken?: string): Promise<any> {
         return await this.authGetActiveSessionsUseCase.getActiveSessions(userId, currentSessionToken);
+    }
+
+    async registerAcessoUser(req: Request): Promise<ApiResponseInterface<{ registered: boolean; message: string }>> {
+        return await this.authRegisterAcessoUserUseCase.execute(req);
     }
 
 }

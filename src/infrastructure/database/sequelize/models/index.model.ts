@@ -17,6 +17,7 @@ import { Events } from './events.model';
 import { Validation } from './validation.model';
 import { Subscription } from './subscription.model';
 import { Payment } from './payment.model';
+import { AccessLog } from './access-log.model';
 
 export { 
   Heroes, 
@@ -35,7 +36,8 @@ export {
   Events, 
   Validation,
   Subscription,
-  Payment
+  Payment,
+  AccessLog
 }; 
 
 export const models = [
@@ -57,7 +59,8 @@ export const models = [
   Events,
   Validation,
   Subscription,
-  Payment
+  Payment,
+  AccessLog
 ];
 
 export function defineAssociations() {
@@ -100,4 +103,8 @@ export function defineAssociations() {
 
   User.hasMany(Payment, { foreignKey: 'user_id', as: 'payments' });
   Payment.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+  // ✅ Access Log Associations
+  User.hasMany(AccessLog, { foreignKey: 'user_id', as: 'accessLogs' });
+  AccessLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 }

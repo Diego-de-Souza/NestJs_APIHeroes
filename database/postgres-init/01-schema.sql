@@ -361,3 +361,34 @@ CREATE TABLE IF NOT EXISTS payments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
+
+-- =====================
+-- TABELA: access_logs
+-- =====================
+CREATE TABLE IF NOT EXISTS access_logs (
+    id SERIAL PRIMARY KEY,
+    route VARCHAR(500) NOT NULL,
+    method VARCHAR(10) NOT NULL,
+    ip VARCHAR(45) NOT NULL,
+    user_agent TEXT,
+    user_id INTEGER,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status_code INTEGER,
+    response_time INTEGER, -- Response time in milliseconds
+    action_type VARCHAR(20) NOT NULL DEFAULT 'other' CHECK (action_type IN ('page_view', 'login', 'api_call', 'other')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT fk_access_logs_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- Índices para melhor performance
+CREATE INDEX IF NOT EXISTS idx_access_logs_user_id ON access_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_access_logs_timestamp ON access_logs(timestamp);
+CREATE INDEX IF NOT EXISTS idx_access_logs_action_type ON access_logs(action_type);
+CREATE INDEX IF NOT EXISTS idx_access_logs_route ON access_logs(route);
+CREATE INDEX IF NOT EXISTS idx_access_logs_action_timestamp ON access_logs(action_type, timestamp);
+
+-- Trigger para updated_at
+CREATE TRIGGER update_access_logs_updated_at 
+BEFORE UPDATE ON access_logs
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
