@@ -1,8 +1,7 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { DashboardInterface } from "src/domain/interfaces/dashboard.interface";
-import { User } from "src/infrastructure/database/sequelize/models/user.model";
-import { DashboardRepository } from "src/infrastructure/repositories/dashboard.repository";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { DashboardInterface } from "../../../domain/interfaces/dashboard.interface";
+import { DashboardRepository } from "../../../infrastructure/repositories/dashboard.repository";
 
 @Injectable()
 export class FindDashboardUseCase {

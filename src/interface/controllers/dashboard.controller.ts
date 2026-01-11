@@ -1,10 +1,9 @@
 import { Controller, Get, UseGuards } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { DashboardService } from "src/application/services/dashboard.service";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { User } from "src/infrastructure/database/sequelize/models/user.model";
+import { DashboardService } from "../../application/services/dashboard.service";
+import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
 import { AuthGuard } from "../guards/auth.guard";
-import { DashboardInterface } from "src/domain/interfaces/dashboard.interface";
+import { DashboardInterface } from "../../domain/interfaces/dashboard.interface";
 
 
 @Controller('dashboard')

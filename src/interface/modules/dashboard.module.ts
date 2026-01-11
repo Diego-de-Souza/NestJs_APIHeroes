@@ -4,9 +4,9 @@ import { models } from "../../infrastructure/database/sequelize/models/index.mod
 import { AuthModule } from "./auth.module";
 
 import { DashboardController } from "../controllers/dashboard.controller";
-import { DashboardService } from "src/application/services/dashboard.service";
-import { FindDashboardUseCase } from "src/application/use-cases/dashboard/find-dashboard.use-case";
-import { DashboardRepository } from "src/infrastructure/repositories/dashboard.repository";
+import { DashboardService } from "../../application/services/dashboard.service";
+import { FindDashboardUseCase } from "../../application/use-cases/dashboard/find-dashboard.use-case";
+import { DashboardRepository } from "../../infrastructure/repositories/dashboard.repository";
 
 @Module({
     imports: [
