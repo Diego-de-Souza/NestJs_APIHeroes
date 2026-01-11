@@ -13,7 +13,7 @@ import { FindHeroesByTeamUseCase } from "../use-cases/heroes/find-heroes-by-team
 import { FindHeroesByReleaseYearUseCase } from "../use-cases/heroes/find-heroes-by-release-year.use-case";
 import { FindHeroesByMoralityUseCase } from "../use-cases/heroes/find-heroes-by-morality.use-case";
 import { FindHeroesByGenreUseCase } from "../use-cases/heroes/find-heroes-by-genre.use-case";
-import { HeroesData } from "src/domain/interfaces/card_heroes.interface";
+import { HeroesData } from "../../domain/interfaces/card_heroes.interface";
 
 @Injectable()
 export class DataHeroesService {

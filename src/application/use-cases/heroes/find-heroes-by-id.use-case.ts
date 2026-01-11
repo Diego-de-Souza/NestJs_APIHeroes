@@ -1,9 +1,9 @@
 import { HttpStatus, Injectable, Logger } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { HeroesRepository } from "../../../infrastructure/repositories/heroes.repository";
-import { StudioRepository } from "src/infrastructure/repositories/studio.repository";
-import { TeamRepository } from "src/infrastructure/repositories/team.repository";
-import { HeroesData } from "src/domain/interfaces/card_heroes.interface";
+import { StudioRepository } from "../../../infrastructure/repositories/studio.repository";
+import { TeamRepository } from "../../../infrastructure/repositories/team.repository";
+import { HeroesData } from "../../../domain/interfaces/card_heroes.interface";
 
 @Injectable()
 export class FindHeroesByIdUseCase {

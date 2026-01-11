@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { AuthRepository } from "src/infrastructure/repositories/auth.repository";
+import { AuthRepository } from "../../../infrastructure/repositories/auth.repository";
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 

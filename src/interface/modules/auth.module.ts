@@ -22,8 +22,8 @@ import { DisableTwoFactorAuthUseCase } from '../../application/use-cases/auth/di
 import { GenerateCodeInUseCase } from '../../application/use-cases/auth/auth-generate-code.use-case';
 import { AuthSignOutUseCase } from '../../application/use-cases/auth/auth-signout.use-case';
 import { AuthRefreshTokenUseCase } from '../../application/use-cases/auth/auth-refresh-token.use-case';
-import { AuthGetActiveSessionsUseCase } from 'src/application/use-cases/auth/auth-get-active-sessions.use-case';
-import { AuthRegisterAcessoUserUseCase } from 'src/application/use-cases/auth/auth-register-acesso-user.use-case';
+import { AuthGetActiveSessionsUseCase } from '../../application/use-cases/auth/auth-get-active-sessions.use-case';
+import { AuthRegisterAcessoUserUseCase } from '../../application/use-cases/auth/auth-register-acesso-user.use-case';
 import { HttpModule } from '@nestjs/axios';
 import { AccessLogModule } from './access-log.module';
 import { AuthGuard } from '../../interface/guards/auth.guard';

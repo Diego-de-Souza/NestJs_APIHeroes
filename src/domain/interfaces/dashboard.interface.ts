@@ -1,4 +1,4 @@
-import { AccessLog } from "src/infrastructure/database/sequelize/models/access-log.model";
+import { AccessLog } from "../../infrastructure/database/sequelize/models/access-log.model";
 
 export interface AccessByMonth {
     janeiro: number;

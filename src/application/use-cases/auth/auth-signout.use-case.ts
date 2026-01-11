@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Response, Request } from 'express';
-import { AuthRepository } from "src/infrastructure/repositories/auth.repository";
+import { AuthRepository } from "../../../infrastructure/repositories/auth.repository";
 import { SignOutResponse } from "../../../domain/interfaces/auth.interface";
 
 @Injectable()

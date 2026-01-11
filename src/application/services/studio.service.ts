@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { CreateStudioUseCase } from "../../application/use-cases/studio/create-studio.use-case";
 import { CreateStudioDto } from "../../interface/dtos/studio/create-studio.dto";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
+import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
 import { Studio } from "../../infrastructure/database/sequelize/models/studio.model";
 import { FindAllStudioUseCase } from "../../application/use-cases/studio/find-all-studio.use-case";
 import { DeleteStudioUseCase } from "../../application/use-cases/studio/delete-studio.use-case";
