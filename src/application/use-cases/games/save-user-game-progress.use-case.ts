@@ -13,7 +13,7 @@ export class SaveUserGameProgressUseCase {
       lvl_user: number;
       score: number;
       attempts: number;
-      metadata: { theme: string };
+      metadata: Record<string, any>;
     }): Promise<ApiResponseInterface<UserGameProcess | number>> {
       const gameExists = await this.gamesRepository.findGameByPk(data.game_id);
       

@@ -14,6 +14,12 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { models } from '../../infrastructure/database/sequelize/models/index.model';
 import { GetUserProgressUseCase } from '../../application/use-cases/games/get-user-progress.use-case';
 import { SaveUserGameProgressUseCase } from '../../application/use-cases/games/save-user-game-progress.use-case';
+import { FindAllGamesUseCase } from '../../application/use-cases/games/find-all-games.use-case';
+import { CreateGameUseCase } from '../../application/use-cases/games/create-game.use-case';
+import { UpdateGameUseCase } from '../../application/use-cases/games/update-game.use-case';
+import { ConverterImageUseCase } from '../../application/use-cases/images/converter-image.use-case';
+import { ImageService } from '../../application/services/image.service';
+import { DeleteGameUseCase } from '../../application/use-cases/games/delete-game.use-case';
 
 @Module({
   imports: [
@@ -32,7 +38,13 @@ import { SaveUserGameProgressUseCase } from '../../application/use-cases/games/s
     PixabayProvider,
     GiphyProvider,
     GetUserProgressUseCase,
-    SaveUserGameProgressUseCase,  
+    SaveUserGameProgressUseCase,
+    FindAllGamesUseCase,  
+    CreateGameUseCase,
+    UpdateGameUseCase,
+    DeleteGameUseCase,
+    ImageService,
+    ConverterImageUseCase,
     {
       provide: 'IMAGE_PROVIDERS',
       useFactory: (

@@ -3,6 +3,7 @@ import { InjectModel } from "@nestjs/sequelize";
 import { User } from "../database/sequelize/models/user.model";
 import { CreateUserDTO } from "../../interface/dtos/user/userCreate.dto";
 import { UpdateUserDTO } from "../../interface/dtos/user/UserUpdate.dto";
+import { Role } from "../database/sequelize/models/roles.model";
 
 @Injectable()
 export class UserRepository {
@@ -33,5 +34,12 @@ export class UserRepository {
         { password: newPassword },
         { where: { id } }
     );
+  }
+
+  async findUserRoleById(id: number): Promise<User | null> {
+    return this.userModel.findOne({
+      where: { id },
+      include: [{ model: Role, as: 'roles' }]
+    });
   }
 }

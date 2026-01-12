@@ -5,13 +5,15 @@ import { Payment } from "../database/sequelize/models/payment.model";
 import { PlanType } from "../../domain/interfaces/subscription-plans.interface";
 import { calculateExpirationDate } from "../../shared/utils/subscription-plans.utils";
 import { CreateSubscriptionData, UpdateSubscriptionData, CreatePaymentData, UpdatePaymentData } from "../../domain/interfaces/payment.interface";
+import { UserRepository } from "./user.repository";
 
 @Injectable()
 export class PaymentRepository {
 
     constructor(
         @InjectModel(Subscription) private readonly subscriptionModel: typeof Subscription,
-        @InjectModel(Payment) private readonly paymentModel: typeof Payment
+        @InjectModel(Payment) private readonly paymentModel: typeof Payment,
+        private readonly userRepository: UserRepository
     ) {}
 
     // SUBSCRIPTION METHODS
@@ -140,6 +142,33 @@ export class PaymentRepository {
         daysRemaining: number;
         planType: string | null;
     }> {
+        const user = await this.userRepository.findUserRoleById(userId);
+        
+        if (!user) {
+            return {
+                subscription: null,
+                isActive: false,
+                daysRemaining: 0,
+                planType: null
+            };
+        }
+
+        // Verifica se é usuário root (nickname 'root' ou tem role 'admin' com access 'full')
+        const isRoot = user.nickname === 'root' || 
+                      (user.roles && user.roles.some(role => 
+                          (role.role === 'admin' && role.access === 'FULL_ACCESS') || 
+                          role.role === 'root'
+                      ));
+        
+        if(isRoot){
+            return{
+                subscription: null,
+                isActive: true,
+                daysRemaining: 999999,
+                planType: null
+            }
+        }
+        
         const subscription = await this.findSubscriptionByUserId(userId);
         
         if (!subscription) {

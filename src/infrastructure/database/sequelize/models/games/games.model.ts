@@ -32,4 +32,16 @@ export class Games extends Model<Games>{
     })
     type:string;
 
+    @Column({
+        type: DataType.STRING(255),
+        allowNull:false,
+    })
+    link:string;
+
+    @Column({
+        type: DataType.STRING(255),
+        allowNull: false,
+    })
+    url_icon: string;
+
 }

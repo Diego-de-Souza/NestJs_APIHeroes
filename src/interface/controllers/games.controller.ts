@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { GamesService } from "../../application/services/games.service";
 import { ImageApiService } from "../../application/services/image-api.service";
 import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
@@ -10,6 +10,62 @@ export class GamesController {
         private readonly gamesService: GamesService,
         private readonly imageApiService: ImageApiService,
     ) {}
+
+    @Post('')
+    async createGame(@Body() gameData: any): Promise<ApiResponseInterface> {
+        try{
+            const result = await this.gamesService.createGame(gameData);
+            return result;
+        }catch(error){
+            return {
+                status: 500,
+                message: 'Erro inesperado ao criar jogo.',
+                error: error.message || error,
+            };
+        }
+    }
+
+    @Put(':id')
+    async updateGame(@Body() gameData: any, @Param('id') id: number): Promise<ApiResponseInterface> {
+        try{
+            const result = await this.gamesService.updateGame(id, gameData);
+            return result;
+        }catch(error){
+            return {
+                status: 500,
+                message: 'Erro inesperado ao atualizar jogo.',
+                error: error.message || error,
+            };
+        }
+    }
+
+    @Delete(':id')
+    async deleteGame(@Param('id') id: number): Promise<ApiResponseInterface> {
+        try{
+            const result = await this.gamesService.deleteGame(id);
+            return result;
+        }catch(error){
+            return {
+                status: 500,
+                message: 'Erro inesperado ao deletar jogo.',
+                error: error.message || error,
+            };
+        }
+    }
+
+    @Get('list-games')
+    async listGames(): Promise<ApiResponseInterface> {
+        try{
+            const result = await this.gamesService.listGames();
+            return result;
+        }catch(error){
+            return {
+                status: 500,
+                message: 'Erro inesperado ao buscar lista de jogos.',
+                error: error.message || error,
+            };
+        }
+    }
 
     @Post('memory-game')
     async getDataMemoryGame(@Body() payload: any): Promise<ApiResponseInterface> {
@@ -68,7 +124,7 @@ export class GamesController {
     lvl_user: number;
     score: number;
     attempts: number;
-    metadata: { theme: string };
+    metadata: Record<string, any>;
   }) {
     return this.gamesService.createUserGameProgress(body);
   }

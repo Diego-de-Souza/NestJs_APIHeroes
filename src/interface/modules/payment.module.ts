@@ -8,6 +8,7 @@ import { AuthModule } from './auth.module';
 import { Subscription } from '../../infrastructure/database/sequelize/models/subscription.model';
 import { Payment } from '../../infrastructure/database/sequelize/models/payment.model';
 import { models } from '../../infrastructure/database/sequelize/models/index.model';
+import { UserRepository } from 'src/infrastructure/repositories/user.repository';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { models } from '../../infrastructure/database/sequelize/models/index.mod
   providers: [
     PaymentService,
     PaymentRepository,
-    PremiumGuard
+    PremiumGuard,
+    UserRepository
   ],
   exports: [PaymentService, PaymentRepository, PremiumGuard]
 })

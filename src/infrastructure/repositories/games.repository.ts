@@ -11,6 +11,30 @@ export class GamesRepository {
         @InjectModel(UserGameProcess) private readonly userGameProgressModel: typeof UserGameProcess
     ){}
 
+    createGame(gameData: any): Promise<Games> {
+        return this.gamesModel.create(gameData);
+    }
+
+    updateGame(id: number, gameData: any): Promise<number> {
+        return this.gamesModel.update(gameData, {
+            where: {
+                id: id
+            }
+        }).then(([affectedCount]) => affectedCount);
+    }
+
+    findGameById(id: number): Promise<Games | null> {
+        return this.gamesModel.findByPk(id);
+    }
+
+    deleteGame(id: number): Promise<number> {
+        return this.gamesModel.destroy({
+            where: {
+                id: id
+            }
+        });
+    }
+
     findGameByType(type: string): Promise<Games | null> {
         return this.gamesModel.findOne({
             where: {
@@ -44,6 +68,10 @@ export class GamesRepository {
 
     findGameByPk(id: number): Promise<Games | null> {
         return this.gamesModel.findByPk(id);
+    }
+
+    findAllGames(): Promise<Games[]> {
+        return this.gamesModel.findAll();
     }
 
 }

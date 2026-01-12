@@ -217,7 +217,9 @@ CREATE TABLE IF NOT EXISTS games (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description VARCHAR(255),
-    type VARCHAR(50)
+    type VARCHAR(50),
+    link VARCHAR(255),
+    url_icon VARCHAR(255)
 );
 
 ALTER TABLE games ADD CONSTRAINT games_name_unique UNIQUE (name);
