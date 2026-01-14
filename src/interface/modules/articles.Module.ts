@@ -14,6 +14,8 @@ import { FindArticlesForHomepageUseCase } from "../../application/use-cases/arti
 import { AutomaticContentCreateUseCase } from "../../application/use-cases/articles/automatic_content_create.use-case";
 import { ImageService } from "../../application/services/image.service";
 import { ConverterImageUseCase } from "../../application/use-cases/images/converter-image.use-case";
+import { SearchArticlesUseCase } from "../../application/use-cases/articles/search-articles.use-case";
+import { SearchSuggestionsUseCase } from "../../application/use-cases/articles/search-suggestions.use-case";
 
 
 @Module({
@@ -36,7 +38,9 @@ import { ConverterImageUseCase } from "../../application/use-cases/images/conver
         FindArticlesForHomepageUseCase,
         AutomaticContentCreateUseCase,
         ImageService,
-        ConverterImageUseCase
+        ConverterImageUseCase,
+        SearchArticlesUseCase,
+        SearchSuggestionsUseCase
     ],
     exports: [ArticlesService]
 })

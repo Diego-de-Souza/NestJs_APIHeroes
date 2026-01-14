@@ -9,6 +9,10 @@ import { FindArticleByIdUseCase } from "../../application/use-cases/articles/fin
 import { FindAllArticleUseCase } from "../../application/use-cases/articles/find-all-articles.use-case";
 import { DeleteArticleUseCase } from "../../application/use-cases/articles/delete-article.use-case";
 import { FindArticlesForHomepageUseCase } from "../use-cases/articles/find-articles-for-homepage.use-case";
+import { SearchArticlesUseCase } from "../use-cases/articles/search-articles.use-case";
+import { SearchSuggestionsUseCase } from "../use-cases/articles/search-suggestions.use-case";
+import { SearchArticlesDto } from "../../interface/dtos/articles/search-articles.dto";
+import { SearchSuggestionsDto } from "../../interface/dtos/articles/search-suggestions.dto";
 
 @Injectable()
 export class ArticlesService{
@@ -20,6 +24,8 @@ export class ArticlesService{
         private readonly findAllArticlesUseCase: FindAllArticleUseCase,
         private readonly deleteArticleUseCase: DeleteArticleUseCase,
         private readonly articlesForHomepageUseCase: FindArticlesForHomepageUseCase,
+        private readonly searchArticlesUseCase: SearchArticlesUseCase,
+        private readonly searchSuggestionsUseCase: SearchSuggestionsUseCase,
     ){}
 
     async createArticle(articleDto: CreateArticleDto): Promise<ApiResponseInterface<Article>>{
@@ -44,5 +50,13 @@ export class ArticlesService{
 
     async articlesForHomepage(): Promise<ApiResponseInterface<Article>>{
         return await this.articlesForHomepageUseCase.articlesForHomepage();
+    }
+
+    async searchArticles(searchDto: SearchArticlesDto): Promise<ApiResponseInterface<Article>>{
+        return await this.searchArticlesUseCase.execute(searchDto);
+    }
+
+    async getSearchSuggestions(searchDto: SearchSuggestionsDto): Promise<ApiResponseInterface<string>>{
+        return await this.searchSuggestionsUseCase.execute(searchDto);
     }
 }

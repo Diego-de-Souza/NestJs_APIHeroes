@@ -1,9 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
 import { CreateArticleDto } from "../dtos/articles/articlesCreate.dto";
 import { UpdateArticlesDto } from "../dtos/articles/articlesUpdate.dto";
 import { ArticlesService } from "../../application/services/articles.service"
 import { Article } from "../../infrastructure/database/sequelize/models/article.model";
+import { SearchArticlesDto } from "../dtos/articles/search-articles.dto";
+import { SearchSuggestionsDto } from "../dtos/articles/search-suggestions.dto";
+import { UseGuards } from "@nestjs/common";
+import { AuthGuard } from "../guards/auth.guard";
 
 @Controller("articles")
 export class ArticlesController {
@@ -89,6 +93,34 @@ export class ArticlesController {
             return {
                 status: 500,
                 message: 'Erro inesperado ao deletar Artigos.',
+                error: error.message || error,
+            };
+        }
+    }
+
+    @Get('search')
+    async searchArticles(@Query() searchDto: SearchArticlesDto): Promise<ApiResponseInterface<Article>> {
+        try {
+            const result = await this.ArticlesService.searchArticles(searchDto);
+            return result;
+        } catch (error) {
+            return {
+                status: 500,
+                message: 'Erro inesperado ao buscar artigos.',
+                error: error.message || error,
+            };
+        }
+    }
+
+    @Get('search/suggestions')
+    async getSearchSuggestions(@Query() dto: SearchSuggestionsDto): Promise<ApiResponseInterface<string>> {
+        try {
+            const result = await this.ArticlesService.getSearchSuggestions(dto);
+            return result;
+        } catch (error) {
+            return {
+                status: 500,
+                message: 'Erro inesperado ao buscar sugestões.',
                 error: error.message || error,
             };
         }

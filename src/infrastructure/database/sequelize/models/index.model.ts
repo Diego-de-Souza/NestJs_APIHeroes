@@ -18,6 +18,8 @@ import { Validation } from './validation.model';
 import { Subscription } from './subscription.model';
 import { Payment } from './payment.model';
 import { AccessLog } from './access-log.model';
+import { Comment } from './comment.model';
+import { CommentLike } from './comment-like.model';
 
 export { 
   Heroes, 
@@ -25,6 +27,8 @@ export {
   Team, 
   User, 
   Role, 
+  Curiosities,
+  Article,
   Quiz, 
   QuizLevel, 
   QuizHeroes, 
@@ -37,7 +41,9 @@ export {
   Validation,
   Subscription,
   Payment,
-  AccessLog
+  AccessLog,
+  Comment,
+  CommentLike
 }; 
 
 export const models = [
@@ -60,7 +66,9 @@ export const models = [
   Validation,
   Subscription,
   Payment,
-  AccessLog
+  AccessLog,
+  Comment,
+  CommentLike
 ];
 
 export function defineAssociations() {
@@ -107,4 +115,20 @@ export function defineAssociations() {
   // ✅ Access Log Associations
   User.hasMany(AccessLog, { foreignKey: 'user_id', as: 'accessLogs' });
   AccessLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+  // ✅ Comments Associations
+  Article.hasMany(Comment, { foreignKey: 'article_id', as: 'comments' });
+  Comment.belongsTo(Article, { foreignKey: 'article_id', as: 'article' });
+
+  User.hasMany(Comment, { foreignKey: 'user_id', as: 'comments' });
+  Comment.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+  Comment.hasMany(Comment, { foreignKey: 'parent_id', as: 'replies' });
+  Comment.belongsTo(Comment, { foreignKey: 'parent_id', as: 'parent' });
+
+  Comment.hasMany(CommentLike, { foreignKey: 'comment_id', as: 'likes' });
+  CommentLike.belongsTo(Comment, { foreignKey: 'comment_id', as: 'comment' });
+
+  User.hasMany(CommentLike, { foreignKey: 'user_id', as: 'commentLikes' });
+  CommentLike.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 }

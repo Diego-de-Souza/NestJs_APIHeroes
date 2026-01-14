@@ -155,6 +155,96 @@ CREATE TRIGGER update_articles_updated_at
 BEFORE UPDATE ON articles
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- Índices para busca de artigos
+CREATE INDEX IF NOT EXISTS idx_articles_category ON articles(category);
+CREATE INDEX IF NOT EXISTS idx_articles_theme ON articles(theme);
+CREATE INDEX IF NOT EXISTS idx_articles_author ON articles(author);
+CREATE INDEX IF NOT EXISTS idx_articles_created_at ON articles(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_articles_views ON articles(views DESC);
+
+-- Full-text search index (PostgreSQL)
+CREATE INDEX IF NOT EXISTS idx_articles_fulltext 
+  ON articles USING GIN(to_tsvector('portuguese', COALESCE(title, '') || ' ' || COALESCE(description, '') || ' ' || COALESCE(text, '')));
+
+-- =====================
+-- TABELA: comments
+-- =====================
+CREATE TABLE IF NOT EXISTS comments (
+    id SERIAL PRIMARY KEY,
+    article_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    parent_id INTEGER NULL,
+    likes_count INTEGER DEFAULT 0 NOT NULL,
+    dislikes_count INTEGER DEFAULT 0 NOT NULL,
+    is_edited BOOLEAN DEFAULT FALSE NOT NULL,
+    is_deleted BOOLEAN DEFAULT FALSE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    
+    CONSTRAINT fk_comment_article 
+        FOREIGN KEY (article_id) 
+        REFERENCES articles(id) 
+        ON DELETE CASCADE,
+        
+    CONSTRAINT fk_comment_user 
+        FOREIGN KEY (user_id) 
+        REFERENCES users(id) 
+        ON DELETE CASCADE,
+        
+    CONSTRAINT fk_comment_parent 
+        FOREIGN KEY (parent_id) 
+        REFERENCES comments(id) 
+        ON DELETE CASCADE,
+        
+    CONSTRAINT chk_content_not_empty 
+        CHECK (LENGTH(TRIM(content)) > 0),
+        
+    CONSTRAINT chk_parent_not_self 
+        CHECK (parent_id IS NULL OR parent_id != id)
+);
+
+-- Índices para comments
+CREATE INDEX IF NOT EXISTS idx_comments_article_id ON comments(article_id);
+CREATE INDEX IF NOT EXISTS idx_comments_user_id ON comments(user_id);
+CREATE INDEX IF NOT EXISTS idx_comments_parent_id ON comments(parent_id);
+CREATE INDEX IF NOT EXISTS idx_comments_created_at ON comments(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_comments_is_deleted ON comments(is_deleted) WHERE is_deleted = FALSE;
+
+-- Trigger para updated_at
+CREATE TRIGGER update_comments_updated_at 
+BEFORE UPDATE ON comments
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- =====================
+-- TABELA: comment_likes
+-- =====================
+CREATE TABLE IF NOT EXISTS comment_likes (
+    id SERIAL PRIMARY KEY,
+    comment_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    type VARCHAR(10) NOT NULL CHECK (type IN ('like', 'dislike')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    
+    CONSTRAINT fk_comment_like_comment 
+        FOREIGN KEY (comment_id) 
+        REFERENCES comments(id) 
+        ON DELETE CASCADE,
+        
+    CONSTRAINT fk_comment_like_user 
+        FOREIGN KEY (user_id) 
+        REFERENCES users(id) 
+        ON DELETE CASCADE,
+        
+    CONSTRAINT uk_comment_like_user 
+        UNIQUE (comment_id, user_id)
+);
+
+-- Índices para comment_likes
+CREATE INDEX IF NOT EXISTS idx_comment_likes_comment_id ON comment_likes(comment_id);
+CREATE INDEX IF NOT EXISTS idx_comment_likes_user_id ON comment_likes(user_id);
+CREATE INDEX IF NOT EXISTS idx_comment_likes_type ON comment_likes(type);
+
 -- =====================
 -- TABELA: quiz
 -- =====================
