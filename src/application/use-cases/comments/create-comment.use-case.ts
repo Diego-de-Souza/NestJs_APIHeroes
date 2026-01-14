@@ -4,28 +4,15 @@ import { CommentsRepository } from '../../../infrastructure/repositories/comment
 import { CreateCommentDto } from '../../../interface/dtos/comments/create-comment.dto';
 import { Comment } from '../../../infrastructure/database/sequelize/models/comment.model';
 import { User } from '../../../infrastructure/database/sequelize/models/user.model';
-import DOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
+import { sanitizeContent } from '../../../shared/utils/sanitize-content.util';
 
 @Injectable()
 export class CreateCommentUseCase {
   private readonly logger = new Logger(CreateCommentUseCase.name);
-  private readonly window = new JSDOM('').window;
-  private readonly purify = DOMPurify(this.window as any);
 
   constructor(
     private readonly commentsRepository: CommentsRepository,
   ) {}
-
-  /**
-   * Sanitizar conteúdo HTML
-   */
-  private sanitizeContent(content: string): string {
-    return this.purify.sanitize(content, {
-      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a'],
-      ALLOWED_ATTR: ['href', 'target', 'rel'],
-    });
-  }
 
   async execute(createCommentDto: CreateCommentDto, userId: number): Promise<ApiResponseInterface<Comment>> {
     try {
@@ -44,7 +31,7 @@ export class CreateCommentUseCase {
       }
 
       // Sanitizar conteúdo
-      const sanitizedContent = this.sanitizeContent(createCommentDto.content);
+      const sanitizedContent = sanitizeContent(createCommentDto.content);
 
       // Criar comentário
       const comment = await this.commentsRepository.create({

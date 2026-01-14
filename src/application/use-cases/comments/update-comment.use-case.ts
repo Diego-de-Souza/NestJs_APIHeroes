@@ -3,28 +3,15 @@ import { ApiResponseInterface } from '../../../domain/interfaces/APIResponse.int
 import { CommentsRepository } from '../../../infrastructure/repositories/comments.repository';
 import { UpdateCommentDto } from '../../../interface/dtos/comments/update-comment.dto';
 import { Comment } from '../../../infrastructure/database/sequelize/models/comment.model';
-import DOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
+import { sanitizeContent } from '../../../shared/utils/sanitize-content.util';
 
 @Injectable()
 export class UpdateCommentUseCase {
   private readonly logger = new Logger(UpdateCommentUseCase.name);
-  private readonly window = new JSDOM('').window;
-  private readonly purify = DOMPurify(this.window as any);
 
   constructor(
     private readonly commentsRepository: CommentsRepository,
   ) {}
-
-  /**
-   * Sanitizar conteúdo HTML
-   */
-  private sanitizeContent(content: string): string {
-    return this.purify.sanitize(content, {
-      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a'],
-      ALLOWED_ATTR: ['href', 'target', 'rel'],
-    });
-  }
 
   async execute(id: number, updateCommentDto: UpdateCommentDto, userId: number): Promise<ApiResponseInterface<Comment>> {
     try {
@@ -39,7 +26,7 @@ export class UpdateCommentUseCase {
       }
 
       // Sanitizar conteúdo
-      const sanitizedContent = this.sanitizeContent(updateCommentDto.content);
+      const sanitizedContent = sanitizeContent(updateCommentDto.content);
 
       // Atualizar comentário
       await this.commentsRepository.update(id, { content: sanitizedContent });
