@@ -32,6 +32,62 @@ O formato segue as convenções de [Keep a Changelog](https://keepachangelog.co
 
 ---
 
+# **[1.3.0]- 2026-01-16**
+
+### **✨ Added**
+
+- Novos campos `usuario_id` e `role_art` na tabela `articles` para suporte a artigos criados por clientes.
+- Nova tabela `news` no banco de dados com campos `usuario_id` e `role_art` para notícias de clientes.
+- Sistema completo de gerenciamento de notícias (news) para clientes com CRUD completo.
+- Novos endpoints para clientes gerenciarem seus próprios artigos (`POST /api/client/articles`, `GET /api/client/articles`, `GET /api/client/articles/:id`, `PUT /api/client/articles/:id`, `DELETE /api/client/articles/:id`, `POST /api/client/articles/delete-many`).
+- Novos endpoints para clientes gerenciarem suas próprias notícias (`POST /api/client/news`, `GET /api/client/news`, `GET /api/client/news/:id`, `PUT /api/client/news/:id`, `DELETE /api/client/news/:id`, `POST /api/client/news/delete-many`).
+- Use cases para operações de client articles: `CreateClientArticleUseCase`, `UpdateClientArticleUseCase`, `FindClientArticleByIdUseCase`, `FindClientArticlesByUserIdUseCase`, `DeleteClientArticleUseCase`, `DeleteManyClientArticlesUseCase`.
+- Use cases para operações de news: `CreateNewsUseCase`, `UpdateNewsUseCase`, `FindNewsByIdUseCase`, `FindNewsByUserIdUseCase`, `DeleteNewsUseCase`, `DeleteManyNewsUseCase`.
+- DTOs para news: `CreateNewsDto`, `UpdateNewsDto`, `DeleteManyNewsDto`.
+- DTO `DeleteManyArticlesDto` para exclusão múltipla de artigos.
+- Controller `ClientArticlesController` para rotas de artigos de clientes.
+- Controller `NewsController` para rotas de notícias de clientes.
+- Service `NewsService` para orquestração de operações de notícias.
+- Repository `NewsRepository` com métodos CRUD e busca por usuário.
+- Model Sequelize `News` com associações configuradas.
+- Módulo `NewsModule` configurado com todas as dependências.
+- Enum `RoleEnum` com valores ROOT (1), ADMIN (2), CLIENT (3) e função helper `getRoleArtFromString()` para conversão de string para número.
+- Migrações SQL para adicionar campos `usuario_id` e `role_art` na tabela `articles`.
+- Migrações SQL para criação da tabela `news` com foreign keys, constraints e índices.
+- Foreign keys, constraints CHECK e índices nas tabelas `articles` e `news` para `usuario_id` e `role_art`.
+- Trigger para atualização automática de `updated_at` na tabela `news`.
+- Full-text search index (GIN) na tabela `news` para busca em português.
+
+### **🛠️ Changed**
+
+- Tabela `articles` atualizada com novos campos `usuario_id` (foreign key para `users.id`) e `role_art` (enum: 1:root, 2:admin, 3:client) com valor padrão 3.
+- Model `Article` atualizado com campos `usuario_id` e `role_art`.
+- DTO `CreateArticleDto` atualizado para incluir campos opcionais `usuario_id` e `role_art`.
+- `ArticlesService` atualizado com novos métodos: `createClientArticle`, `updateClientArticle`, `findClientArticleById`, `findClientArticlesByUserId`, `deleteClientArticle`, `deleteManyClientArticles`.
+- `ArticlesRepository` atualizado com métodos específicos para clientes: `findArticleByIdAndUserId`, `findArticlesByUserId`, `deleteArticleByUserId`, `deleteManyArticles`.
+- `ArticlesModule` atualizado para incluir `ClientArticlesController`, novos use cases de client articles e importação de `AuthModule` e `UserModule`.
+- `CreateClientArticleUseCase` atualizado para buscar automaticamente o nickname do autor do usuário quando não fornecido.
+- `CreateNewsUseCase` atualizado para buscar automaticamente o `role_art` do usuário baseado no role quando não fornecido explicitamente.
+- Schema SQL inicial (`01-schema.sql`) atualizado para incluir novos campos em `articles` e definição completa da tabela `news`.
+- Script de migração (`02-migration-articles-news.sql`) criado para aplicar mudanças em bancos existentes de forma idempotente.
+
+### **🐛 Fixed**
+
+- Corrigido import absoluto em `create-client-article.use-case.ts` para usar import relativo conforme `.cursorrules`.
+- Corrigido tipo de retorno em `findRoleByUserId` no `NewsRepository` para `Role | null`.
+- Corrigido tratamento de `role_art` em `CreateNewsUseCase` para converter corretamente string de role (ex: "root") para número do enum (1, 2, 3).
+- Corrigido erro de TypeScript relacionado a atribuição de `readonly` properties em DTOs nos controllers de client articles e news.
+
+### **🛑 Security**
+
+- Implementada validação de propriedade para garantir que clientes só possam criar, editar, visualizar e deletar seus próprios artigos e notícias.
+- Proteção de todas as rotas de client articles e news com `AuthGuard` para autenticação obrigatória.
+- Validação de `usuario_id` nos controllers para prevenir que usuários modifiquem dados de outros usuários.
+- Implementada verificação de propriedade nos use cases de delete para garantir que apenas o dono do artigo/notícia possa excluí-lo.
+- Uso de `usuario_id` extraído do token JWT para garantir integridade dos dados.
+
+---
+
 # **[1.2.0]- 2026-01-13**
 
 ### **✨ Added**
