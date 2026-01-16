@@ -14,6 +14,7 @@ import { EventsModule } from "./events.module";
 import { AccessLogModule } from "./access-log.module";
 import { DashboardModule } from "./dashboard.module";
 import { CommentsModule } from "./comments.module";
+import { NewsModule } from "./news.module";
 
 export const appModules = [
   ArticleModule,
@@ -31,5 +32,6 @@ export const appModules = [
   EventsModule,
   AccessLogModule,
   DashboardModule,
-  CommentsModule
+  CommentsModule,
+  NewsModule
 ];

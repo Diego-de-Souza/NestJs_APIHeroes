@@ -82,4 +82,35 @@ export class ArticlesRepository {
         });
     }
 
+    async findArticleByIdAndUserId(id: number, usuario_id: number): Promise<Article>{
+        return await this.articleModel.findOne({where: {id, usuario_id}});
+    }
+
+    async findArticlesByUserId(usuario_id: number): Promise<Article[]>{
+        return await this.articleModel.findAll({
+            where: {usuario_id},
+            order: [['created_at', 'DESC']]
+        });
+    }
+
+    async deleteArticleByUserId(id: number, usuario_id: number): Promise<number> {
+        return await this.articleModel.destroy({
+            where: {
+                id,
+                usuario_id
+            }
+        });
+    }
+
+    async deleteManyArticles(ids: number[], usuario_id: number): Promise<number> {
+        return await this.articleModel.destroy({
+            where: {
+                id: {
+                    [Op.in]: ids
+                },
+                usuario_id
+            }
+        });
+    }
+
 }

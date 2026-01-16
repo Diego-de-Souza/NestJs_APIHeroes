@@ -1,0 +1,274 @@
+## TypeScript Best Practices
+- Use strict type checking (`strict: true` in tsconfig.json)
+- Prefer type inference when the type is obvious
+- Avoid the `any` type; use `unknown` when type is uncertain, then narrow it down
+- Use `type` for unions, intersections, and aliases; use `interface` for object shapes that may be extended
+- Define ALL interfaces in `domain/interfaces/*.interface.ts` files, NOT in services, use cases, controllers, repositories, or any other files
+- Import interfaces from `domain/interfaces/*.interface.ts` files when needed
+- Use `readonly` for immutable properties
+- Prefer `const` assertions for literal types
+- Use explicit return types for public methods
+- Use `Record<string, any>` or specific types instead of `any` for objects
+
+## NestJS Best Practices
+- Use dependency injection with constructor injection
+- Mark all dependencies as `readonly` in constructors: `private readonly repository: Repository`
+- Use `@Injectable()` decorator for all services, use cases, repositories, and providers
+- Use `Logger` from `@nestjs/common` for logging, never `console.log` in production code
+- Use proper HTTP status codes from `@nestjs/common` (HttpStatus enum)
+- Use NestJS exceptions: `BadRequestException`, `NotFoundException`, `UnauthorizedException`, `ForbiddenException`, `InternalServerErrorException`
+- Use `ValidationPipe` globally with `whitelist: true` and `forbidNonWhitelisted: true`
+- Use guards for authentication and authorization
+- Use interceptors for cross-cutting concerns (logging, transformation, etc.)
+- Use pipes for data transformation and validation
+- Use modules to organize features and manage dependencies
+- Export services and repositories that need to be shared between modules
+
+## Clean Architecture Layers
+
+### Domain Layer (`src/domain/`)
+- **ONLY** contains interfaces in `domain/interfaces/*.interface.ts`
+- Interfaces define contracts and data structures
+- NO business logic, NO dependencies on other layers
+- All interfaces MUST be in `.interface.ts` files
+- Use PascalCase for interface names: `UserInterface`, `ApiResponseInterface`
+- Interfaces should be pure TypeScript, no decorators
+
+### Application Layer (`src/application/`)
+- Contains business logic in two sub-layers:
+  - **Use Cases** (`application/use-cases/`): Single responsibility, one use case per file
+  - **Services** (`application/services/`): Orchestrate use cases, coordinate multiple use cases
+- Use cases MUST be in `application/use-cases/{feature}/{action}-{entity}.use-case.ts`
+- Services MUST be in `application/services/{feature}.service.ts`
+- Use cases should have a single `execute()` method
+- Use cases MUST return `ApiResponseInterface<T>` or specific response types
+- Use cases can depend on repositories (infrastructure) but NOT on controllers or DTOs
+- Services can depend on use cases and other services
+- Use `Logger` from `@nestjs/common` for logging
+- Handle errors appropriately: throw NestJS exceptions, log errors
+
+### Infrastructure Layer (`src/infrastructure/`)
+- Contains external concerns:
+  - **Repositories** (`infrastructure/repositories/`): Data access, database operations
+  - **Models** (`infrastructure/database/sequelize/models/`): Sequelize ORM models
+  - **Providers** (`infrastructure/providers/`): External service integrations
+- Repositories MUST be in `infrastructure/repositories/{entity}.repository.ts`
+- Repositories use `@InjectModel()` to inject Sequelize models
+- Repositories handle all database operations (CRUD, queries, transactions)
+- Repositories return domain entities or models
+- Models use Sequelize decorators (`@Table`, `@Column`, `@ForeignKey`, etc.)
+- Models MUST be in `infrastructure/database/sequelize/models/{entity}.model.ts`
+- Providers implement interfaces from `domain/interfaces/`
+
+### Interface Layer (`src/interface/`)
+- Contains presentation concerns:
+  - **Controllers** (`interface/controllers/`): HTTP endpoints, request/response handling
+  - **DTOs** (`interface/dtos/{feature}/`): Data Transfer Objects for validation
+  - **Modules** (`interface/modules/`): NestJS modules
+  - **Guards** (`interface/guards/`): Authentication and authorization
+- Controllers MUST be in `interface/controllers/{feature}.controller.ts`
+- Controllers depend on services (application layer), NOT on use cases or repositories directly
+- Controllers use DTOs for request validation
+- Controllers return `ApiResponseInterface<T>` or specific response types
+- DTOs MUST be in `interface/dtos/{feature}/{action}-{entity}.dto.ts`
+- DTOs use `class-validator` decorators for validation
+- DTOs use `class-transformer` decorators for transformation
+- Modules MUST be in `interface/modules/{feature}.module.ts`
+- Modules import `SequelizeModule.forFeature(models)` for database access
+- Modules declare controllers, services, use cases, repositories as providers
+
+## File Naming Conventions
+- Controllers: `{feature}.controller.ts` (PascalCase)
+- Services: `{feature}.service.ts` (PascalCase)
+- Use Cases: `{action}-{entity}.use-case.ts` (kebab-case): `create-user.use-case.ts`, `find-user-by-id.use-case.ts`
+- Repositories: `{entity}.repository.ts` (PascalCase)
+- Models: `{entity}.model.ts` (PascalCase)
+- DTOs: `{action}-{entity}.dto.ts` (kebab-case): `create-user.dto.ts`, `update-user.dto.ts`
+- Interfaces: `{name}.interface.ts` (PascalCase): `user.interface.ts`, `APIResponse.interface.ts`
+- Modules: `{feature}.module.ts` (PascalCase)
+- Guards: `{name}.guard.ts` (PascalCase)
+- Utils: `{name}.util.ts` (kebab-case)
+
+## Import Rules
+- **NEVER** use absolute imports starting with `src/`
+- **ALWAYS** use relative imports: `../../../`, `../../`, etc.
+- Import order:
+  1. NestJS core imports (`@nestjs/common`, `@nestjs/core`, etc.)
+  2. Third-party imports
+  3. Domain interfaces (`domain/interfaces/`)
+  4. Infrastructure (repositories, models)
+  5. Application (use cases, services)
+  6. Interface (DTOs, controllers)
+  7. Shared utilities
+
+## DTOs (Data Transfer Objects)
+- MUST use `class-validator` decorators: `@IsString()`, `@IsInt()`, `@IsNotEmpty()`, `@IsOptional()`, etc.
+- MUST use `class-transformer` decorators when needed: `@Transform()`, `@Type()`
+- Provide meaningful error messages in decorators: `@IsString({ message: 'Campo deve ser string' })`
+- Use `@IsOptional()` for optional fields
+- Use `@Transform()` to convert string to number when needed: `@Transform(({ value }) => parseInt(value, 10))`
+- Group related DTOs in folders: `interface/dtos/{feature}/`
+- Use `PartialType()` from `@nestjs/mapped-types` for update DTOs when appropriate
+- Use `OmitType()` or `PickType()` when needed for inheritance
+
+## Use Cases
+- One use case per file
+- File name: `{action}-{entity}.use-case.ts`
+- Class name: `{Action}{Entity}UseCase` (PascalCase): `CreateUserUseCase`, `FindUserByIdUseCase`
+- MUST have a single `execute()` method
+- `execute()` method should be async and return `Promise<ApiResponseInterface<T>>`
+- Inject repositories via constructor
+- Use `Logger` for logging: `private readonly logger = new Logger(ClassName.name)`
+- Throw NestJS exceptions for errors: `NotFoundException`, `BadRequestException`, etc.
+- Validate inputs before processing
+- Handle errors with try-catch and log them appropriately
+
+## Services
+- File name: `{feature}.service.ts`
+- Class name: `{Feature}Service` (PascalCase)
+- Services orchestrate use cases
+- Services can call multiple use cases
+- Services handle business logic coordination
+- Use `Logger` for logging
+- Return `ApiResponseInterface<T>` or delegate to use cases
+
+## Repositories
+- File name: `{entity}.repository.ts`
+- Class name: `{Entity}Repository` (PascalCase)
+- Use `@InjectModel()` to inject Sequelize models
+- Methods should be async
+- Return domain models or entities
+- Handle database errors appropriately
+- Use Sequelize query methods: `findAll()`, `findOne()`, `create()`, `update()`, `destroy()`
+- Use `Op` from Sequelize for complex queries
+- Use transactions when needed
+
+## Controllers
+- File name: `{feature}.controller.ts`
+- Class name: `{Feature}Controller` (PascalCase)
+- Use `@Controller('route')` decorator
+- Use HTTP method decorators: `@Get()`, `@Post()`, `@Put()`, `@Delete()`, `@Patch()`
+- Use `@UseGuards()` for authentication/authorization
+- Use `@Body()`, `@Param()`, `@Query()` for request data
+- Use `@Req()` for accessing request object when needed
+- Use `ParseIntPipe` for parameter validation
+- Inject services via constructor
+- Controllers should be thin - delegate to services
+- Return `ApiResponseInterface<T>` or let services return it
+- Use Swagger decorators: `@ApiTags()`, `@ApiOperation()`, `@ApiResponse()`
+
+## Error Handling
+- Use NestJS built-in exceptions:
+  - `BadRequestException` for validation errors (400)
+  - `UnauthorizedException` for authentication errors (401)
+  - `ForbiddenException` for authorization errors (403)
+  - `NotFoundException` for not found resources (404)
+  - `ConflictException` for conflicts (409)
+  - `InternalServerErrorException` for unexpected errors (500)
+- Always log errors before throwing: `this.logger.error('Error message:', error)`
+- Provide meaningful error messages to users
+- Never expose internal error details in production
+- Use try-catch blocks in use cases and services
+- Let NestJS handle exception transformation
+
+## Logging
+- Use `Logger` from `@nestjs/common`, NEVER `console.log` or `console.error`
+- Create logger instance: `private readonly logger = new Logger(ClassName.name)`
+- Use appropriate log levels:
+  - `logger.log()` for informational messages
+  - `logger.warn()` for warnings
+  - `logger.error()` for errors
+  - `logger.debug()` for debug messages (development only)
+- Include context in log messages
+- Log errors with stack traces: `logger.error('Error message:', error.stack)`
+
+## Validation
+- Use `class-validator` decorators in DTOs
+- Use `ValidationPipe` globally with:
+  - `transform: true` - transform payloads to DTO instances
+  - `whitelist: true` - strip non-whitelisted properties
+  - `forbidNonWhitelisted: true` - throw error for non-whitelisted properties
+- Validate all inputs at the controller level
+- Use custom validators when needed (in `shared/validators/`)
+
+## Security
+- Never commit API keys, secrets, or credentials
+- Use environment variables via `ConfigService` from `@nestjs/config`
+- Sanitize user inputs (especially HTML content)
+- Use guards for authentication and authorization
+- Validate and sanitize data from external sources
+- Use HTTPS for all API calls in production
+- Implement rate limiting when needed (ThrottlerModule)
+- Use secure session tokens
+- Validate file uploads (type, size, content)
+
+## Database
+- Use Sequelize ORM for database operations
+- Models MUST be in `infrastructure/database/sequelize/models/`
+- Use migrations for schema changes (`database/migrations/`)
+- Use transactions for operations that must be atomic
+- Use indexes for performance optimization
+- Use soft deletes when appropriate (`is_deleted` flag)
+- Use timestamps (`created_at`, `updated_at`)
+- Use foreign keys with proper constraints
+- Use enums for fixed value sets
+
+## Code Organization
+- Group related files by feature/domain
+- Keep files focused on a single responsibility
+- Use barrel exports (`index.ts`) sparingly and only when it improves clarity
+- Keep imports organized and clean
+- Use consistent naming conventions across the codebase
+- Separate concerns: controllers handle HTTP, services orchestrate, use cases contain business logic, repositories handle data access
+
+## Performance
+- Use database indexes for frequently queried fields
+- Use pagination for list endpoints
+- Use `select` to limit fields returned from database
+- Use transactions efficiently
+- Avoid N+1 queries - use eager loading with `include` when needed
+- Cache frequently accessed data when appropriate
+- Use connection pooling for database connections
+
+## Testing (Future)
+- Write unit tests for use cases
+- Write integration tests for controllers
+- Mock external dependencies
+- Test error scenarios
+- Use Jest for testing
+
+## API Response Format
+- Always return `ApiResponseInterface<T>` structure:
+  ```typescript
+  {
+    status: HttpStatus,
+    message: string,
+    data?: T | T[],
+    dataUnit?: T
+  }
+  ```
+- Use `data` for arrays, `dataUnit` for single objects
+- Include meaningful success/error messages
+- Use appropriate HTTP status codes
+
+## Module Configuration
+- Each feature should have its own module
+- Modules MUST import `SequelizeModule.forFeature(models)` for database access
+- Modules declare all providers: services, use cases, repositories
+- Modules export services that need to be shared
+- Import other modules when dependencies are needed
+- Use `forwardRef()` when circular dependencies occur
+
+## Guards
+- Guards MUST be in `interface/guards/`
+- Use `@Injectable()` decorator
+- Implement `CanActivate` interface
+- Use guards for authentication (`AuthGuard`) and authorization (`PremiumGuard`, etc.)
+- Guards should throw `UnauthorizedException` or `ForbiddenException` when access is denied
+
+## Interceptors
+- Interceptors MUST be in `shared/interceptors/`
+- Use `@Injectable()` decorator
+- Implement `NestInterceptor` interface
+- Use for cross-cutting concerns: logging, transformation, caching
+- Register globally in `AppModule` when needed

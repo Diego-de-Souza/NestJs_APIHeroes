@@ -29,7 +29,9 @@ export class CreateArticleUseCase {
 
         const articleToSave = {
             ...articleDto,
-            image: imageUploadResult
+            image: imageUploadResult,
+            usuario_id: articleDto.usuario_id || null,
+            role_art: articleDto.role_art || 1 // Default para root (interno)
         };
 
         await this.articleRepository.createArticle(articleToSave);

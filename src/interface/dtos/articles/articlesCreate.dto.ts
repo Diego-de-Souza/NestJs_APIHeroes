@@ -41,9 +41,9 @@ export class CreateArticleDto {
     @IsNotEmpty({ message: "Palavras-chave não podem estar vazias" })
     readonly keyWords: string[];
 
+    @IsOptional()
     @IsString({ message: "Rota deve ser string" })
-    @IsNotEmpty({ message: "Rota não pode estar vazia" })
-    readonly route: string;
+    readonly route?: string;
 
     @IsOptional()
     @IsInt({ message: "Views deve ser um número inteiro" })
@@ -61,8 +61,16 @@ export class CreateArticleDto {
     @IsString({ message: "Imagem deve ser uma string base64" })
     readonly image?: string;
 
+    @IsOptional()
     @IsString({ message: "Autor deve ser string" })
-    @IsNotEmpty({ message: "Autor não pode estar vazio" })
     @MaxLength(50, { message: "Autor deve conter menos de 50 caracteres" })
     readonly author: string;
+
+    @IsOptional()
+    @IsInt({ message: "Usuario ID deve ser um número inteiro" })
+    readonly usuario_id?: number;
+
+    @IsOptional()
+    @IsInt({ message: "Role do artigo deve ser um número inteiro (1:root, 2:admin, 3:client)" })
+    readonly role_art?: number;
 }

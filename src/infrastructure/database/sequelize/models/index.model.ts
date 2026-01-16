@@ -20,6 +20,7 @@ import { Payment } from './payment.model';
 import { AccessLog } from './access-log.model';
 import { Comment } from './comment.model';
 import { CommentLike } from './comment-like.model';
+import { News } from './news.model';
 
 export { 
   Heroes, 
@@ -43,7 +44,8 @@ export {
   Payment,
   AccessLog,
   Comment,
-  CommentLike
+  CommentLike,
+  News
 }; 
 
 export const models = [
@@ -68,7 +70,8 @@ export const models = [
   Payment,
   AccessLog,
   Comment,
-  CommentLike
+  CommentLike,
+  News
 ];
 
 export function defineAssociations() {

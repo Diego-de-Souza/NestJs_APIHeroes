@@ -13,6 +13,12 @@ import { SearchArticlesUseCase } from "../use-cases/articles/search-articles.use
 import { SearchSuggestionsUseCase } from "../use-cases/articles/search-suggestions.use-case";
 import { SearchArticlesDto } from "../../interface/dtos/articles/search-articles.dto";
 import { SearchSuggestionsDto } from "../../interface/dtos/articles/search-suggestions.dto";
+import { CreateClientArticleUseCase } from "../use-cases/articles/create-client-article.use-case";
+import { UpdateClientArticleUseCase } from "../use-cases/articles/update-client-article.use-case";
+import { FindClientArticleByIdUseCase } from "../use-cases/articles/find-client-article-by-id.use-case";
+import { FindClientArticlesByUserIdUseCase } from "../use-cases/articles/find-client-articles-by-user-id.use-case";
+import { DeleteClientArticleUseCase } from "../use-cases/articles/delete-client-article.use-case";
+import { DeleteManyClientArticlesUseCase } from "../use-cases/articles/delete-many-client-articles.use-case";
 
 @Injectable()
 export class ArticlesService{
@@ -26,6 +32,12 @@ export class ArticlesService{
         private readonly articlesForHomepageUseCase: FindArticlesForHomepageUseCase,
         private readonly searchArticlesUseCase: SearchArticlesUseCase,
         private readonly searchSuggestionsUseCase: SearchSuggestionsUseCase,
+        private readonly createClientArticleUseCase: CreateClientArticleUseCase,
+        private readonly updateClientArticleUseCase: UpdateClientArticleUseCase,
+        private readonly findClientArticleByIdUseCase: FindClientArticleByIdUseCase,
+        private readonly findClientArticlesByUserIdUseCase: FindClientArticlesByUserIdUseCase,
+        private readonly deleteClientArticleUseCase: DeleteClientArticleUseCase,
+        private readonly deleteManyClientArticlesUseCase: DeleteManyClientArticlesUseCase,
     ){}
 
     async createArticle(articleDto: CreateArticleDto): Promise<ApiResponseInterface<Article>>{
@@ -58,5 +70,30 @@ export class ArticlesService{
 
     async getSearchSuggestions(searchDto: SearchSuggestionsDto): Promise<ApiResponseInterface<string>>{
         return await this.searchSuggestionsUseCase.execute(searchDto);
+    }
+
+    // Client routes methods
+    async createClientArticle(articleDto: CreateArticleDto, usuario_id: number): Promise<ApiResponseInterface<Article>>{
+        return await this.createClientArticleUseCase.createClientArticle(articleDto, usuario_id);
+    }
+
+    async updateClientArticle(id: number, articleDto: UpdateArticlesDto, usuario_id: number): Promise<ApiResponseInterface<Article>>{
+        return await this.updateClientArticleUseCase.updateClientArticle(id, articleDto, usuario_id);
+    }
+
+    async findClientArticleById(id: number, usuario_id: number): Promise<ApiResponseInterface<Article>>{
+        return await this.findClientArticleByIdUseCase.findClientArticleById(id, usuario_id);
+    }
+
+    async findClientArticlesByUserId(usuario_id: number): Promise<ApiResponseInterface<Article>>{
+        return await this.findClientArticlesByUserIdUseCase.findClientArticlesByUserId(usuario_id);
+    }
+
+    async deleteClientArticle(id: number, usuario_id: number): Promise<ApiResponseInterface<number>>{
+        return await this.deleteClientArticleUseCase.deleteClientArticle(id, usuario_id);
+    }
+
+    async deleteManyClientArticles(ids: number[], usuario_id: number): Promise<ApiResponseInterface<number>>{
+        return await this.deleteManyClientArticlesUseCase.deleteManyClientArticles(ids, usuario_id);
     }
 }

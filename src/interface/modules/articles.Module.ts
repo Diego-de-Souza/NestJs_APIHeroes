@@ -3,6 +3,8 @@ import { SequelizeModule } from "@nestjs/sequelize";
 import { HttpModule } from "@nestjs/axios";
 import { models } from '../../infrastructure/database/sequelize/models/index.model';
 import { ArticlesController } from "../../interface/controllers/articles.Controller";
+import { ClientArticlesController } from "../../interface/controllers/client-articles.controller";
+import { AuthModule } from "./auth.module";
 import { ArticlesService } from "../../application/services/articles.service";
 import { ArticlesRepository } from "../../infrastructure/repositories/articles.repository";
 import { CreateArticleUseCase } from "../../application/use-cases/articles/create-articles.use-case";
@@ -16,6 +18,13 @@ import { ImageService } from "../../application/services/image.service";
 import { ConverterImageUseCase } from "../../application/use-cases/images/converter-image.use-case";
 import { SearchArticlesUseCase } from "../../application/use-cases/articles/search-articles.use-case";
 import { SearchSuggestionsUseCase } from "../../application/use-cases/articles/search-suggestions.use-case";
+import { CreateClientArticleUseCase } from "../../application/use-cases/articles/create-client-article.use-case";
+import { UpdateClientArticleUseCase } from "../../application/use-cases/articles/update-client-article.use-case";
+import { FindClientArticleByIdUseCase } from "../../application/use-cases/articles/find-client-article-by-id.use-case";
+import { FindClientArticlesByUserIdUseCase } from "../../application/use-cases/articles/find-client-articles-by-user-id.use-case";
+import { DeleteClientArticleUseCase } from "../../application/use-cases/articles/delete-client-article.use-case";
+import { DeleteManyClientArticlesUseCase } from "../../application/use-cases/articles/delete-many-client-articles.use-case";
+import { UserModule } from "./user.module";
 
 
 @Module({
@@ -24,9 +33,11 @@ import { SearchSuggestionsUseCase } from "../../application/use-cases/articles/s
         HttpModule.register({
             timeout: 30000, // 30 segundos timeout global
             maxRedirects: 3
-        })
+        }),
+        AuthModule, 
+        UserModule,
     ],
-    controllers: [ArticlesController],
+    controllers: [ArticlesController, ClientArticlesController],
     providers: [
         ArticlesService,
         ArticlesRepository,
@@ -40,7 +51,13 @@ import { SearchSuggestionsUseCase } from "../../application/use-cases/articles/s
         ImageService,
         ConverterImageUseCase,
         SearchArticlesUseCase,
-        SearchSuggestionsUseCase
+        SearchSuggestionsUseCase,
+        CreateClientArticleUseCase,
+        UpdateClientArticleUseCase,
+        FindClientArticleByIdUseCase,
+        FindClientArticlesByUserIdUseCase,
+        DeleteClientArticleUseCase,
+        DeleteManyClientArticlesUseCase
     ],
     exports: [ArticlesService]
 })

@@ -1,10 +1,10 @@
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
 @Table({
-    tableName: "articles",
+    tableName: "news",
     timestamps: false
 })
-export class Article extends Model<Article> {
+export class News extends Model<News> {
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
@@ -13,12 +13,6 @@ export class Article extends Model<Article> {
         unique: true
     })
     id: number;
-
-    @Column({
-        type: DataType.STRING(50),
-        allowNull: false,
-    })
-    category: string;
 
     @Column({
         type: DataType.STRING(100),
@@ -36,31 +30,20 @@ export class Article extends Model<Article> {
         type: DataType.TEXT,
         allowNull: false,
     })
-    text: string;
+    content: string;
 
     @Column({
-        type: DataType.JSONB,
+        type: DataType.STRING(50),
+        allowNull: false,
+        field: 'type_news_letter'
+    })
+    type_news_letter: string;
+
+    @Column({
+        type: DataType.STRING(50),
         allowNull: false,
     })
-    summary: object;
-
-    @Column({
-        type: DataType.STRING(255),
-    })
-    thumbnail: string;
-
-    @Column({
-        type: DataType.ARRAY(DataType.TEXT),
-        allowNull: false,
-        field: 'key_words'
-    })
-    keyWords: string[];
-
-    @Column({
-        type: DataType.STRING(255),
-        allowNull: true,
-    })
-    route: string;
+    theme: string;
 
     @Column({
         type: DataType.DATE,
@@ -81,28 +64,6 @@ export class Article extends Model<Article> {
         defaultValue: 0,
     })
     views: number;
-
-    @Column({
-        type: DataType.STRING(50),
-    })
-    theme: string;
-
-    @Column({
-        type: DataType.STRING(20),
-        field: 'theme_color'
-    })
-    themeColor: string;
-
-    @Column({
-        type: DataType.STRING(255),
-    })
-    image: string;
-
-    @Column({
-        type: DataType.STRING(50),
-        allowNull: false,
-    })
-    author: string;
 
     @Column({
         type: DataType.INTEGER,
