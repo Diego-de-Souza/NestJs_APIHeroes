@@ -32,6 +32,58 @@ O formato segue as convenções de [Keep a Changelog](https://keepachangelog.co
 
 ---
 
+# **[1.4.0]- 2026-01-18**
+
+### **✨ Added**
+
+- Sistema completo de notificações para usuários com suporte a múltiplos tipos (info, success, warning, error, system).
+- Novos endpoints para gerenciamento de notificações (`GET /api/notifications`, `GET /api/notifications/:id`, `PATCH /api/notifications/:id/read`, `DELETE /api/notifications/:id`, `POST /api/notifications`).
+- Sistema completo de SAC (Serviço de Atendimento ao Cliente) com gerenciamento de solicitações e respostas.
+- Novos endpoints para SAC (`POST /api/sac/contacts`, `GET /api/sac/contacts`, `GET /api/sac/contacts/:id`, `PATCH /api/sac/contacts/:id/status`, `DELETE /api/sac/contacts/:id`, `POST /api/sac/contacts/:id/responses`).
+- Tabela `notifications` no banco de dados com campos para título, mensagem, imagem, autor, tipo e status de leitura.
+- Tabela `sac_contacts` para armazenar solicitações de contato (suporte, reclamação, elogio) com sistema de tickets.
+- Tabela `sac_responses` para armazenar respostas às solicitações SAC.
+- Tabela `sac_attachments` para anexos de solicitações e respostas SAC (estrutura criada para uso futuro).
+- Tabela `sac_ticket_sequence` para geração automática e sequencial de números de ticket (formato: TKT-YYYY-NNNN).
+- Modelos Sequelize `Notification`, `SacContact`, `SacResponse`, `SacAttachment` com associações configuradas.
+- DTOs para notificações: `CreateNotificationDto`.
+- DTOs para SAC: `CreateContactDto`, `CreateResponseDto`, `UpdateStatusDto`, `FilterContactsDto`.
+- Use cases para notificações: `CreateNotificationUseCase`, `FindNotificationsByUserIdUseCase`, `FindNotificationByIdUseCase`, `MarkNotificationAsReadUseCase`, `DeleteNotificationUseCase`.
+- Use cases para SAC: `CreateContactUseCase`, `FindContactsByUserIdUseCase`, `FindContactByIdUseCase`, `FindAllContactsUseCase`, `UpdateContactStatusUseCase`, `DeleteContactUseCase`, `CreateResponseUseCase`.
+- Repository `NotificationsRepository` com métodos CRUD e busca por usuário.
+- Repository `SacRepository` com métodos CRUD, filtros avançados e geração automática de ticket numbers.
+- Service `NotificationsService` para orquestração de operações de notificações.
+- Service `SacService` para orquestração de operações de SAC.
+- Controller `NotificationsController` com rotas protegidas por `AuthGuard`.
+- Controller `SacController` com rotas protegidas por `AuthGuard` e controle de acesso baseado em roles.
+- Módulos `NotificationsModule` e `SacModule` configurados com todas as dependências.
+- Geração automática de `tag_color` baseada no tipo de notificação (info: #00d2ff, success: #4caf50, warning: #ff9800, error: #e62429, system: #9c27b0).
+- Sistema de tickets sequenciais com formato único `TKT-YYYY-NNNN` reiniciando a cada ano.
+- Filtros avançados para listagem de solicitações SAC (tipo, status, prioridade, busca textual, filtro por data, paginação).
+- Validação de propriedade para garantir que usuários só acessem suas próprias notificações e solicitações.
+- Suporte a paginação na listagem de solicitações SAC com limite máximo de 100 itens por página.
+
+### **🛠️ Changed**
+
+- Atualizado `index.model.ts` para incluir novos modelos `Notification`, `SacContact`, `SacResponse`, `SacAttachment` e suas associações.
+- Atualizado `index.modules.ts` para incluir `NotificationsModule` e `SacModule` na lista de módulos da aplicação.
+
+### **🐛 Fixed**
+
+- Corrigido erro de TypeScript relacionado a modificação de propriedade `readonly` no DTO `FilterContactsDto` no controller SAC.
+
+### **🛑 Security**
+
+- Implementada validação de propriedade para garantir que clientes só possam visualizar, marcar como lida e excluir suas próprias notificações.
+- Proteção de todas as rotas de notificações com `AuthGuard` para autenticação obrigatória.
+- Implementada validação de propriedade para garantir que clientes só possam visualizar suas próprias solicitações SAC.
+- Proteção de todas as rotas de SAC com `AuthGuard` para autenticação obrigatória.
+- Apenas administradores podem criar notificações para outros usuários, atualizar status de solicitações SAC e excluir solicitações.
+- Validação de roles (admin/root) para operações administrativas em SAC.
+- Uso de `usuario_id` extraído do token JWT para garantir integridade dos dados.
+
+---
+
 # **[1.3.0]- 2026-01-16**
 
 ### **✨ Added**
