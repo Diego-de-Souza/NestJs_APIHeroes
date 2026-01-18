@@ -525,3 +525,103 @@ CREATE INDEX IF NOT EXISTS idx_access_logs_action_timestamp ON access_logs(actio
 CREATE TRIGGER update_access_logs_updated_at 
 BEFORE UPDATE ON access_logs
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- =====================
+-- TABELA: notifications
+-- =====================
+CREATE TABLE IF NOT EXISTS notifications (
+    id SERIAL PRIMARY KEY,
+    usuario_id INTEGER NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    message TEXT NOT NULL,
+    image VARCHAR(500) NULL,
+    author VARCHAR(100) DEFAULT 'Sistema',
+    type VARCHAR(20) DEFAULT 'info' CHECK (type IN ('info', 'success', 'warning', 'error', 'system')),
+    tag_color VARCHAR(7) DEFAULT '#00d2ff',
+    read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT fk_notifications_usuario FOREIGN KEY (usuario_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_usuario_id ON notifications(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_read ON notifications(read);
+CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created_at DESC);
+
+CREATE TRIGGER update_notifications_updated_at 
+BEFORE UPDATE ON notifications
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- =====================
+-- TABELA: sac_contacts
+-- =====================
+CREATE TABLE IF NOT EXISTS sac_contacts (
+    id SERIAL PRIMARY KEY,
+    usuario_id INTEGER NOT NULL,
+    ticket_number VARCHAR(20) UNIQUE NOT NULL,
+    type VARCHAR(20) NOT NULL CHECK (type IN ('suporte', 'reclamacao', 'elogio')),
+    subject VARCHAR(200) NOT NULL,
+    message TEXT NOT NULL,
+    priority VARCHAR(20) DEFAULT 'normal' CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
+    status VARCHAR(20) DEFAULT 'aberto' CHECK (status IN ('aberto', 'em_andamento', 'resolvido', 'fechado')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT fk_sac_contacts_usuario FOREIGN KEY (usuario_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_sac_contacts_usuario_id ON sac_contacts(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_sac_contacts_status ON sac_contacts(status);
+CREATE INDEX IF NOT EXISTS idx_sac_contacts_type ON sac_contacts(type);
+CREATE INDEX IF NOT EXISTS idx_sac_contacts_ticket_number ON sac_contacts(ticket_number);
+
+CREATE TRIGGER update_sac_contacts_updated_at 
+BEFORE UPDATE ON sac_contacts
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- =====================
+-- TABELA: sac_responses
+-- =====================
+CREATE TABLE IF NOT EXISTS sac_responses (
+    id SERIAL PRIMARY KEY,
+    contact_id INTEGER NOT NULL,
+    message TEXT NOT NULL,
+    author VARCHAR(100) NOT NULL DEFAULT 'Sistema',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT fk_sac_responses_contact FOREIGN KEY (contact_id) REFERENCES sac_contacts(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_sac_responses_contact_id ON sac_responses(contact_id);
+
+-- =====================
+-- TABELA: sac_attachments
+-- =====================
+CREATE TABLE IF NOT EXISTS sac_attachments (
+    id SERIAL PRIMARY KEY,
+    contact_id INTEGER NULL,
+    response_id INTEGER NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(500) NOT NULL,
+    file_size BIGINT NOT NULL,
+    mime_type VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT fk_sac_attachments_contact FOREIGN KEY (contact_id) REFERENCES sac_contacts(id) ON DELETE CASCADE,
+    CONSTRAINT fk_sac_attachments_response FOREIGN KEY (response_id) REFERENCES sac_responses(id) ON DELETE CASCADE,
+    CHECK ((contact_id IS NOT NULL AND response_id IS NULL) OR (contact_id IS NULL AND response_id IS NOT NULL))
+);
+
+CREATE INDEX IF NOT EXISTS idx_sac_attachments_contact_id ON sac_attachments(contact_id);
+CREATE INDEX IF NOT EXISTS idx_sac_attachments_response_id ON sac_attachments(response_id);
+
+-- =====================
+-- TABELA: sac_ticket_sequence
+-- =====================
+CREATE TABLE IF NOT EXISTS sac_ticket_sequence (
+    year INTEGER PRIMARY KEY,
+    last_number INTEGER DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Inserir registro inicial para o ano atual
+INSERT INTO sac_ticket_sequence (year, last_number) 
+VALUES (EXTRACT(YEAR FROM CURRENT_DATE)::INTEGER, 0)
+ON CONFLICT (year) DO NOTHING;

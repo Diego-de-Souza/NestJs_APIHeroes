@@ -21,6 +21,10 @@ import { AccessLog } from './access-log.model';
 import { Comment } from './comment.model';
 import { CommentLike } from './comment-like.model';
 import { News } from './news.model';
+import { Notification } from './notification.model';
+import { SacContact } from './sac-contact.model';
+import { SacResponse } from './sac-response.model';
+import { SacAttachment } from './sac-attachment.model';
 
 export { 
   Heroes, 
@@ -45,7 +49,11 @@ export {
   AccessLog,
   Comment,
   CommentLike,
-  News
+  News,
+  Notification,
+  SacContact,
+  SacResponse,
+  SacAttachment
 }; 
 
 export const models = [
@@ -71,7 +79,11 @@ export const models = [
   AccessLog,
   Comment,
   CommentLike,
-  News
+  News,
+  Notification,
+  SacContact,
+  SacResponse,
+  SacAttachment
 ];
 
 export function defineAssociations() {
@@ -134,4 +146,21 @@ export function defineAssociations() {
 
   User.hasMany(CommentLike, { foreignKey: 'user_id', as: 'commentLikes' });
   CommentLike.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+  // ✅ Notifications Associations
+  User.hasMany(Notification, { foreignKey: 'usuario_id', as: 'notifications' });
+  Notification.belongsTo(User, { foreignKey: 'usuario_id', as: 'user' });
+
+  // ✅ SAC Associations
+  User.hasMany(SacContact, { foreignKey: 'usuario_id', as: 'sacContacts' });
+  SacContact.belongsTo(User, { foreignKey: 'usuario_id', as: 'user' });
+
+  SacContact.hasMany(SacResponse, { foreignKey: 'contact_id', as: 'responses' });
+  SacResponse.belongsTo(SacContact, { foreignKey: 'contact_id', as: 'contact' });
+
+  SacContact.hasMany(SacAttachment, { foreignKey: 'contact_id', as: 'attachments' });
+  SacAttachment.belongsTo(SacContact, { foreignKey: 'contact_id', as: 'contact' });
+
+  SacResponse.hasMany(SacAttachment, { foreignKey: 'response_id', as: 'attachments' });
+  SacAttachment.belongsTo(SacResponse, { foreignKey: 'response_id', as: 'response' });
 }
