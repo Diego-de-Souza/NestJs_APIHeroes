@@ -53,15 +53,15 @@ jobs:
           NODE_ENV: production
 
       - name: Configure SSH
+        if: ${{ secrets.BACKEND_HOST != '' }}
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          if [ -n "${{ secrets.BACKEND_HOST }}" ]; then
-            ssh-keyscan -H "${{ secrets.BACKEND_HOST }}" >> ~/.ssh/known_hosts || true
-          fi
+          ssh-keyscan -H "${{ secrets.BACKEND_HOST }}" >> ~/.ssh/known_hosts || true
 
       - name: Copy files to EC2
+        if: ${{ secrets.BACKEND_HOST != '' }}
         run: |
           rsync -avz -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
             --exclude 'node_modules' \
@@ -72,12 +72,14 @@ jobs:
             ./ ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }}:${{ env.APP_DIR }}/
 
       - name: Install dependencies on server
+        if: ${{ secrets.BACKEND_HOST != '' }}
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} \
             "cd ${{ env.APP_DIR }} && npm install --production"
 
       - name: Create .env file on EC2
+        if: ${{ secrets.BACKEND_HOST != '' }}
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} bash << 'SSHEOF'
@@ -86,15 +88,14 @@ jobs:
           PORT=${{ vars.PORT || '3000' }}
           
           # Database (RDS PostgreSQL)
-          DB_HOST=${{ vars.DB_HOST }}
+          DB_HOST=${{ secrets.DB_HOST }}
           DB_PORT=${{ vars.DB_PORT || '5432' }}
-          DB_USERNAME=${{ vars.DB_USERNAME }}
-          DB_NAME=${{ vars.DB_NAME }}
-          DB_SSL=false
-          # DB_PASSWORD será obtido dinamicamente do Secrets Manager via get-db-password.sh
-          DB_PASSWORD_SECRET=${{ secrets.DB_PASSWORD_SECRET_ARN }}
-          # Opcional: DATABASE_URL completa (se preferir usar diretamente)
-          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          DB_USERNAME=${{ secrets.DB_USERNAME }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          DB_SSL=${{ vars.DB_SSL || 'false' }}
+          # DB_PASSWORD será obtido do secret (ou do Secrets Manager via get-db-password.sh se DB_PASSWORD_SECRET_ARN estiver definido)
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_PASSWORD_SECRET=${{ secrets.DB_PASSWORD_SECRET_ARN || '' }}
           
           # AWS
           AWS_REGION=${{ vars.AWS_REGION || 'us-east-1' }}
@@ -132,6 +133,7 @@ jobs:
           SSHEOF
 
       - name: Create get-db-password.sh script on EC2
+        if: ${{ secrets.BACKEND_HOST != '' && secrets.DB_PASSWORD_SECRET_ARN != '' }}
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} bash << 'SSHEOF'
@@ -169,6 +171,7 @@ jobs:
           SSHEOF
 
       - name: Create start.sh script on EC2
+        if: ${{ secrets.BACKEND_HOST != '' }}
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} bash << 'SSHEOF'
@@ -221,12 +224,14 @@ jobs:
           SSHEOF
 
       - name: Restart application with PM2
+        if: ${{ secrets.BACKEND_HOST != '' }}
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} \
             "cd ${{ env.APP_DIR }} && /opt/app/start.sh"
 
       - name: Health check
+        if: ${{ secrets.BACKEND_HOST != '' }}
         run: |
           sleep 10
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
