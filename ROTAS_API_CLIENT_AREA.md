@@ -1,7 +1,7 @@
 # Rotas da API - Área do Cliente
 
 Este documento detalha todas as rotas da API relacionadas à área do cliente para gerenciamento de artigos e notícias.
-
+ 
 ## Base URL
 ```
 /api/client
