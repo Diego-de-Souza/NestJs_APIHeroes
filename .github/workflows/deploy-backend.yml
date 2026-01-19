@@ -55,8 +55,18 @@ jobs:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          # Salva a chave SSH removendo espaços extras e garantindo formato correto
+          cat > ~/.ssh/deploy_key << 'KEYEOF'
+          ${{ secrets.SSH_PRIVATE_KEY }}
+          KEYEOF
           chmod 600 ~/.ssh/deploy_key
+          # Verifica se a chave está no formato correto
+          if ! ssh-keygen -l -f ~/.ssh/deploy_key >/dev/null 2>&1; then
+            echo "⚠️ Warning: SSH key format validation failed"
+            echo "First 50 chars of key:"
+            head -c 50 ~/.ssh/deploy_key
+            echo ""
+          fi
           ssh-keyscan -H "${{ secrets.EC2_HOST || secrets.DB_HOST }}" >> ~/.ssh/known_hosts || true
 
       - name: Test SSH connection
