@@ -59,9 +59,21 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H "${{ secrets.DB_HOST }}" >> ~/.ssh/known_hosts || true
 
+      - name: Test SSH connection
+        run: |
+          echo "Testing SSH connection to ${{ secrets.DB_HOST }}..."
+          ssh -i ~/.ssh/deploy_key \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=30 \
+            -o BatchMode=yes \
+            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} \
+            "echo 'SSH connection successful!'" || (echo "❌ SSH connection failed. Please check:" && echo "1. Security Group allows SSH (port 22) from GitHub Actions IPs" && echo "2. EC2 instance is running" && echo "3. DB_HOST secret contains the correct EC2 IP/hostname (not RDS endpoint)" && exit 1)
+
       - name: Install rsync on EC2
         run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=10 \
+          ssh -i ~/.ssh/deploy_key \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=30 \
             ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} \
             "command -v rsync >/dev/null 2>&1 || (sudo yum install -y rsync || sudo apt-get update && sudo apt-get install -y rsync || sudo apk add --no-cache rsync)"
       
