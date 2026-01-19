@@ -86,7 +86,17 @@ jobs:
             -o StrictHostKeyChecking=no \
             -o ConnectTimeout=30 \
             ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
-            "command -v rsync >/dev/null 2>&1 || (sudo yum install -y rsync || sudo apt-get update && sudo apt-get install -y rsync || sudo apk add --no-cache rsync)"
+            "if command -v rsync >/dev/null 2>&1; then \
+              echo 'rsync already installed'; \
+            elif command -v yum >/dev/null 2>&1; then \
+              sudo yum install -y rsync; \
+            elif command -v apt-get >/dev/null 2>&1; then \
+              sudo apt-get update && sudo apt-get install -y rsync; \
+            elif command -v apk >/dev/null 2>&1; then \
+              sudo apk add --no-cache rsync; \
+            else \
+              echo 'No package manager found'; exit 1; \
+            fi"
       
       - name: Copy files to EC2
         run: |
