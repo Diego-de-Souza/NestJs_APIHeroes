@@ -21,7 +21,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  BACKEND_HOST: ${{ secrets.DB_HOST }}
+  BACKEND_HOST: ${{ secrets.EC2_HOST || secrets.DB_HOST }}
   SSH_USER: ec2-user
   APP_DIR: /opt/app
 
@@ -57,24 +57,25 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "${{ secrets.DB_HOST }}" >> ~/.ssh/known_hosts || true
+          ssh-keyscan -H "${{ secrets.EC2_HOST || secrets.DB_HOST }}" >> ~/.ssh/known_hosts || true
 
       - name: Test SSH connection
         run: |
-          echo "Testing SSH connection to ${{ secrets.DB_HOST }}..."
+          EC2_HOST="${{ secrets.EC2_HOST || secrets.DB_HOST }}"
+          echo "Testing SSH connection to $EC2_HOST..."
           ssh -i ~/.ssh/deploy_key \
             -o StrictHostKeyChecking=no \
             -o ConnectTimeout=30 \
             -o BatchMode=yes \
-            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} \
-            "echo 'SSH connection successful!'" || (echo "❌ SSH connection failed. Please check:" && echo "1. Security Group allows SSH (port 22) from GitHub Actions IPs" && echo "2. EC2 instance is running" && echo "3. DB_HOST secret contains the correct EC2 IP/hostname (not RDS endpoint)" && exit 1)
+            ${{ env.SSH_USER }}@$EC2_HOST \
+            "echo 'SSH connection successful!'" || (echo "❌ SSH connection failed. Please check:" && echo "1. Security Group allows SSH (port 22) from GitHub Actions IPs" && echo "2. EC2 instance is running" && echo "3. Create secret 'EC2_HOST' with EC2 public IP/hostname (not RDS endpoint)" && echo "   Current value: $EC2_HOST" && exit 1)
 
       - name: Install rsync on EC2
         run: |
           ssh -i ~/.ssh/deploy_key \
             -o StrictHostKeyChecking=no \
             -o ConnectTimeout=30 \
-            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} \
+            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
             "command -v rsync >/dev/null 2>&1 || (sudo yum install -y rsync || sudo apt-get update && sudo apt-get install -y rsync || sudo apk add --no-cache rsync)"
       
       - name: Copy files to EC2
@@ -85,18 +86,18 @@ jobs:
             --exclude '*.log' \
             --exclude '.env' \
             --exclude '.github' \
-            ./ ${{ env.SSH_USER }}@${{ secrets.DB_HOST }}:${{ env.APP_DIR }}/
+            ./ ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }}:${{ env.APP_DIR }}/
 
       - name: Install dependencies on server
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} \
+            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
             "cd ${{ env.APP_DIR }} && npm install --production"
 
       - name: Create .env file on EC2
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} bash << 'SSHEOF'
+            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} bash << 'SSHEOF'
           cat > ${{ env.APP_DIR }}/.env << 'ENVEOF'
           NODE_ENV=production
           PORT=${{ vars.PORT || '3000' }}
@@ -149,7 +150,7 @@ jobs:
       - name: Create get-db-password.sh script on EC2
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} bash << 'SSHEOF'
+            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} bash << 'SSHEOF'
           cat > ${{ env.APP_DIR }}/get-db-password.sh << 'SCRIPTEOF'
           #!/bin/bash
           # Script para obter senha do banco do AWS Secrets Manager
@@ -186,7 +187,7 @@ jobs:
       - name: Create start.sh script on EC2
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} bash << 'SSHEOF'
+            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} bash << 'SSHEOF'
           cat > ${{ env.APP_DIR }}/start.sh << 'SCRIPTEOF'
           #!/bin/bash
           set -e
@@ -238,14 +239,14 @@ jobs:
       - name: Restart application with PM2
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} \
+            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
             "cd ${{ env.APP_DIR }} && /opt/app/start.sh"
 
       - name: Health check
         run: |
           sleep 10
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} \
+            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
             "pm2 status"
 
       - name: Cleanup SSH key
