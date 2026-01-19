@@ -98,6 +98,12 @@ jobs:
               echo 'No package manager found'; exit 1; \
             fi"
       
+      - name: Prepare app directory on EC2
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
+            "sudo mkdir -p ${{ env.APP_DIR }} && sudo chown -R ${{ env.SSH_USER }}:${{ env.SSH_USER }} ${{ env.APP_DIR }}"
+      
       - name: Copy files to EC2
         run: |
           rsync -avz -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
