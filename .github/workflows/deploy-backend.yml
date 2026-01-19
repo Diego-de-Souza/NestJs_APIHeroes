@@ -124,7 +124,7 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
-            "cd ${{ env.APP_DIR }} && echo 'Current directory:' && pwd && echo 'Files before build:' && ls -la && echo 'Running build...' && NODE_ENV=production npm run build && echo 'Files after build:' && ls -la && echo 'Checking dist directory:' && ls -la dist/ 2>&1 || echo 'dist directory not found' && if [ -f dist/shared/main.js ]; then echo '✅ dist/shared/main.js exists'; else echo '❌ dist/shared/main.js NOT FOUND'; exit 1; fi"
+            "cd ${{ env.APP_DIR }} && echo 'Current directory:' && pwd && echo 'Files before build:' && ls -la && echo 'Running build...' && NODE_ENV=production npm run build && echo 'Files after build:' && ls -la && echo 'Checking dist directory:' && ls -la dist/ 2>&1 || echo 'dist directory not found' && if [ -f dist/src/main.js ]; then echo '✅ dist/src/main.js exists'; else echo '❌ dist/src/main.js NOT FOUND'; exit 1; fi"
 
       - name: Create .env file on EC2
         run: |
@@ -250,7 +250,7 @@ jobs:
           pm2 delete api 2>/dev/null || true
           
           # Inicia nova instância
-          pm2 start dist/shared/main.js \
+          pm2 start dist/src/main.js \
               --name api \
               --instances 1 \
               --max-memory-restart 500M \
