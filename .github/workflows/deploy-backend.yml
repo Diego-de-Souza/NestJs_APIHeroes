@@ -79,53 +79,53 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} \
-            'cat > ${{ env.APP_DIR }}/.env << '"'"'EOF'"'"'
-          NODE_ENV=production
-          PORT=${{ vars.PORT || '3000' }}
-          
-          # Database (RDS PostgreSQL)
-          DB_HOST=${{ vars.DB_HOST }}
-          DB_PORT=${{ vars.DB_PORT || '5432' }}
-          DB_USERNAME=${{ vars.DB_USERNAME }}
-          DB_NAME=${{ vars.DB_NAME }}
-          DB_SSL=false
-          # DB_PASSWORD será obtido dinamicamente do Secrets Manager via get-db-password.sh
-          DB_PASSWORD_SECRET=${{ secrets.DB_PASSWORD_SECRET_ARN }}
-          # Opcional: DATABASE_URL completa (se preferir usar diretamente)
-          DATABASE_URL=${{ secrets.DATABASE_URL }}
-          
-          # AWS
-          AWS_REGION=${{ vars.AWS_REGION || 'us-east-1' }}
-          AWS_S3_BUCKET=${{ vars.AWS_S3_BUCKET }}
-          CLOUDFRONT_URL=${{ vars.CLOUDFRONT_URL }}
-          
-          # JWT
-          SECRET_KEY=${{ secrets.SECRET_KEY }}
-          REFRESH_SECRET_KEY=${{ secrets.REFRESH_SECRET_KEY }}
-          
-          # Frontend
-          FRONTEND_URL=${{ vars.FRONTEND_URL }}
-          
-          # Stripe
-          STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
-          STRIPE_MONTHLY_PRICE_ID=${{ secrets.STRIPE_MONTHLY_PRICE_ID }}
-          STRIPE_QUARTERLY_PRICE_ID=${{ secrets.STRIPE_QUARTERLY_PRICE_ID }}
-          STRIPE_SEMIANNUAL_PRICE_ID=${{ secrets.STRIPE_SEMIANNUAL_PRICE_ID }}
-          STRIPE_ANNUAL_PRICE_ID=${{ secrets.STRIPE_ANNUAL_PRICE_ID }}
-          
-          # APIs (Opcional)
-          UNSPLASH_ACCESS_KEY=${{ secrets.UNSPLASH_ACCESS_KEY }}
-          PIXABAY_API_KEY=${{ secrets.PIXABAY_API_KEY }}
-          PEXELS_API_KEY=${{ secrets.PEXELS_API_KEY }}
-          GIPHY_API_KEY=${{ secrets.GIPHY_API_KEY }}
-          
-          # Swagger
-          ENABLE_SWAGGER=${{ vars.ENABLE_SWAGGER || 'false' }}
-          
-          # Root User
-          ROOT_PASSWORD=${{ secrets.ROOT_PASSWORD }}
-          EOF'
+            "cat > ${{ env.APP_DIR }}/.env << 'ENVEOF'
+NODE_ENV=production
+PORT=${{ vars.PORT || '3000' }}
+
+# Database (RDS PostgreSQL)
+DB_HOST=${{ vars.DB_HOST }}
+DB_PORT=${{ vars.DB_PORT || '5432' }}
+DB_USERNAME=${{ vars.DB_USERNAME }}
+DB_NAME=${{ vars.DB_NAME }}
+DB_SSL=false
+# DB_PASSWORD será obtido dinamicamente do Secrets Manager via get-db-password.sh
+DB_PASSWORD_SECRET=${{ secrets.DB_PASSWORD_SECRET_ARN }}
+# Opcional: DATABASE_URL completa (se preferir usar diretamente)
+DATABASE_URL=${{ secrets.DATABASE_URL }}
+
+# AWS
+AWS_REGION=${{ vars.AWS_REGION || 'us-east-1' }}
+AWS_S3_BUCKET=${{ vars.AWS_S3_BUCKET }}
+CLOUDFRONT_URL=${{ vars.CLOUDFRONT_URL }}
+
+# JWT
+SECRET_KEY=${{ secrets.SECRET_KEY }}
+REFRESH_SECRET_KEY=${{ secrets.REFRESH_SECRET_KEY }}
+
+# Frontend
+FRONTEND_URL=${{ vars.FRONTEND_URL }}
+
+# Stripe
+STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+STRIPE_MONTHLY_PRICE_ID=${{ secrets.STRIPE_MONTHLY_PRICE_ID }}
+STRIPE_QUARTERLY_PRICE_ID=${{ secrets.STRIPE_QUARTERLY_PRICE_ID }}
+STRIPE_SEMIANNUAL_PRICE_ID=${{ secrets.STRIPE_SEMIANNUAL_PRICE_ID }}
+STRIPE_ANNUAL_PRICE_ID=${{ secrets.STRIPE_ANNUAL_PRICE_ID }}
+
+# APIs (Opcional)
+UNSPLASH_ACCESS_KEY=${{ secrets.UNSPLASH_ACCESS_KEY }}
+PIXABAY_API_KEY=${{ secrets.PIXABAY_API_KEY }}
+PEXELS_API_KEY=${{ secrets.PEXELS_API_KEY }}
+GIPHY_API_KEY=${{ secrets.GIPHY_API_KEY }}
+
+# Swagger
+ENABLE_SWAGGER=${{ vars.ENABLE_SWAGGER || 'false' }}
+
+# Root User
+ROOT_PASSWORD=${{ secrets.ROOT_PASSWORD }}
+ENVEOF"
 
       - name: Create get-db-password.sh script on EC2
         run: |
