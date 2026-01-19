@@ -59,6 +59,12 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H "${{ secrets.DB_HOST }}" >> ~/.ssh/known_hosts || true
 
+      - name: Install rsync on EC2
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=10 \
+            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} \
+            "command -v rsync >/dev/null 2>&1 || (sudo yum install -y rsync || sudo apt-get update && sudo apt-get install -y rsync || sudo apk add --no-cache rsync)"
+      
       - name: Copy files to EC2
         run: |
           rsync -avz -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
@@ -78,7 +84,7 @@ jobs:
       - name: Create .env file on EC2
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} bash << 'SSHEOF'
+            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} bash << 'SSHEOF'
           cat > ${{ env.APP_DIR }}/.env << 'ENVEOF'
           NODE_ENV=production
           PORT=${{ vars.PORT || '3000' }}
@@ -131,7 +137,7 @@ jobs:
       - name: Create get-db-password.sh script on EC2
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} bash << 'SSHEOF'
+            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} bash << 'SSHEOF'
           cat > ${{ env.APP_DIR }}/get-db-password.sh << 'SCRIPTEOF'
           #!/bin/bash
           # Script para obter senha do banco do AWS Secrets Manager
@@ -168,7 +174,7 @@ jobs:
       - name: Create start.sh script on EC2
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} bash << 'SSHEOF'
+            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} bash << 'SSHEOF'
           cat > ${{ env.APP_DIR }}/start.sh << 'SCRIPTEOF'
           #!/bin/bash
           set -e
