@@ -24,10 +24,10 @@ export class UpdateHeroesUseCase {
             }
         }
 
-        // Salva as imagens no CloudFlare se existirem
+        // Salva as imagens no S3 se existirem
         if (heroesDto.image1) {
             try {
-                this.logger.log('Salvando image1 no CloudFlare...');
+                this.logger.log('Salvando image1 no S3...');
                 // Deleta a imagem antiga se existir
                 if (heroesExists.image1 && typeof heroesExists.image1 === 'string') {
                     try {
@@ -46,13 +46,13 @@ export class UpdateHeroesUseCase {
                 (heroesDto as any).image1 = image1Url;
                 this.logger.log(`Image1 salva com sucesso: ${image1Url}`);
             } catch (error) {
-                this.logger.error('Erro ao salvar image1 no CloudFlare:', error);
+                this.logger.error('Erro ao salvar image1 no S3:', error);
             }
         }
 
         if (heroesDto.image2) {
             try {
-                this.logger.log('Salvando image2 no CloudFlare...');
+                this.logger.log('Salvando image2 no S3...');
                 // Deleta a imagem antiga se existir
                 if (heroesExists.image2 && typeof heroesExists.image2 === 'string') {
                     try {
@@ -71,7 +71,7 @@ export class UpdateHeroesUseCase {
                 (heroesDto as any).image2 = image2Url;
                 this.logger.log(`Image2 salva com sucesso: ${image2Url}`);
             } catch (error) {
-                this.logger.error('Erro ao salvar image2 no CloudFlare:', error);
+                this.logger.error('Erro ao salvar image2 no S3:', error);
             }
         }
 

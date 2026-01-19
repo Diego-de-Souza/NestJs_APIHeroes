@@ -15,40 +15,42 @@ function loadPostgresDriver() {
   }
 }
 
-export const sequelizeConfig: SequelizeModuleOptions = isProduction && process.env.DATABASE_URL
-  ? (() => {
-      const dbUrl = new URL(process.env.DATABASE_URL);
-      // Se SUPABASE_SERVICE_ROLE_KEY estiver definida, usa ela para bypassar o RLS
-      const password = process.env.SUPABASE_SERVICE_ROLE_KEY || dbUrl.password;
-      // No Supabase, o usuário geralmente é 'postgres'
-      const username = process.env.SUPABASE_SERVICE_ROLE_KEY ? 'postgres' : dbUrl.username;
+export const sequelizeConfig: SequelizeModuleOptions = (() => {
+      // Prioridade 1: DATABASE_URL (para compatibilidade, mas agora é RDS)
+      // Prioridade 2: Variáveis individuais (DB_HOST, DB_USERNAME, etc.)
+      // Prioridade 3: Valores padrão para desenvolvimento local
       
-      return {
-        dialect: 'postgres',
-        dialectModule: loadPostgresDriver(),
-        host: dbUrl.hostname,
-        port: parseInt(dbUrl.port, 10) || 5432,
-        username: username,
-        password: password,
-        database: dbUrl.pathname.slice(1),
-        autoLoadModels: true,
-        synchronize: false,
-        dialectOptions: {
-          ssl: {
-            require: true,
-            rejectUnauthorized: false,
+      if (isProduction && process.env.DATABASE_URL) {
+        // Se DATABASE_URL está definido (pode ser RDS ou outro PostgreSQL)
+        const dbUrl = new URL(process.env.DATABASE_URL);
+        return {
+          dialect: 'postgres',
+          dialectModule: loadPostgresDriver(),
+          host: dbUrl.hostname,
+          port: parseInt(dbUrl.port, 10) || 5432,
+          username: dbUrl.username,
+          password: dbUrl.password,
+          database: dbUrl.pathname.slice(1),
+          autoLoadModels: true,
+          synchronize: false,
+          dialectOptions: {
+            ssl: process.env.DB_SSL === 'true' ? {
+              require: true,
+              rejectUnauthorized: false,
+            } : false,
           },
-        },
-        logging: false,
-        pool: {
-          max: 10,
-          min: 2,
-          acquire: 30000,
-          idle: 10000,
-        },
-      };
-    })()
-  : {
+          logging: false,
+          pool: {
+            max: 10,
+            min: 2,
+            acquire: 30000,
+            idle: 10000,
+          },
+        };
+      }
+      
+      // Usar variáveis individuais (RDS padrão ou desenvolvimento)
+      return {
       dialect: 'postgres',
       dialectModule: loadPostgresDriver(),
       host: process.env.DB_HOST || 'localhost',
@@ -59,13 +61,18 @@ export const sequelizeConfig: SequelizeModuleOptions = isProduction && process.e
       autoLoadModels: true,
       synchronize: false,
       dialectOptions: {
-        ssl: false,
+        // RDS geralmente não requer SSL no mesmo VPC, mas pode configurar se necessário
+        ssl: process.env.DB_SSL === 'true' ? {
+          require: true,
+          rejectUnauthorized: false,
+        } : false,
       },
-      logging: (msg: string) => logger.debug(msg),
+      logging: isProduction ? false : (msg: string) => logger.debug(msg),
       pool: {
-        max: 5,
-        min: 0,
+        max: isProduction ? 10 : 5,
+        min: isProduction ? 2 : 0,
         acquire: 30000,
         idle: 10000,
       },
     };
+})();

@@ -1,23 +1,35 @@
 import { Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { ConverterImageUseCase } from "../use-cases/images/converter-image.use-case";
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
-import * as process from "process";
 
 @Injectable()
 export class ImageService {
     private readonly logger = new Logger(ImageService.name);
-    private readonly connection_s3: S3Client;
+    private readonly s3Client: S3Client;
+    private readonly bucketName: string;
+    private readonly cloudfrontUrl: string;
+    private readonly region: string;
+
     constructor(
-        private readonly converterImageUseCase: ConverterImageUseCase
+        private readonly converterImageUseCase: ConverterImageUseCase,
+        private readonly configService: ConfigService
     ){
-        this.connection_s3 = new S3Client({
-            region: "auto",
-            endpoint: process.env.R2_ENDPOINT,
-            credentials: {
-                accessKeyId: process.env.R2_ACCESS_KEY!,
-                secretAccessKey: process.env.R2_SECRET_KEY!
-            }
+        this.region = this.configService.get<string>('AWS_REGION') || 'us-east-1';
+        this.bucketName = this.configService.get<string>('AWS_S3_BUCKET') || process.env.AWS_S3_BUCKET || '';
+        this.cloudfrontUrl = this.configService.get<string>('CLOUDFRONT_URL') || process.env.CLOUDFRONT_URL || '';
+
+        // Na EC2, o S3Client usa automaticamente a IAM Role (não precisa de credentials explícitas)
+        // Localmente ou fora da EC2, pode usar credenciais via variáveis de ambiente se necessário
+        this.s3Client = new S3Client({
+            region: this.region,
+            // Credenciais são obtidas automaticamente da IAM Role quando roda na EC2
+            // Se necessário para desenvolvimento local, pode usar:
+            // credentials: process.env.AWS_ACCESS_KEY_ID ? {
+            //     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            //     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!
+            // } : undefined
         });
     }
     
@@ -29,17 +41,17 @@ export class ImageService {
             // Gera nome único para imagem
             const fileName = `${folderName}/${uuidv4()}.jpg`;
             
-            // Faz upload
-            await this.connection_s3.send(new PutObjectCommand({
-                Bucket: process.env.R2_BUCKET,
+            // Faz upload no S3 (bucket privado)
+            await this.s3Client.send(new PutObjectCommand({
+                Bucket: this.bucketName,
                 Key: fileName,
                 Body: imageBuffer,
                 ContentType: "image/jpeg",
-                ACL: "public-read"
+                // Não usar ACL: 'public-read' - bucket é privado, acesso via CloudFront
             }));
 
-            // Monta URL pública
-            imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
+            // Monta URL pública via CloudFront (não do S3 diretamente)
+            imageUrl = `${this.cloudfrontUrl}/${fileName}`;
             return imageUrl;
         }catch(error){
             this.logger.error("Error saving image:", error);
@@ -73,17 +85,17 @@ export class ImageService {
             // Gera nome único para imagem
             const fileName = `${folderName}/${uuidv4()}.${extension}`;
             
-            // Faz upload
-            await this.connection_s3.send(new PutObjectCommand({
-                Bucket: process.env.R2_BUCKET,
+            // Faz upload no S3 (bucket privado)
+            await this.s3Client.send(new PutObjectCommand({
+                Bucket: this.bucketName,
                 Key: fileName,
                 Body: buffer,
                 ContentType: detectedContentType,
-                ACL: "public-read"
+                // Não usar ACL: 'public-read' - bucket é privado, acesso via CloudFront
             }));
 
-            // Monta URL pública
-            imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
+            // Monta URL pública via CloudFront (não do S3 diretamente)
+            imageUrl = `${this.cloudfrontUrl}/${fileName}`;
             return imageUrl;
         }catch(error){
             this.logger.error("Error saving image from buffer:", error);
@@ -93,15 +105,25 @@ export class ImageService {
 
     async deleteImage(imageUrl: string): Promise<void> {
         try{
-            const publicUrl = process.env.R2_PUBLIC_URL!;
-            let key = imageUrl.replace(publicUrl, '').replace(/^\/+/, '');
+            // Remove a URL do CloudFront para obter apenas o key do S3
+            // Exemplo: https://dlh5iebwq8aw1.cloudfront.net/heroes/image.jpg -> heroes/image.jpg
+            let key = imageUrl;
+            if (this.cloudfrontUrl) {
+                key = imageUrl.replace(this.cloudfrontUrl, '').replace(/^\/+/, '');
+            } else {
+                // Fallback: tenta extrair do padrão S3 URL ou CloudFront
+                key = imageUrl.replace(/^https?:\/\/[^\/]+\//, '').replace(/^\/+/, '');
+            }
 
-            await this.connection_s3.send(new DeleteObjectCommand({
-                Bucket: process.env.R2_BUCKET,
+            await this.s3Client.send(new DeleteObjectCommand({
+                Bucket: this.bucketName,
                 Key: key
             }));
+
+            this.logger.log(`Imagem deletada: ${key}`);
         }catch(error){
             this.logger.error("Error deleting image:", error);
+            throw error;
         }
     }
 }

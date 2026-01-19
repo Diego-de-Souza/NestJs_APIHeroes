@@ -79,8 +79,8 @@ export class CreateDadosHeroisDto {
 
     //variaveis para salvar as imagens (recebe Buffer, mas será convertido para URL string após upload)
     @ApiProperty()
-    image1?: Buffer; // Buffer recebido, será substituído pela URL após upload no CloudFlare
+    image1?: Buffer; // Buffer recebido, será substituído pela URL após upload no S3/CloudFront
     @ApiProperty()
-    image2?: Buffer; // Buffer recebido, será substituído pela URL após upload no CloudFlare
+    image2?: Buffer; // Buffer recebido, será substituído pela URL após upload no S3/CloudFront
 
 }

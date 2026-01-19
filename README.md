@@ -105,17 +105,40 @@ Atualmente veja o que já está e o que não está configurado para rodar no con
       * tabela de studios;
       * tabela de team;
 
-As váriaveis de acesso ao banco mysql e mongoDB para o docker já estão configuradas abaixo, só comentar as outras e colar as abaixo no arquivo "**.env**":
-```
-  DB_HOST=localhost             # Nome do serviço no docker-compose.yml
-DB_PORT=3306               # Porta padrão do MySQL
-DB_USERNAME=admin          # O usuário configurado no MYSQL_USER
-DB_PASSWORD=admin1234      # A senha configurada no MYSQL_PASSWORD
-DB_NAME=HeroesPlataform    # O banco de dados configurado no MYSQL_DATABASE
+As váriaveis de acesso ao banco PostgreSQL e MongoDB para o docker já estão configuradas abaixo, só comentar as outras e colar as abaixo no arquivo "**.env**":
 
-# Configuração para conexão MongoDB
-MONGO_URL=mongodb://root:rootpassword@localhost:27017/testdb?authSource=admin
+**⚠️ IMPORTANTE**: A aplicação foi migrada para AWS (EC2 + RDS + S3 + CloudFront). Veja o arquivo `ENV_VARIABLES.md` para configuração completa das variáveis de ambiente.
+
+Para desenvolvimento local com Docker:
 ```
+NODE_ENV=development
+PORT=3000
+
+# Database PostgreSQL (Docker)
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=heroesplataform_user
+DB_PASSWORD=QPK4abTEM1EDMJYya0ZBephFQ7yDnjKA
+DB_NAME=heroesplataform
+DB_SSL=false
+
+# AWS (configure mesmo em dev se quiser testar uploads)
+AWS_REGION=us-east-1
+AWS_S3_BUCKET=heroesplatform-images-XXXXX
+CLOUDFRONT_URL=https://xxxxx.cloudfront.net
+
+# JWT
+SECRET_KEY=sua_chave_secreta_jwt_aqui_minimo_32_caracteres
+REFRESH_SECRET_KEY=sua_chave_secreta_refresh_token_aqui_minimo_32_caracteres
+
+# Frontend
+FRONTEND_URL=http://localhost:3001
+
+# Configuração para conexão MongoDB (opcional)
+MONGO_URL=mongodb://admin:admin@1234@localhost:27017/HeroesMongoPlataform?authSource=admin
+```
+
+**📖 Consulte `ENV_VARIABLES.md`** para documentação completa de todas as variáveis de ambiente.
 
 ### Como utilizar o docker para subir as imagens e usar o banco?
 Simples, primeiro instale o docker desktop em sua máquina ou em uma vm para usar com o linux, link do docker: [Docker](https://www.docker.com/);

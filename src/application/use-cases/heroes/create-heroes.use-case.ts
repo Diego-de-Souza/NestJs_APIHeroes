@@ -33,7 +33,7 @@ export class CreateHeroesUseCase {
 
         if (heroesDto.image1) {
             try {
-                this.logger.log('Salvando image1 no CloudFlare...');
+                this.logger.log('Salvando image1 no S3...');
                 const image1Url = await this.imageService.saveImageBuffer(
                     heroesDto.image1,
                     'heroes',
@@ -44,13 +44,13 @@ export class CreateHeroesUseCase {
                 (heroesDto as any).image1 = image1Url;
                 this.logger.log(`Image1 salva com sucesso: ${image1Url}`);
             } catch (error) {
-                this.logger.error('Erro ao salvar image1 no CloudFlare:', error);
+                this.logger.error('Erro ao salvar image1 no S3:', error);
             }
         }
 
         if (heroesDto.image2) {
             try {
-                this.logger.log('Salvando image2 no CloudFlare...');
+                this.logger.log('Salvando image2 no S3...');
                 const image2Url = await this.imageService.saveImageBuffer(
                     heroesDto.image2,
                     'heroes',
@@ -61,7 +61,7 @@ export class CreateHeroesUseCase {
                 (heroesDto as any).image2 = image2Url;
                 this.logger.log(`Image2 salva com sucesso: ${image2Url}`);
             } catch (error) {
-                this.logger.error('Erro ao salvar image2 no CloudFlare:', error);
+                this.logger.error('Erro ao salvar image2 no S3:', error);
             }
         }
 
