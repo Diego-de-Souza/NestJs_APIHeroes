@@ -21,7 +21,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  BACKEND_HOST: ${{ secrets.BACKEND_HOST }}
+  BACKEND_HOST: ${{ secrets.DB_HOST }}
   SSH_USER: ec2-user
   APP_DIR: /opt/app
 
@@ -57,7 +57,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "${{ secrets.BACKEND_HOST }}" >> ~/.ssh/known_hosts || true
+          ssh-keyscan -H "${{ secrets.DB_HOST }}" >> ~/.ssh/known_hosts || true
 
       - name: Copy files to EC2
         run: |
@@ -67,12 +67,12 @@ jobs:
             --exclude '*.log' \
             --exclude '.env' \
             --exclude '.github' \
-            ./ ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }}:${{ env.APP_DIR }}/
+            ./ ${{ env.SSH_USER }}@${{ secrets.DB_HOST }}:${{ env.APP_DIR }}/
 
       - name: Install dependencies on server
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} \
+            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} \
             "cd ${{ env.APP_DIR }} && npm install --production"
 
       - name: Create .env file on EC2
@@ -220,14 +220,14 @@ jobs:
       - name: Restart application with PM2
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} \
+            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} \
             "cd ${{ env.APP_DIR }} && /opt/app/start.sh"
 
       - name: Health check
         run: |
           sleep 10
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} \
+            ${{ env.SSH_USER }}@${{ secrets.DB_HOST }} \
             "pm2 status"
 
       - name: Cleanup SSH key
