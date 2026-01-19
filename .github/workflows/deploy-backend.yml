@@ -5,13 +5,14 @@ on:
       - main
       - master
   workflow_dispatch:
+
 env:
   AWS_REGION: us-east-1
-  BACKEND_HOST: ${{ secrets.BD_HOST }}
-  SSH_HOST: ${{ secrets.EC2_HOST || secrets.BD_HOST }}
+  BACKEND_HOST: ${{ secrets.DB_HOST }}  # Corrigido: DB_HOST, não BD_HOST
+  SSH_HOST: ${{ secrets.EC2_HOST }}  # Use EC2_HOST diretamente
   SSH_USER: ec2-user
   APP_DIR: /opt/app
-  SSH_PORT: ${{ vars.SSH_PORT || '22' }}
+  SSH_PORT: 22  # Defina fixo ou use variável
   SSH_TIMEOUT: 30
 
 jobs:
@@ -27,8 +28,12 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
 
+          # IMPORTANTE: O conteúdo da chave deve ter \n no final
+          # Se a chave não terminar com newline, adicione:
+          echo "" >> ~/.ssh/deploy_key
+
           cat > ~/.ssh/config << EOF
-          Host ${{ env.BD_HOST }}
+          Host ${{ env.SSH_HOST }}
             HostName ${{ env.SSH_HOST }}
             Port ${{ env.SSH_PORT }}
             User ${{ env.SSH_USER }}
@@ -42,32 +47,39 @@ jobs:
           chmod 600 ~/.ssh/config
 
           echo "Testing connection to ${{ env.SSH_HOST }}:${{ env.SSH_PORT }}..."
-          if timeout 10 bash -c "cat < /dev/null > /dev/tcp/${{ env.SSH_HOST }}/${{ env.SSH_PORT }}" 2>/dev/null; then
+          
+          # Teste mais robusto
+          if nc -z -w 5 "${{ env.SSH_HOST }}" "${{ env.SSH_PORT }}" 2>/dev/null; then
             echo "✅ Port ${{ env.SSH_PORT }} is open and reachable"
           else
-            echo "❌ Port ${{ env.SSH_PORT }} test failed"
+            echo "❌ Port ${{ env.SSH_PORT }} is not reachable"
             exit 1
           fi
 
-          if [ -n "${{ env.SSH_HOST }}" ]; then
-            ssh-keyscan -p ${{ env.SSH_PORT }} -H "${{ env.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || echo "Warning: Could not add host to known_hosts, but continuing..."
-            chmod 644 ~/.ssh/known_hosts
-          fi
+          # Adicionar fingerprint
+          ssh-keyscan -p "${{ env.SSH_PORT }}" -H "${{ env.SSH_HOST }}" 2>/dev/null >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
       - name: Test SSH connection
         run: |
-          SSH_CONFIG_PATH="$HOME/.ssh/config"
-          SSH_CONNECTION_FAILED=false
-
-          if [ -f "$SSH_CONFIG_PATH" ]; then
-            ssh -F "$SSH_CONFIG_PATH" ${{ env.BACKEND_HOST }} "echo 'SSH connection successful'" || SSH_CONNECTION_FAILED=true
-          else
-            ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ${{ env.SSH_PORT }} ${{ env.SSH_USER }}@${{ env.SSH_HOST }} "echo 'SSH connection successful'" || SSH_CONNECTION_FAILED=true
-          fi
-
-          if [ "$SSH_CONNECTION_FAILED" = true ]; then
-            echo "❌ ERROR: Cannot connect to ${{ env.SSH_HOST }}:${{ env.SSH_PORT }}"
-            exit 1
-          fi
-
+          echo "Testing SSH connection to ${{ env.SSH_USER }}@${{ env.SSH_HOST }}:${{ env.SSH_PORT }}..."
+          
+          # Teste direto primeiro
+          ssh -v -i ~/.ssh/deploy_key \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            -o ConnectTimeout=10 \
+            -p "${{ env.SSH_PORT }}" \
+            "${{ env.SSH_USER }}@${{ env.SSH_HOST }}" \
+            "echo '✅ SSH connection successful'" || {
+              echo "❌ SSH connection failed"
+              echo "Debug info:"
+              echo "SSH_HOST: ${{ env.SSH_HOST }}"
+              echo "SSH_PORT: ${{ env.SSH_PORT }}"
+              echo "SSH_USER: ${{ env.SSH_USER }}"
+              echo "Checking key file..."
+              head -5 ~/.ssh/deploy_key
+              exit 1
+            }
+          
           echo "✅ SSH connection successful!"
