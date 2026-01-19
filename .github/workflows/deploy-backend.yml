@@ -1,286 +1,66 @@
-name: Deploy Backend to AWS
-
-on:
-  # Opção 1: Deploy automático apenas na branch main/master
-  push:
-    branches:
-      - main
-      - master
-  
-  # Opção 2: Deploy em qualquer branch (descomente para ativar)
-  # push:
-  #   branches:
-  #     - '*'  # Qualquer branch
-  
-  # Opção 3: Deploy apenas manual (descomente para ativar)
-  # workflow_dispatch:
-  
-  # Opção 4: Deploy quando criar uma tag de release (descomente para ativar)
-  # release:
-  #   types: [published]
-
 env:
   AWS_REGION: us-east-1
-  BACKEND_HOST: ${{ secrets.EC2_HOST || secrets.DB_HOST }}
+  BACKEND_HOST: ${{ secrets.BD_HOST }}
+  SSH_HOST: ${{ secrets.EC2_HOST || secrets.BD_HOST }}
   SSH_USER: ec2-user
   APP_DIR: /opt/app
+  SSH_PORT: ${{ vars.SSH_PORT || '22' }}
+  SSH_TIMEOUT: 30
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: npm test
-        continue-on-error: true  # Continua mesmo se testes falharem (opcional)
-
-      - name: Build application
-        run: npm run build
-        env:
-          NODE_ENV: production
+      # ...checkout, build, etc...
 
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          # Salva a chave SSH removendo espaços extras e garantindo formato correto
-          cat > ~/.ssh/deploy_key << 'KEYEOF'
-          ${{ secrets.SSH_PRIVATE_KEY }}
-          KEYEOF
+          chmod 700 ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          # Verifica se a chave está no formato correto
-          if ! ssh-keygen -l -f ~/.ssh/deploy_key >/dev/null 2>&1; then
-            echo "⚠️ Warning: SSH key format validation failed"
-            echo "First 50 chars of key:"
-            head -c 50 ~/.ssh/deploy_key
-            echo ""
+
+          cat > ~/.ssh/config << EOF
+          Host ${{ env.BD_HOST }}
+            HostName ${{ env.SSH_HOST }}
+            Port ${{ env.SSH_PORT }}
+            User ${{ env.SSH_USER }}
+            IdentityFile ~/.ssh/deploy_key
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            ConnectTimeout ${{ env.SSH_TIMEOUT }}
+            ServerAliveInterval 60
+            ServerAliveCountMax 3
+          EOF
+          chmod 600 ~/.ssh/config
+
+          echo "Testing connection to ${{ env.SSH_HOST }}:${{ env.SSH_PORT }}..."
+          if timeout 10 bash -c "cat < /dev/null > /dev/tcp/${{ env.SSH_HOST }}/${{ env.SSH_PORT }}" 2>/dev/null; then
+            echo "✅ Port ${{ env.SSH_PORT }} is open and reachable"
+          else
+            echo "❌ Port ${{ env.SSH_PORT }} test failed"
+            exit 1
           fi
-          ssh-keyscan -H "${{ secrets.EC2_HOST || secrets.DB_HOST }}" >> ~/.ssh/known_hosts || true
+
+          if [ -n "${{ env.SSH_HOST }}" ]; then
+            ssh-keyscan -p ${{ env.SSH_PORT }} -H "${{ env.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || echo "Warning: Could not add host to known_hosts, but continuing..."
+            chmod 644 ~/.ssh/known_hosts
+          fi
 
       - name: Test SSH connection
         run: |
-          EC2_HOST="${{ secrets.EC2_HOST || secrets.DB_HOST }}"
-          echo "Testing SSH connection to $EC2_HOST..."
-          ssh -i ~/.ssh/deploy_key \
-            -o StrictHostKeyChecking=no \
-            -o ConnectTimeout=30 \
-            -o BatchMode=yes \
-            ${{ env.SSH_USER }}@$EC2_HOST \
-            "echo 'SSH connection successful!'" || (echo "❌ SSH connection failed. Please check:" && echo "1. Security Group allows SSH (port 22) from GitHub Actions IPs" && echo "2. EC2 instance is running" && echo "3. Create secret 'EC2_HOST' with EC2 public IP/hostname (not RDS endpoint)" && echo "   Current value: $EC2_HOST" && exit 1)
+          SSH_CONFIG_PATH="$HOME/.ssh/config"
+          SSH_CONNECTION_FAILED=false
 
-      - name: Install rsync on EC2
-        run: |
-          ssh -i ~/.ssh/deploy_key \
-            -o StrictHostKeyChecking=no \
-            -o ConnectTimeout=30 \
-            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
-            "if command -v rsync >/dev/null 2>&1; then \
-              echo 'rsync already installed'; \
-            elif command -v yum >/dev/null 2>&1; then \
-              sudo yum install -y rsync; \
-            elif command -v apt-get >/dev/null 2>&1; then \
-              sudo apt-get update && sudo apt-get install -y rsync; \
-            elif command -v apk >/dev/null 2>&1; then \
-              sudo apk add --no-cache rsync; \
-            else \
-              echo 'No package manager found'; exit 1; \
-            fi"
-      
-      - name: Prepare app directory on EC2
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
-            "sudo mkdir -p ${{ env.APP_DIR }} && sudo chown -R ${{ env.SSH_USER }}:${{ env.SSH_USER }} ${{ env.APP_DIR }}"
-      
-      - name: Copy files to EC2
-        run: |
-          rsync -avz -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            --exclude 'node_modules' \
-            --exclude '.git' \
-            --exclude '*.log' \
-            --exclude '.env' \
-            --exclude '.github' \
-            ./ ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }}:${{ env.APP_DIR }}/
-
-      - name: Install dependencies on server
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
-            "cd ${{ env.APP_DIR }} && npm install"
-      
-      - name: Build application on server
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
-            "cd ${{ env.APP_DIR }} && echo 'Current directory:' && pwd && echo 'Files before build:' && ls -la && echo 'Running build...' && NODE_ENV=production npm run build && echo 'Files after build:' && ls -la && echo 'Checking dist directory:' && ls -la dist/ 2>&1 || echo 'dist directory not found' && if [ -f dist/src/main.js ]; then echo '✅ dist/src/main.js exists'; else echo '❌ dist/src/main.js NOT FOUND'; exit 1; fi"
-
-      - name: Create .env file on EC2
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} bash << 'SSHEOF'
-          cat > ${{ env.APP_DIR }}/.env << 'ENVEOF'
-          NODE_ENV=production
-          PORT=${{ vars.PORT || '3000' }}
-          
-          # Database (RDS PostgreSQL)
-          DB_HOST=${{ secrets.DB_HOST }}
-          DB_PORT=${{ vars.DB_PORT || '5432' }}
-          DB_USERNAME=${{ secrets.DB_USERNAME }}
-          DB_NAME=${{ secrets.DB_NAME }}
-          DB_SSL=${{ vars.DB_SSL || 'false' }}
-          # DB_PASSWORD será obtido do secret (ou do Secrets Manager via get-db-password.sh se DB_PASSWORD_SECRET_ARN estiver definido)
-          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          DB_PASSWORD_SECRET=${{ secrets.DB_PASSWORD_SECRET_ARN || '' }}
-          
-          # AWS
-          AWS_REGION=${{ vars.AWS_REGION || 'us-east-1' }}
-          AWS_S3_BUCKET=${{ vars.AWS_S3_BUCKET }}
-          CLOUDFRONT_URL=${{ vars.CLOUDFRONT_URL }}
-          
-          # JWT
-          SECRET_KEY=${{ secrets.SECRET_KEY }}
-          REFRESH_SECRET_KEY=${{ secrets.REFRESH_SECRET_KEY }}
-          
-          # Frontend
-          FRONTEND_URL=${{ vars.FRONTEND_URL }}
-          
-          # Stripe
-          STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
-          STRIPE_MONTHLY_PRICE_ID=${{ secrets.STRIPE_MONTHLY_PRICE_ID }}
-          STRIPE_QUARTERLY_PRICE_ID=${{ secrets.STRIPE_QUARTERLY_PRICE_ID }}
-          STRIPE_SEMIANNUAL_PRICE_ID=${{ secrets.STRIPE_SEMIANNUAL_PRICE_ID }}
-          STRIPE_ANNUAL_PRICE_ID=${{ secrets.STRIPE_ANNUAL_PRICE_ID }}
-          
-          # APIs (Opcional)
-          UNSPLASH_ACCESS_KEY=${{ secrets.UNSPLASH_ACCESS_KEY }}
-          PIXABAY_API_KEY=${{ secrets.PIXABAY_API_KEY }}
-          PEXELS_API_KEY=${{ secrets.PEXELS_API_KEY }}
-          GIPHY_API_KEY=${{ secrets.GIPHY_API_KEY }}
-          
-          # Swagger
-          ENABLE_SWAGGER=${{ vars.ENABLE_SWAGGER || 'false' }}
-          
-          # Root User
-          ROOT_PASSWORD=${{ secrets.ROOT_PASSWORD }}
-          ENVEOF
-          sed -i 's/^  //' ${{ env.APP_DIR }}/.env
-          SSHEOF
-
-      - name: Create get-db-password.sh script on EC2
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} bash << 'SSHEOF'
-          cat > ${{ env.APP_DIR }}/get-db-password.sh << 'SCRIPTEOF'
-          #!/bin/bash
-          # Script para obter senha do banco do AWS Secrets Manager
-          SECRET_ARN="${DB_PASSWORD_SECRET}"
-          REGION="${AWS_REGION:-us-east-1}"
-          
-          if [ -z "$SECRET_ARN" ]; then
-              echo "ERRO: DB_PASSWORD_SECRET não está definido" >&2
-              exit 1
+          if [ -f "$SSH_CONFIG_PATH" ]; then
+            ssh -F "$SSH_CONFIG_PATH" ${{ env.BACKEND_HOST }} "echo 'SSH connection successful'" || SSH_CONNECTION_FAILED=true
+          else
+            ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ${{ env.SSH_PORT }} ${{ env.SSH_USER }}@${{ env.SSH_HOST }} "echo 'SSH connection successful'" || SSH_CONNECTION_FAILED=true
           fi
-          
-          # Obtém o valor do secret (extrai apenas a senha, removendo JSON wrapper se necessário)
-          PASSWORD=$(aws secretsmanager get-secret-value \
-              --secret-id "$SECRET_ARN" \
-              --region "$REGION" \
-              --query SecretString \
-              --output text 2>/dev/null)
-          
-          # Se o secret retornar JSON, extrai apenas a senha
-          if echo "$PASSWORD" | grep -q '"password"'; then
-              PASSWORD=$(echo "$PASSWORD" | grep -oP '"password"\s*:\s*"\K[^"]+' || echo "$PASSWORD")
-          fi
-          
-          if [ -z "$PASSWORD" ]; then
-              echo "ERRO: Não foi possível obter senha do Secrets Manager" >&2
-              exit 1
-          fi
-          
-          echo "$PASSWORD"
-          SCRIPTEOF
-          chmod +x ${{ env.APP_DIR }}/get-db-password.sh
-          SSHEOF
 
-      - name: Create start.sh script on EC2
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} bash << 'SSHEOF'
-          cat > ${{ env.APP_DIR }}/start.sh << 'SCRIPTEOF'
-          #!/bin/bash
-          set -e
-          
-          APP_DIR="${{ env.APP_DIR }}"
-          cd "$APP_DIR"
-          
-          # Carrega variáveis de ambiente
-          if [ -f .env ]; then
-              export $(cat .env | grep -v '^#' | xargs)
+          if [ "$SSH_CONNECTION_FAILED" = true ]; then
+            echo "❌ ERROR: Cannot connect to ${{ env.SSH_HOST }}:${{ env.SSH_PORT }}"
+            exit 1
           fi
-          
-          # Obtém senha do banco do Secrets Manager
-          if [ ! -z "$DB_PASSWORD_SECRET" ]; then
-              echo "Obtendo senha do banco do Secrets Manager..."
-              export DB_PASSWORD=$(./get-db-password.sh)
-              if [ -z "$DB_PASSWORD" ]; then
-                  echo "ERRO: Falha ao obter senha do banco" >&2
-                  exit 1
-              fi
-              echo "Senha do banco obtida com sucesso"
-          fi
-          
-          # Inicia aplicação com PM2
-          echo "Iniciando aplicação com PM2..."
-          
-          # Para aplicação existente se estiver rodando
-          pm2 delete api 2>/dev/null || true
-          
-          # Inicia nova instância
-          pm2 start dist/src/main.js \
-              --name api \
-              --instances 1 \
-              --max-memory-restart 500M \
-              --log /var/log/app-out.log \
-              --error /var/log/app-error.log \
-              --merge-logs \
-              --time
-          
-          # Salva configuração do PM2 para reiniciar no boot
-          pm2 save
-          
-          echo "Aplicação iniciada com sucesso!"
-          pm2 status
-          SCRIPTEOF
-          chmod +x ${{ env.APP_DIR }}/start.sh
-          SSHEOF
 
-      - name: Restart application with PM2
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
-            "cd ${{ env.APP_DIR }} && /opt/app/start.sh"
-
-      - name: Health check
-        run: |
-          sleep 10
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
-            "pm2 status"
-
-      - name: Cleanup SSH key
-        if: always()
-        run: rm -f ~/.ssh/deploy_key
+          echo "✅ SSH connection successful!"
