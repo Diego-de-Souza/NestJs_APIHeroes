@@ -37,3 +37,4 @@ jobs:
             "echo 'SUCESSO!'; exit 0" \
             && echo "✅ SSH funciona!" \
             || echo "❌ SSH falhou"
+            
