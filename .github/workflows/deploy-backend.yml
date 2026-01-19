@@ -124,7 +124,7 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
-            "cd ${{ env.APP_DIR }} && NODE_ENV=production npm run build"
+            "cd ${{ env.APP_DIR }} && echo 'Current directory:' && pwd && echo 'Files before build:' && ls -la && echo 'Running build...' && NODE_ENV=production npm run build && echo 'Files after build:' && ls -la && echo 'Checking dist directory:' && ls -la dist/ 2>&1 || echo 'dist directory not found' && if [ -f dist/main.js ]; then echo '✅ dist/main.js exists'; else echo '❌ dist/main.js NOT FOUND'; exit 1; fi"
 
       - name: Create .env file on EC2
         run: |
