@@ -1,4 +1,5 @@
-# Triggers do workflow: push na main/master e manual
+name: Deploy to EC2
+
 on:
   push:
     branches:
@@ -8,78 +9,139 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  BACKEND_HOST: ${{ secrets.DB_HOST }}  # Corrigido: DB_HOST, não BD_HOST
-  SSH_HOST: ${{ secrets.EC2_HOST }}  # Use EC2_HOST diretamente
+  SSH_HOST: ${{ secrets.EC2_HOST }}
   SSH_USER: ec2-user
   APP_DIR: /opt/app
-  SSH_PORT: 22  # Defina fixo ou use variável
-  SSH_TIMEOUT: 30
+  SSH_PORT: 22
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    
     steps:
-      # ...checkout, build, etc...
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
 
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-
-          # IMPORTANTE: O conteúdo da chave deve ter \n no final
-          # Se a chave não terminar com newline, adicione:
-          echo "" >> ~/.ssh/deploy_key
-
-          cat > ~/.ssh/config << EOF
-          Host ${{ env.SSH_HOST }}
-            HostName ${{ env.SSH_HOST }}
-            Port ${{ env.SSH_PORT }}
-            User ${{ env.SSH_USER }}
-            IdentityFile ~/.ssh/deploy_key
-            StrictHostKeyChecking no
-            UserKnownHostsFile /dev/null
-            ConnectTimeout ${{ env.SSH_TIMEOUT }}
-            ServerAliveInterval 60
-            ServerAliveCountMax 3
-          EOF
-          chmod 600 ~/.ssh/config
-
-          echo "Testing connection to ${{ env.SSH_HOST }}:${{ env.SSH_PORT }}..."
           
-          # Teste mais robusto
-          if nc -z -w 5 "${{ env.SSH_HOST }}" "${{ env.SSH_PORT }}" 2>/dev/null; then
-            echo "✅ Port ${{ env.SSH_PORT }} is open and reachable"
+          # Escrever a chave SSH
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          
+          # Corrigir formatação
+          sed -i 's/\\n/\n/g' ~/.ssh/deploy_key  # Converter \n para quebras de linha reais
+          sed -i 's/\r$//' ~/.ssh/deploy_key     # Remover CRLF do Windows
+          
+          # Garantir que começa e termina corretamente
+          if ! head -1 ~/.ssh/deploy_key | grep -q "BEGIN"; then
+            echo "-----BEGIN RSA PRIVATE KEY-----" > ~/.ssh/deploy_key.tmp
+            cat ~/.ssh/deploy_key >> ~/.ssh/deploy_key.tmp
+            mv ~/.ssh/deploy_key.tmp ~/.ssh/deploy_key
+          fi
+          
+          if ! tail -1 ~/.ssh/deploy_key | grep -q "END"; then
+            echo "-----END RSA PRIVATE KEY-----" >> ~/.ssh/deploy_key
+          fi
+          
+          # Adicionar newline final
+          echo "" >> ~/.ssh/deploy_key
+          
+          chmod 600 ~/.ssh/deploy_key
+          
+          # Verificar a chave
+          echo "=== Verificando chave SSH ==="
+          echo "Linhas: $(wc -l ~/.ssh/deploy_key)"
+          echo "Primeira linha: $(head -1 ~/.ssh/deploy_key)"
+          echo "Última linha: $(tail -1 ~/.ssh/deploy_key)"
+          
+          # Testar se a chave é válida
+          if ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null 2>&1; then
+            echo "✅ Chave SSH válida"
           else
-            echo "❌ Port ${{ env.SSH_PORT }} is not reachable"
+            echo "❌ Chave SSH inválida"
             exit 1
           fi
 
-          # Adicionar fingerprint
-          ssh-keyscan -p "${{ env.SSH_PORT }}" -H "${{ env.SSH_HOST }}" 2>/dev/null >> ~/.ssh/known_hosts
-          chmod 644 ~/.ssh/known_hosts
-
       - name: Test SSH connection
         run: |
-          echo "Testing SSH connection to ${{ env.SSH_USER }}@${{ env.SSH_HOST }}:${{ env.SSH_PORT }}..."
+          echo "=== Testando conexão SSH ==="
+          echo "Conectando em $SSH_USER@$SSH_HOST:$SSH_PORT"
           
-          # Teste direto primeiro
-          ssh -v -i ~/.ssh/deploy_key \
+          # Teste simples de porta
+          timeout 5 nc -zv "$SSH_HOST" "$SSH_PORT" && echo "✅ Porta 22 acessível"
+          
+          # Teste SSH
+          set +e  # Não sair no primeiro erro
+          ssh_output=$(timeout 15 ssh \
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
             -o ConnectTimeout=10 \
-            -p "${{ env.SSH_PORT }}" \
-            "${{ env.SSH_USER }}@${{ env.SSH_HOST }}" \
-            "echo '✅ SSH connection successful'" || {
-              echo "❌ SSH connection failed"
-              echo "Debug info:"
-              echo "SSH_HOST: ${{ env.SSH_HOST }}"
-              echo "SSH_PORT: ${{ env.SSH_PORT }}"
-              echo "SSH_USER: ${{ env.SSH_USER }}"
-              echo "Checking key file..."
-              head -5 ~/.ssh/deploy_key
-              exit 1
-            }
+            -o LogLevel=ERROR \
+            -i ~/.ssh/deploy_key \
+            "$SSH_USER@$SSH_HOST" \
+            "echo '✅ Conexão SSH bem-sucedida'; whoami; hostname" 2>&1)
           
-          echo "✅ SSH connection successful!"
+          ssh_exit=$?
+          
+          if [ $ssh_exit -eq 0 ]; then
+            echo "$ssh_output"
+            echo "✅ SSH funcionando perfeitamente!"
+          else
+            echo "❌ Falha na conexão SSH"
+            echo "Saída do SSH:"
+            echo "$ssh_output"
+            
+            # Tentar com verbose para debug
+            echo "=== DEBUG com verbose ==="
+            timeout 10 ssh -vvv \
+              -o ConnectTimeout=5 \
+              -i ~/.ssh/deploy_key \
+              "$SSH_USER@$SSH_HOST" \
+              "echo test" 2>&1 | tail -50
+            exit 1
+          fi
+
+      - name: Deploy to EC2
+        run: |
+          echo "=== Iniciando deploy ==="
+          
+          # Criar diretório da aplicação
+          ssh -o StrictHostKeyChecking=no \
+              -i ~/.ssh/deploy_key \
+              "$SSH_USER@$SSH_HOST" \
+              "sudo mkdir -p $APP_DIR && sudo chown -R $SSH_USER:$SSH_USER $APP_DIR"
+          
+          # Sincronizar arquivos
+          echo "Sincronizando arquivos..."
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key" \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.env' \
+            ./ "$SSH_USER@$SSH_HOST:$APP_DIR/"
+          
+          # Executar deploy no servidor
+          echo "Executando deploy no servidor..."
+          ssh -o StrictHostKeyChecking=no \
+              -i ~/.ssh/deploy_key \
+              "$SSH_USER@$SSH_HOST" \
+              "cd $APP_DIR && \
+               npm ci --only=production && \
+               echo 'Deploy concluído!'"
+          
+          echo "✅ Deploy finalizado com sucesso!"

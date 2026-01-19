@@ -1,0 +1,39 @@
+name: Test SSH Connection
+
+on:
+  workflow_dispatch:  # Apenas manual
+
+jobs:
+  test-ssh:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Test SSH Setup
+        run: |
+          echo "=== TESTE DE CONEXÃO SSH ==="
+          echo "IP do EC2: ${{ secrets.EC2_HOST }}"
+          echo "Tamanho da chave: ${#SSH_PRIVATE_KEY} caracteres"
+          
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          
+          # Salvar chave
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/test_key
+          chmod 600 ~/.ssh/test_key
+          
+          # Mostrar primeiras e últimas linhas
+          echo "Primeiras 3 linhas da chave:"
+          head -3 ~/.ssh/test_key
+          echo "Últimas 3 linhas da chave:"
+          tail -3 ~/.ssh/test_key
+          
+          # Testar conexão básica
+          echo "Testando conexão..."
+          timeout 10 ssh \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=5 \
+            -i ~/.ssh/test_key \
+            ec2-user@${{ secrets.EC2_HOST }} \
+            "echo 'SUCESSO!'; exit 0" \
+            && echo "✅ SSH funciona!" \
+            || echo "❌ SSH falhou"
