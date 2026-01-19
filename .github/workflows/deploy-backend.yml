@@ -57,7 +57,9 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ secrets.BACKEND_HOST }} >> ~/.ssh/known_hosts
+          if [ -n "${{ secrets.BACKEND_HOST }}" ]; then
+            ssh-keyscan -H "${{ secrets.BACKEND_HOST }}" >> ~/.ssh/known_hosts || true
+          fi
 
       - name: Copy files to EC2
         run: |
