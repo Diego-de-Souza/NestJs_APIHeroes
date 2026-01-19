@@ -118,7 +118,13 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
-            "cd ${{ env.APP_DIR }} && npm install --production"
+            "cd ${{ env.APP_DIR }} && npm install"
+      
+      - name: Build application on server
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ env.SSH_USER }}@${{ secrets.EC2_HOST || secrets.DB_HOST }} \
+            "cd ${{ env.APP_DIR }} && NODE_ENV=production npm run build"
 
       - name: Create .env file on EC2
         run: |
