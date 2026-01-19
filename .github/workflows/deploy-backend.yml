@@ -53,7 +53,6 @@ jobs:
           NODE_ENV: production
 
       - name: Configure SSH
-        if: ${{ secrets.BACKEND_HOST }}
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
@@ -72,14 +71,12 @@ jobs:
             ./ ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }}:${{ env.APP_DIR }}/
 
       - name: Install dependencies on server
-        if: ${{ secrets.BACKEND_HOST }}
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} \
             "cd ${{ env.APP_DIR }} && npm install --production"
 
       - name: Create .env file on EC2
-        if: ${{ secrets.BACKEND_HOST }}
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} bash << 'SSHEOF'
@@ -133,7 +130,6 @@ jobs:
           SSHEOF
 
       - name: Create get-db-password.sh script on EC2
-        if: ${{ secrets.BACKEND_HOST && secrets.DB_PASSWORD_SECRET_ARN }}
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} bash << 'SSHEOF'
@@ -171,7 +167,6 @@ jobs:
           SSHEOF
 
       - name: Create start.sh script on EC2
-        if: ${{ secrets.BACKEND_HOST }}
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} bash << 'SSHEOF'
@@ -224,14 +219,12 @@ jobs:
           SSHEOF
 
       - name: Restart application with PM2
-        if: ${{ secrets.BACKEND_HOST }}
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             ${{ env.SSH_USER }}@${{ secrets.BACKEND_HOST }} \
             "cd ${{ env.APP_DIR }} && /opt/app/start.sh"
 
       - name: Health check
-        if: ${{ secrets.BACKEND_HOST }}
         run: |
           sleep 10
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
