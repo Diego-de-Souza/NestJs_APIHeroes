@@ -60,7 +60,6 @@ jobs:
           ssh-keyscan -H "${{ secrets.BACKEND_HOST }}" >> ~/.ssh/known_hosts || true
 
       - name: Copy files to EC2
-        if: ${{ secrets.BACKEND_HOST }}
         run: |
           rsync -avz -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
             --exclude 'node_modules' \
