@@ -79,7 +79,7 @@ async function bootstrap() {
 
   await app.init();
   if (require.main === module) {
-    await app.listen(port);
+    await app.listen(port, '0.0.0.0');
     logger.log(`🚀 API rodando na porta ${port}`);
   }
 

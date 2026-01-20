@@ -116,7 +116,12 @@ jobs:
               "echo test" 2>&1 | tail -50
             exit 1
           fi
-
+      # Antes do deploy, edite o main.ts
+      - name: Configure API to listen on all interfaces
+        run: |
+          cd /opt/app
+          sed -i "s/await app\.listen(port)/await app.listen(port, '0.0.0.0')/" src/main.ts
+          
       - name: Deploy to EC2
         run: |
           echo "=== Iniciando deploy ==="
