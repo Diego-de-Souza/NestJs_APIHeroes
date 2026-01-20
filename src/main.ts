@@ -18,6 +18,12 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = process.env.PORT || configService.get('PORT') || 3000;
 
+  logger.log('Environment PORT: ' + process.env.PORT);
+  logger.log('Config Service PORT: ' + configService.get('PORT'));
+  logger.log('url banco de dados: ' + configService.get('DATABASE_URL'));
+  logger.log('Banco de dados:' + ' ' + configService.get('DATABASE_NAME'));
+
+
   app.use('/api/payment/webhook', express.raw({ type: '*/*' }));
   
   app.use(cookieParser());
