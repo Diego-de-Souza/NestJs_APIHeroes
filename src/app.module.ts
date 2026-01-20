@@ -13,7 +13,9 @@ import { AccessLogInterceptor } from './shared/interceptors/AccessLogInterceptor
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+            isGlobal: true,
+         }),
     ScheduleModule.forRoot(), 
     SequelizeModule.forRoot(sequelizeConfig),
     ...appModules
