@@ -46,7 +46,7 @@ async function bootstrap() {
     });
   }
 
-  app.setGlobalPrefix('api');
+  // app.setGlobalPrefix('api');
   app.enableCors({
     origin: [configService.get('FRONTEND_URL')],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
