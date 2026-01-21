@@ -382,7 +382,7 @@ jobs:
                
                echo ''
                echo '📦 INSTALANDO DEPENDÊNCIAS DE PRODUÇÃO...'
-               npm ci --only=production --silent
+               npm ci --silent
                echo '✅ Dependências instaladas'
                
                echo ''
