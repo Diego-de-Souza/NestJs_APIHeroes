@@ -22,7 +22,7 @@ async function bootstrap() {
   logger.log('Config Service PORT: ' + configService.get('PORT'));
   logger.log('url banco de dados: ' + configService.get('DB_HOST'));
   logger.log('Banco de dados:' + ' ' + configService.get('DB_NAME'));
-
+  logger.log('URL frontend: ' + configService.get('FRONTEND_URL'));
 
   app.use('/api/payment/webhook', express.raw({ type: '*/*' }));
   
