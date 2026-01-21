@@ -20,8 +20,8 @@ async function bootstrap() {
 
   logger.log('Environment PORT: ' + process.env.PORT);
   logger.log('Config Service PORT: ' + configService.get('PORT'));
-  logger.log('url banco de dados: ' + configService.get('DATABASE_URL'));
-  logger.log('Banco de dados:' + ' ' + configService.get('DATABASE_NAME'));
+  logger.log('url banco de dados: ' + configService.get('DB_HOST'));
+  logger.log('Banco de dados:' + ' ' + configService.get('DB_NAME'));
 
 
   app.use('/api/payment/webhook', express.raw({ type: '*/*' }));
