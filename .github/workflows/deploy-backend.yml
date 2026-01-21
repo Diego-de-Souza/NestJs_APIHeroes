@@ -36,6 +36,27 @@ jobs:
         env:
           NODE_ENV: production
 
+      - name: Prepare deployment package
+        run: |
+          # Criar diretório temporário para deploy
+          mkdir -p deploy-package
+          
+          # Copiar os arquivos necessários
+          cp -r dist deploy-package/
+          cp package.json deploy-package/
+          cp package-lock.json deploy-package/
+          
+          # Opcional: copiar outros arquivos necessários
+          if [ -f ".env.production" ]; then
+            cp .env.production deploy-package/
+          fi
+          if [ -f "ecosystem.config.js" ]; then
+            cp ecosystem.config.js deploy-package/
+          fi
+          
+          echo "📦 Pacote de deploy preparado:"
+          ls -la deploy-package/
+
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
@@ -116,7 +137,7 @@ jobs:
               "echo test" 2>&1 | tail -50
             exit 1
           fi
-      # Antes do deploy, edite o main.ts
+
       - name: Configure API to listen on all interfaces
         run: |
           sed -i "s/await app\.listen(port)/await app.listen(port, '0.0.0.0')/" src/main.ts
@@ -131,21 +152,28 @@ jobs:
               "$SSH_USER@$SSH_HOST" \
               "sudo mkdir -p $APP_DIR && sudo chown -R $SSH_USER:$SSH_USER $APP_DIR"
           
-          # Sincronizar arquivos
-          echo "Sincronizando arquivos..."
+          # Sincronizar APENAS o pacote de deploy
+          echo "📤 Enviando arquivos para o EC2..."
           rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key" \
-            --exclude='.git' \
-            --exclude='node_modules' \
-            --exclude='.env' \
-            ./ "$SSH_USER@$SSH_HOST:$APP_DIR/"
+            --delete \
+            deploy-package/ \
+            "$SSH_USER@$SSH_HOST:$APP_DIR/"
           
-          # Executar deploy no servidor
-          echo "Executando deploy no servidor..."
+          # Executar deploy no servidor (APENAS instalação de dependências)
+          echo "⚙️ Configurando aplicação no EC2..."
           ssh -o StrictHostKeyChecking=no \
               -i ~/.ssh/deploy_key \
               "$SSH_USER@$SSH_HOST" \
               "cd $APP_DIR && \
-               npm ci --only=production && \
-               echo 'Deploy concluído!'"
+               echo '📋 Versões:' && \
+               node --version && npm --version && \
+               echo '📦 Instalando dependências de produção...' && \
+               npm ci --only=production --silent && \
+               echo '🚀 Iniciando/Reiniciando aplicação...' && \
+               pm2 delete app 2>/dev/null || true && \
+               pm2 start dist/main.js --name 'app' && \
+               pm2 save && \
+               echo '✅ Deploy concluído!' && \
+               pm2 status app"
           
-          echo "✅ Deploy finalizado com sucesso!"
+          echo "🎉 Deploy finalizado com sucesso!"
