@@ -18,12 +18,6 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = process.env.PORT || configService.get('PORT') || 3000;
 
-  logger.log('Environment PORT: ' + process.env.PORT);
-  logger.log('Config Service PORT: ' + configService.get('PORT'));
-  logger.log('url banco de dados: ' + configService.get('DB_HOST'));
-  logger.log('Banco de dados:' + ' ' + configService.get('DB_NAME'));
-  logger.log('URL frontend: ' + configService.get('FRONTEND_URL'));
-
   app.use('/api/payment/webhook', express.raw({ type: '*/*' }));
   
   app.use(cookieParser());
@@ -81,6 +75,11 @@ async function bootstrap() {
   if (require.main === module) {
     await app.listen(port, '0.0.0.0');
     logger.log(`🚀 API rodando na porta ${port}`);
+    logger.log('Environment PORT: ' + process.env.PORT);
+    logger.log('Config Service PORT: ' + configService.get('PORT'));
+    logger.log('url banco de dados: ' + configService.get('DB_HOST'));
+    logger.log('Banco de dados:' + ' ' + configService.get('DB_NAME'));
+    logger.log('URL frontend: ' + configService.get('FRONTEND_URL'));
   }
 
   return app;
