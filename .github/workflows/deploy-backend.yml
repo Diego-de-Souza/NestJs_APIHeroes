@@ -25,7 +25,7 @@ jobs:
       - name: Configure Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
@@ -34,135 +34,268 @@ jobs:
       - name: Build application
         run: |
           echo "🔨 Buildando aplicação NestJS..."
-          # Limpar builds anteriores
+          
+          # Remover build anterior
           rm -rf dist
           
-          # Build da aplicação
+          # Executar build
           npm run build
           
-          # Verificar se o main.js foi gerado
-          echo "📁 Verificando resultado do build..."
-          if [ ! -f "dist/main.js" ]; then
-            echo "❌ ERRO CRÍTICO: dist/main.js não foi gerado!"
-            echo "📄 Listando conteúdo de dist/:"
-            ls -la dist/ 2>/dev/null || echo "dist/ não existe"
-            echo "🔍 Verificando tsconfig.json:"
-            cat tsconfig.json
-            exit 1
+          echo "📁 Verificando estrutura do dist gerado..."
+          
+          # Verificar se main.js está em dist/src/ (seu caso)
+          if [ -f "dist/src/main.js" ]; then
+            echo "🔄 Estrutura incorreta detectada: main.js está em dist/src/"
+            echo "📦 Corrigindo estrutura..."
+            
+            # Mover todo o conteúdo de dist/src para dist
+            cp -r dist/src/* dist/ 2>/dev/null
+            
+            # Remover pasta src se estiver vazia
+            if [ -d "dist/src" ]; then
+              rmdir dist/src 2>/dev/null || true
+            fi
+            
+            echo "✅ Estrutura corrigida: dist/main.js criado"
           fi
           
-          echo "✅ Build concluído - main.js encontrado"
-          echo "📄 Primeiras linhas do main.js:"
-          head -5 dist/main.js
+          # Verificar se main.js existe na raiz do dist
+          if [ ! -f "dist/main.js" ]; then
+            echo "🔍 Procurando main.js em subdiretórios..."
+            MAIN_JS_PATH=$(find dist -name "main.js" -type f | head -1)
+            
+            if [ -n "$MAIN_JS_PATH" ]; then
+              echo "📄 Main.js encontrado em: $MAIN_JS_PATH"
+              echo "🔄 Copiando para dist/main.js..."
+              
+              # Criar dist/main.js a partir do arquivo encontrado
+              cp "$MAIN_JS_PATH" "dist/main.js"
+              echo "✅ dist/main.js criado"
+            else
+              echo "❌ ERRO CRÍTICO: main.js não encontrado em lugar nenhum!"
+              echo "📁 Listando conteúdo de dist:"
+              find dist -type f -name "*.js" | head -20
+              exit 1
+            fi
+          fi
+          
+          # Verificação final
+          echo "✅ Build concluído com sucesso!"
+          echo "📁 Estrutura final do dist:"
+          ls -la dist/
+          echo "📄 Main.js na raiz: $(ls -la dist/main.js 2>/dev/null || echo 'NÃO ENCONTRADO')"
         env:
           NODE_ENV: production
 
       - name: Configure API to listen on all interfaces
         run: |
           echo "🔧 Configurando API para escutar em 0.0.0.0..."
+          
+          # Verificar se main.ts existe
+          if [ ! -f "src/main.ts" ]; then
+            echo "⚠️ src/main.ts não encontrado, procurando..."
+            MAIN_TS=$(find . -name "main.ts" -type f | grep -v node_modules | head -1)
+            if [ -n "$MAIN_TS" ]; then
+              echo "📄 Encontrado em: $MAIN_TS"
+              # Usar o arquivo encontrado
+              MAIN_TS_FILE="$MAIN_TS"
+            else
+              echo "❌ main.ts não encontrado em lugar nenhum!"
+              exit 1
+            fi
+          else
+            MAIN_TS_FILE="src/main.ts"
+          fi
+          
           # Backup do arquivo original
-          cp src/main.ts src/main.ts.backup
+          cp "$MAIN_TS_FILE" "${MAIN_TS_FILE}.backup"
           
-          # Modificar o listen para aceitar conexões externas
+          # Modificar para escutar em 0.0.0.0
           # Primeiro, remove qualquer '0.0.0.0' existente
-          sed -i "s/await app.listen(port, '0.0.0.0')/await app.listen(port)/g" src/main.ts
-          # Agora adiciona
-          sed -i "s/await app\.listen(port)/await app.listen(port, '0.0.0.0')/" src/main.ts
+          sed -i "s/await app\.listen(port, '0\.0\.0\.0')/await app.listen(port)/g" "$MAIN_TS_FILE"
+          # Agora adiciona '0.0.0.0'
+          sed -i "s/await app\.listen(port)/await app.listen(port, '0.0.0.0')/g" "$MAIN_TS_FILE"
           
-          echo "📄 Verificando alteração no main.ts:"
-          grep -n "listen" src/main.ts
+          echo "✅ main.ts modificado"
+          echo "📄 Verificação da modificação:"
+          grep -n "listen" "$MAIN_TS_FILE"
+
+      - name: Create PM2 ecosystem file
+        run: |
+          echo "📄 Criando ecosystem.config.js..."
+          cat > ecosystem.config.js << 'EOF'
+          module.exports = {
+            apps: [{
+              name: 'app',
+              script: './dist/main.js',
+              cwd: '.',
+              instances: 1,
+              autorestart: true,
+              watch: false,
+              max_memory_restart: '500M',
+              env: {
+                NODE_ENV: 'production',
+                PORT: 3000
+              },
+              env_production: {
+                NODE_ENV: 'production',
+                PORT: 3000
+              },
+              error_file: '/var/log/app-error.log',
+              out_file: '/var/log/app-out.log',
+              log_file: '/var/log/app-combined.log',
+              time: true,
+              merge_logs: true,
+              log_date_format: 'YYYY-MM-DD HH:mm:ss'
+            }]
+          }
+          EOF
+          
+          echo "✅ ecosystem.config.js criado"
+          echo "📄 Conteúdo:"
+          cat ecosystem.config.js
 
       - name: Prepare deployment package
         run: |
           echo "📦 Preparando pacote de deploy..."
+          
           # Limpar pacotes anteriores
           rm -rf deploy-package
           mkdir -p deploy-package
           
-          # Copiar build gerado
+          # 1. Copiar dist (com estrutura correta)
           echo "📁 Copiando dist..."
           cp -r dist deploy-package/
           
-          # Copiar package files
+          # 2. Copiar package files
           echo "📄 Copiando package.json e package-lock.json..."
           cp package.json deploy-package/
           cp package-lock.json deploy-package/
           
-          # Copiar arquivos adicionais que podem ser necessários
-          echo "📄 Copiando arquivos adicionais..."
-          [ -f ".env.example" ] && cp .env.example deploy-package/
-          [ -f "ecosystem.config.js" ] && cp ecosystem.config.js deploy-package/
-          [ -f "nest-cli.json" ] && cp nest-cli.json deploy-package/
-          [ -f "tsconfig.build.json" ] && cp tsconfig.build.json deploy-package/
+          # 3. Copiar ecosystem.config.js
+          echo "📄 Copiando ecosystem.config.js..."
+          cp ecosystem.config.js deploy-package/
           
-          # Verificar conteúdo
-          echo "📁 Estrutura do deploy-package:"
-          find deploy-package -type f | sort
+          # 4. Copiar outros arquivos necessários
+          echo "📄 Copiando arquivos adicionais..."
+          
+          # .env.example se existir
+          if [ -f ".env.example" ]; then
+            cp .env.example deploy-package/
+            echo "  - .env.example"
+          fi
+          
+          # nest-cli.json se existir
+          if [ -f "nest-cli.json" ]; then
+            cp nest-cli.json deploy-package/
+            echo "  - nest-cli.json"
+          fi
+          
+          # tsconfig.json se existir
+          if [ -f "tsconfig.json" ]; then
+            cp tsconfig.json deploy-package/
+            echo "  - tsconfig.json"
+          fi
+          
+          # tsconfig.build.json se existir
+          if [ -f "tsconfig.build.json" ]; then
+            cp tsconfig.build.json deploy-package/
+            echo "  - tsconfig.build.json"
+          fi
+          
           echo ""
-          echo "📄 Tamanho do dist:"
-          du -sh deploy-package/dist/
+          echo "📁 Estrutura final do deploy-package:"
+          ls -la deploy-package/
+          echo ""
+          echo "📁 Conteúdo de dist dentro do pacote:"
+          ls -la deploy-package/dist/
 
-      - name: Configure SSH
+      - name: Configure SSH key
         run: |
           echo "🔑 Configurando chave SSH..."
+          
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           
-          # Escrever a chave SSH
+          # Escrever a chave SSH do secret
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           
-          # Corrigir formatação
+          # Corrigir formatação - converter \n para quebras de linha reais
           sed -i 's/\\n/\n/g' ~/.ssh/deploy_key
+          
+          # Remover CRLF do Windows se houver
           sed -i 's/\r$//' ~/.ssh/deploy_key
           
-          # Garantir que começa e termina corretamente
-          if ! grep -q "BEGIN RSA PRIVATE KEY" ~/.ssh/deploy_key; then
+          # Garantir que começa com -----BEGIN
+          if ! head -1 ~/.ssh/deploy_key | grep -q "BEGIN"; then
             echo "-----BEGIN RSA PRIVATE KEY-----" > ~/.ssh/deploy_key.tmp
             cat ~/.ssh/deploy_key >> ~/.ssh/deploy_key.tmp
             mv ~/.ssh/deploy_key.tmp ~/.ssh/deploy_key
+            echo "✓ Adicionado BEGIN header"
           fi
           
-          if ! grep -q "END RSA PRIVATE KEY" ~/.ssh/deploy_key; then
+          # Garantir que termina com -----END
+          if ! tail -1 ~/.ssh/deploy_key | grep -q "END"; then
+            echo "" >> ~/.ssh/deploy_key
             echo "-----END RSA PRIVATE KEY-----" >> ~/.ssh/deploy_key
+            echo "✓ Adicionado END footer"
           fi
           
           # Adicionar newline final
           echo "" >> ~/.ssh/deploy_key
           
+          # Ajustar permissões
           chmod 600 ~/.ssh/deploy_key
           
-          # Validar chave
-          echo "✅ Chave SSH salva"
+          echo "✅ Chave SSH configurada"
           echo "📏 Tamanho: $(wc -l < ~/.ssh/deploy_key) linhas"
 
       - name: Test SSH connection
         run: |
           echo "🔌 Testando conexão SSH com EC2..."
           
-          # Testar se a porta está aberta
+          # Testar se a porta SSH está acessível
           echo "🌐 Testando porta $SSH_PORT..."
-          if timeout 3 nc -z "$SSH_HOST" "$SSH_PORT"; then
-            echo "✅ Porta $SSH_PORT acessível"
+          if timeout 3 nc -z -w 2 "$SSH_HOST" "$SSH_PORT"; then
+            echo "✅ Porta $SSH_PORT está acessível"
           else
-            echo "❌ Porta $SSH_PORT não acessível"
+            echo "❌ Não foi possível acessar a porta $SSH_PORT em $SSH_HOST"
+            echo "⚠️ Verifique:"
+            echo "  1. O endereço do EC2 está correto?"
+            echo "  2. O Security Group permite SSH (porta 22)?"
             exit 1
           fi
           
           # Testar conexão SSH
           echo "🔗 Testando autenticação SSH..."
-          ssh -o StrictHostKeyChecking=no \
-              -o ConnectTimeout=10 \
-              -o BatchMode=yes \
-              -i ~/.ssh/deploy_key \
-              "$SSH_USER@$SSH_HOST" \
-              "echo '✅ Conexão SSH bem-sucedida'; echo 'Usuário:' \$(whoami); echo 'Hostname:' \$(hostname)"
           
-          if [ $? -eq 0 ]; then
+          set +e  # Não sair no primeiro erro
+          SSH_OUTPUT=$(timeout 10 ssh \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=8 \
+            -o BatchMode=yes \
+            -o LogLevel=ERROR \
+            -i ~/.ssh/deploy_key \
+            "$SSH_USER@$SSH_HOST" \
+            "echo '✅ SSH conectado com sucesso!'; echo 'Usuário:' \$(whoami); echo 'Hostname:' \$(hostname); echo 'Node.js:' \$(node --version 2>/dev/null || echo 'Não instalado'); exit 0" 2>&1)
+          
+          SSH_EXIT=$?
+          set -e
+          
+          if [ $SSH_EXIT -eq 0 ]; then
+            echo "$SSH_OUTPUT"
             echo "🎉 Conexão SSH funcionando perfeitamente!"
           else
             echo "❌ Falha na conexão SSH"
-            echo "🔍 Debug com verbose:"
-            ssh -vvv -o ConnectTimeout=5 -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" "exit" 2>&1 | tail -20
+            echo "📄 Saída do SSH:"
+            echo "$SSH_OUTPUT"
+            echo ""
+            echo "🔍 Tentando debug detalhado..."
+            timeout 5 ssh -vvv \
+              -o ConnectTimeout=3 \
+              -i ~/.ssh/deploy_key \
+              "$SSH_USER@$SSH_HOST" \
+              "exit" 2>&1 | tail -30
             exit 1
           fi
 
@@ -171,26 +304,27 @@ jobs:
           echo "🚀 INICIANDO DEPLOY PARA EC2"
           echo "========================================"
           
-          # 1. Criar diretório da aplicação no EC2
-          echo "📁 Criando diretório $APP_DIR no EC2..."
+          # 1. Criar e configurar diretório da aplicação no EC2
+          echo ""
+          echo "📁 PREPARANDO DIRETÓRIO NO EC2..."
           ssh -o StrictHostKeyChecking=no \
               -o ConnectTimeout=10 \
               -i ~/.ssh/deploy_key \
               "$SSH_USER@$SSH_HOST" \
               "sudo mkdir -p $APP_DIR && \
                sudo chown -R $SSH_USER:$SSH_USER $APP_DIR && \
-               echo '✅ Diretório criado e permissões ajustadas'"
+               echo '✅ Diretório $APP_DIR criado e configurado'"
           
-          # 2. Verificar o que tem no deploy-package localmente
+          # 2. Verificar conteúdo local do pacote de deploy
           echo ""
-          echo "📦 VERIFICANDO PACOTE LOCAL:"
-          echo "Conteúdo do deploy-package:"
+          echo "📦 VERIFICANDO PACOTE LOCAL..."
+          echo "Arquivos no deploy-package:"
           ls -la deploy-package/
           echo ""
-          echo "Conteúdo do dist local:"
-          ls -la deploy-package/dist/ 2>/dev/null || echo "⚠️ dist não encontrado localmente"
+          echo "Arquivos em deploy-package/dist:"
+          ls -la deploy-package/dist/ 2>/dev/null || echo "⚠️ dist não encontrado localmente!"
           
-          # 3. Sincronizar arquivos com EC2
+          # 3. Enviar arquivos para o EC2
           echo ""
           echo "📤 ENVIANDO ARQUIVOS PARA EC2..."
           rsync -avz \
@@ -200,32 +334,39 @@ jobs:
             deploy-package/ \
             "$SSH_USER@$SSH_HOST:$APP_DIR/"
           
-          echo "✅ Arquivos enviados para EC2"
+          echo "✅ Arquivos enviados com sucesso"
           
-          # 4. Verificar se os arquivos chegaram no EC2
+          # 4. VERIFICAR se os arquivos chegaram corretamente no EC2
           echo ""
-          echo "🔍 VERIFICANDO ARQUIVOS NO EC2:"
+          echo "🔍 VERIFICANDO ARQUIVOS NO EC2..."
           ssh -o StrictHostKeyChecking=no \
               -i ~/.ssh/deploy_key \
               "$SSH_USER@$SSH_HOST" \
-              "echo '📁 Estrutura em $APP_DIR:'; \
+              "echo '📁 ESTRUTURA EM $APP_DIR:'; \
                ls -la $APP_DIR/; \
                echo ''; \
-               echo '📁 Conteúdo de $APP_DIR/dist:'; \
-               ls -la $APP_DIR/dist/ 2>/dev/null || echo '❌ dist não encontrado'; \
-               echo ''; \
-               if [ -f '$APP_DIR/dist/main.js' ]; then \
-                 echo '✅ main.js encontrado!'; \
-                 echo '📄 Primeiras linhas:'; \
-                 head -3 '$APP_DIR/dist/main.js'; \
+               echo '📁 CONTEÚDO DO DIST:'; \
+               if [ -d '$APP_DIR/dist' ]; then \
+                 ls -la $APP_DIR/dist/; \
                else \
-                 echo '❌ ERRO: main.js não encontrado!'; \
-                 echo 'Procurando por arquivos JS:'; \
-                 find '$APP_DIR' -name '*.js' -type f | head -10; \
+                 echo '❌ ERRO: Pasta dist não encontrada!'; \
+                 exit 1; \
+               fi; \
+               echo ''; \
+               echo '📄 VERIFICANDO MAIN.JS:'; \
+               if [ -f '$APP_DIR/dist/main.js' ]; then \
+                 echo '✅ dist/main.js ENCONTRADO!'; \
+                 echo '📏 Tamanho:' \$(wc -l < '$APP_DIR/dist/main.js') 'linhas'; \
+                 echo '📄 Primeiras 5 linhas:'; \
+                 head -5 '$APP_DIR/dist/main.js'; \
+               else \
+                 echo '❌ ERRO CRÍTICO: dist/main.js NÃO ENCONTRADO!'; \
+                 echo '🔍 Procurando main.js em subdiretórios:'; \
+                 find $APP_DIR -name 'main.js' -type f; \
                  exit 1; \
                fi"
           
-          # 5. Instalar dependências e iniciar aplicação
+          # 5. INSTALAR DEPENDÊNCIAS E CONFIGURAR APLICAÇÃO
           echo ""
           echo "⚙️ CONFIGURANDO APLICAÇÃO NO EC2..."
           ssh -o StrictHostKeyChecking=no \
@@ -234,87 +375,115 @@ jobs:
               "set -e  # Sai no primeiro erro
                cd $APP_DIR
                
-               echo '📋 Versões do ambiente:'
-               node --version
-               npm --version
+               echo '📋 AMBIENTE:'
+               echo '- Node.js:' \$(node --version)
+               echo '- NPM:' \$(npm --version)
+               echo '- Diretório:' \$(pwd)
                
                echo ''
-               echo '📦 INSTALANDO DEPENDÊNCIAS...'
-               # Instalar apenas dependências de produção
+               echo '📦 INSTALANDO DEPENDÊNCIAS DE PRODUÇÃO...'
                npm ci --only=production --silent
                echo '✅ Dependências instaladas'
                
                echo ''
-               echo '🔍 VERIFICANDO DEPENDÊNCIAS:'
-               npm list --depth=0 2>/dev/null | head -20
+               echo '🔍 VERIFICANDO DEPENDÊNCIAS INSTALADAS:'
+               npm list --depth=0 2>/dev/null | grep -E \"^(├──|└──|├─┬|└─┬)\" | head -15
                
                echo ''
-               echo '🚀 INICIANDO APLICAÇÃO COM PM2...'
+               echo '🚀 CONFIGURANDO PM2...'
                
-               # Parar aplicação existente se houver
-               pm2 delete app 2>/dev/null || true
+               # Parar instância existente se houver
+               pm2 delete app 2>/dev/null || echo 'ℹ️ Nenhuma instância anterior encontrada'
                
-               # Iniciar nova instância
-               pm2 start dist/main.js \
-                 --name 'app' \
-                 --time \
-                 --log /var/log/app.log \
-                 --error /var/log/app-error.log \
-                 --output /var/log/app-out.log \
-                 --restart-delay 3000
+               # Iniciar aplicação usando ecosystem.config.js
+               if [ -f 'ecosystem.config.js' ]; then
+                 echo '📄 Iniciando com ecosystem.config.js...'
+                 pm2 start ecosystem.config.js --env production
+               else
+                 echo '📄 Iniciando diretamente...'
+                 pm2 start dist/main.js \
+                   --name 'app' \
+                   --time \
+                   --log /var/log/app.log \
+                   --error /var/log/app-error.log \
+                   --output /var/log/app-out.log
+               fi
                
                # Salvar configuração do PM2
                pm2 save
                
-               # Configurar inicialização automática
-               pm2 startup 2>/dev/null || true
+               # Configurar inicialização automática (se ainda não configurado)
+               pm2 startup 2>/dev/null || echo 'ℹ️ Startup já configurado'
                
                echo ''
                echo '✅ APLICAÇÃO INICIADA!'
+               
+               # Aguardar alguns segundos para a aplicação iniciar
+               sleep 3
+               
                echo ''
                echo '📊 STATUS DA APLICAÇÃO:'
                pm2 status app
                
                echo ''
                echo '📄 ÚLTIMOS LOGS:'
-               pm2 logs app --lines 5 --nostream
+               pm2 logs app --lines 8 --nostream
                
                echo ''
                echo '🌐 TESTANDO API LOCALMENTE...'
-               sleep 2
-               curl -f http://localhost:3000/api/health 2>/dev/null || \
-               curl -f http://localhost:3000 2>/dev/null || \
-               curl -f http://localhost:3000/health 2>/dev/null || \
-                 echo '⚠️ API pode não estar respondendo ainda (verifique logs)'"
+               # Tentar vários endpoints comuns
+               for endpoint in '/health' '/api/health' '/status' '/'; do
+                 if curl -s -f -o /dev/null -w \"%{http_code}\" http://localhost:3000\$endpoint --connect-timeout 5 | grep -q \"^2\|^3\"; then
+                   echo \"✅ API respondendo em http://localhost:3000\$endpoint\"
+                   break
+                 fi
+               done || echo '⚠️ API não respondeu ainda (pode estar iniciando)'
+               
+               echo ''
+               echo '💾 USO DE DISCO:'
+               du -sh ."
           
-          # 6. Verificar se a aplicação está rodando
+          # 6. VERIFICAÇÃO FINAL
           echo ""
-          echo "🔍 VERIFICAÇÃO FINAL..."
+          echo "🔍 VERIFICAÇÃO FINAL DO DEPLOY..."
           ssh -o StrictHostKeyChecking=no \
               -i ~/.ssh/deploy_key \
               "$SSH_USER@$SSH_HOST" \
-              "if pm2 list | grep -q 'app'; then \
-                 echo '✅ Aplicação está rodando no PM2'; \
-                 echo '📊 Detalhes:'; \
-                 pm2 info app | grep -E '(status|uptime|memory)'; \
-               else \
-                 echo '❌ Aplicação NÃO está rodando!'; \
-                 echo '📄 Verificando logs de erro:'; \
-                 tail -20 /var/log/app-error.log 2>/dev/null || echo 'Log não encontrado'; \
-                 exit 1; \
+              "cd $APP_DIR
+               
+               echo '📊 PM2 STATUS COMPLETO:'
+               pm2 list
+               
+               echo ''
+               echo '🔍 VERIFICANDO SE APLICAÇÃO ESTÁ RODANDO:'
+               if pm2 list | grep -q 'app.*online'; then
+                 echo '✅ APLICAÇÃO ESTÁ ONLINE!'
+                 echo '⏱️  Uptime:'
+                 pm2 show app | grep -E '(status|uptime|memory|cpu)'
+               else
+                 echo '❌ APLICAÇÃO NÃO ESTÁ ONLINE!'
+                 echo '📄 LOGS DE ERRO:'
+                 tail -20 /var/log/app-error.log 2>/dev/null || echo 'Arquivo de log não encontrado'
+                 exit 1
                fi"
           
           echo ""
           echo "========================================"
           echo "🎉 DEPLOY CONCLUÍDO COM SUCESSO!"
-          echo "📡 API disponível em: http://$SSH_HOST:3000"
+          echo "📡 Endpoint público: http://${{ secrets.EC2_HOST }}:3000"
           echo "========================================"
 
-      # Opcional: Limpeza
       - name: Cleanup
         if: always()
         run: |
           echo "🧹 Limpando arquivos temporários..."
-          rm -f ~/.ssh/deploy_key
-          rm -rf deploy-package
+          rm -f ~/.ssh/deploy_key 2>/dev/null || true
+          rm -rf deploy-package 2>/dev/null || true
+          
+          # Restaurar main.ts original se backup existir
+          if [ -f "src/main.ts.backup" ]; then
+            mv src/main.ts.backup src/main.ts
+            echo "✅ main.ts restaurado"
+          fi
+          
           echo "✅ Limpeza concluída"
