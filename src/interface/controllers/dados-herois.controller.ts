@@ -7,6 +7,7 @@ import { DataHeroesService } from '../../application/services/data-heroes.servic
 import { CreateDadosHeroisDto } from '../dtos/dados-herois/create-dados-herois.dto';
 import { LogInterceptor } from '../../shared/interceptors/LogInterceptor';
 import { UpdateDadosHeroisDto } from '../dtos/dados-herois/update-dados-herois.dto';
+import type { Express } from 'express';
 
 @ApiTags('Herois')
 @Controller('herois')

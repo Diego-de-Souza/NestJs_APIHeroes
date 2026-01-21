@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, PipeTransform } from "@nestjs/common";
 import exp from "constants";
-
+import type { Express } from 'express';
 
 @Injectable()
 export class FileValidationPipe implements PipeTransform{
