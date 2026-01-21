@@ -80,6 +80,10 @@ async function bootstrap() {
     logger.log('url banco de dados: ' + configService.get('DB_HOST'));
     logger.log('Banco de dados:' + ' ' + configService.get('DB_NAME'));
     logger.log('URL frontend: ' + configService.get('FRONTEND_URL'));
+    logger.log('SERVICE_ROLE_KEY: ' + configService.get('SERVICE_ROLE_KEY'));
+    logger.log('R2_ACCESS_KEY: ' + configService.get('R2_ACCESS_KEY'));
+    logger.log('SERVICE_ROLE_KEY com process: ' + process.env.SERVICE_ROLE_KEY);
+    logger.log('R2_ACCESS_KEY: ' + process.env.R2_ACCESS_KEY);
   }
 
   return app;
