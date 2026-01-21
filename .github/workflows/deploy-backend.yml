@@ -20,26 +20,23 @@ jobs:
         with:
           node-version: '20'
           
-      - run: npm ci && npm run build
+      - name: Install NestJS CLI and dependencies
+        run: |
+          npm ci
+          # Instalar Nest CLI globalmente para o build
+          npm install -g @nestjs/cli
+          
+      - name: Build application
+        run: npm run build
         env:
           NODE_ENV: production
           
-      - name: Fix dist structure
+      - name: Prepare deployment
         run: |
-          # Corrigir se main.js está em dist/src/
-          if [ -f "dist/src/main.js" ]; then
-            mv dist/src/* dist/ 2>/dev/null || true
-            rmdir dist/src 2>/dev/null || true
-          fi
+          # Corrigir estrutura do dist se necessário
+          [ -f "dist/src/main.js" ] && mv dist/src/* dist/ && rmdir dist/src
           
-      - name: Configure API to listen on all interfaces
-        run: |
-          if [ -f "src/main.ts" ]; then
-            sed -i "s/await app\.listen(port)/await app.listen(port, '0.0.0.0')/g" src/main.ts
-          fi
-          
-      - name: Create PM2 config
-        run: |
+          # Criar ecosystem.config
           cat > ecosystem.config.js << 'EOF'
           module.exports = {
             apps: [{
@@ -48,45 +45,38 @@ jobs:
               instances: 1,
               autorestart: true,
               watch: false,
-              max_memory_restart: '500M',
               env: {
-                NODE_ENV: 'production',
-                PORT: 3000
+                NODE_ENV: 'production'
               }
             }]
           }
           EOF
           
-      - name: Configure SSH
+          # Criar diretório temporário
+          mkdir -p _deploy
+          cp -r dist _deploy/
+          cp package.json package-lock.json ecosystem.config.js _deploy/
+          
+      - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/key
-          sed -i 's/\\n/\n/g' ~/.ssh/key
+          sed -i 's/\\\\n/\\n/g; s/\\n/\n/g' ~/.ssh/key
           chmod 600 ~/.ssh/key
           
       - name: Deploy
         run: |
           # Enviar arquivos
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/key -r dist package.json package-lock.json ecosystem.config.js "$SSH_USER@$SSH_HOST:$APP_DIR/"
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/key" _deploy/ "$SSH_USER@$SSH_HOST:$APP_DIR/"
           
-          # Executar no EC2
+          # Configurar no EC2
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/key "$SSH_USER@$SSH_HOST" "
             cd $APP_DIR
-            
-            # Instalar dependências
             npm ci --only=production
-            
-            # Criar diretório de logs com permissão
-            mkdir -p ~/.pm2/logs 2>/dev/null || true
-            
-            # Parar e iniciar PM2
             pm2 delete app 2>/dev/null || true
             pm2 start ecosystem.config.js
-            
-            # Salvar configuração
-            pm2 save 2>/dev/null || true
-            
-            echo '✅ Deploy concluído!'
-            echo '📊 Status PM2:'
-            pm2 list | grep app
+            echo '🚀 Aplicação iniciada!'
           "
+          
+      - name: Cleanup
+        run: rm -rf _deploy ~/.ssh/key
