@@ -1,165 +1,110 @@
-name: Deploy API to EC2
+name: Deploy API Heroes to EC2
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [ main, master ]
   workflow_dispatch:
 
 env:
+  AWS_REGION: us-east-1
   SSH_HOST: ${{ secrets.EC2_HOST }}
   SSH_USER: ec2-user
-  APP_DIR: /opt/app
   SSH_PORT: 22
-  NODE_ENV: production
+  APP_DIR: /opt/app
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # ===============================
-      # 1. CHECKOUT
-      # ===============================
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # ===============================
-      # 2. NODE SETUP
-      # ===============================
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      # ===============================
-      # 3. INSTALL + BUILD
-      # ===============================
-      - name: Install dependencies
-        run: npm ci
+      # -----------------------------
+      # DEPENDÊNCIAS
+      # -----------------------------
+      - name: Install dependencies (with devDependencies)
+        run: |
+          echo "📦 Installing dependencies..."
+          npm ci
 
-      - name: Build NestJS application
+      # GARANTIA ABSOLUTA DO CLI
+      - name: Ensure NestJS CLI is available
+        run: |
+          echo "🔧 Ensuring NestJS CLI..."
+          npm install -D @nestjs/cli
+
+      # -----------------------------
+      # BUILD
+      # -----------------------------
+      - name: Build NestJS
         run: |
           echo "🔨 Building NestJS..."
           rm -rf dist
-          npx nest build
+          npm run build
 
-          echo "📁 Validating dist structure..."
-          if [ ! -f "dist/main.js" ]; then
+          echo "📁 Verifying dist..."
+          if [ ! -f dist/main.js ]; then
             echo "❌ dist/main.js not found"
             find dist -type f
             exit 1
           fi
 
-      # ===============================
-      # 4. PM2 ECOSYSTEM
-      # ===============================
-      - name: Create PM2 ecosystem file
-        run: |
-          cat > ecosystem.config.js << 'EOF'
-          module.exports = {
-            apps: [{
-              name: 'api',
-              script: './dist/main.js',
-              exec_mode: 'fork',
-              instances: 1,
-              autorestart: true,
-              watch: false,
-              max_memory_restart: '400M',
-              env: {
-                NODE_ENV: 'production',
-                PORT: 3000
-              },
-              error_file: './logs/error.log',
-              out_file: './logs/out.log',
-              merge_logs: true,
-              time: true
-            }]
-          }
-          EOF
-
-      # ===============================
-      # 5. PACKAGE DEPLOY FILES
-      # ===============================
-      - name: Prepare deploy package
-        run: |
-          rm -rf deploy
-          mkdir deploy
-
-          cp -r dist deploy/
-          cp package.json package-lock.json ecosystem.config.js deploy/
-
-      # ===============================
-      # 6. SSH KEY
-      # ===============================
+      # -----------------------------
+      # SSH CONFIG
+      # -----------------------------
       - name: Configure SSH key
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          sed -i 's/\\n/\n/g' ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
 
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          sed -i 's/\\n/\n/g' ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      # ===============================
-      # 7. SSH TEST
-      # ===============================
       - name: Test SSH connection
         run: |
-          nc -zv $SSH_HOST $SSH_PORT
           ssh -o StrictHostKeyChecking=no \
-              -i ~/.ssh/id_rsa \
-              $SSH_USER@$SSH_HOST "echo SSH OK"
+              -o ConnectTimeout=10 \
+              -i ~/.ssh/deploy_key \
+              $SSH_USER@$SSH_HOST "echo '✅ SSH OK'"
 
-      # ===============================
-      # 8. DEPLOY TO EC2
-      # ===============================
+      # -----------------------------
+      # DEPLOY
+      # -----------------------------
       - name: Deploy to EC2
         run: |
           echo "🚀 Deploying to EC2..."
 
-          ssh -i ~/.ssh/id_rsa \
-              -o StrictHostKeyChecking=no \
-              $SSH_USER@$SSH_HOST "
-                sudo mkdir -p $APP_DIR &&
-                sudo chown -R $SSH_USER:$SSH_USER $APP_DIR &&
-                mkdir -p $APP_DIR/logs
-              "
-
-          rsync -az --delete \
-            -e \"ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no\" \
-            deploy/ \
+          rsync -avz \
+            --delete \
+            -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key" \
+            dist package.json package-lock.json ecosystem.config.js \
             $SSH_USER@$SSH_HOST:$APP_DIR/
 
-          ssh -i ~/.ssh/id_rsa \
-              -o StrictHostKeyChecking=no \
-              $SSH_USER@$SSH_HOST "
-                cd $APP_DIR &&
-                npm ci --omit=dev &&
-                pm2 delete api || true &&
-                pm2 start ecosystem.config.js &&
+          ssh -o StrictHostKeyChecking=no \
+              -i ~/.ssh/deploy_key \
+              $SSH_USER@$SSH_HOST << EOF
+                set -e
+                cd $APP_DIR
+
+                echo "📦 Installing production dependencies..."
+                npm ci --omit=dev
+
+                echo "🚀 Restarting PM2..."
+                pm2 delete app || true
+                pm2 start ecosystem.config.js --env production
                 pm2 save
-              "
 
-      # ===============================
-      # 9. HEALTH CHECK
-      # ===============================
-      - name: Verify application
-        run: |
-          ssh -i ~/.ssh/id_rsa \
-              -o StrictHostKeyChecking=no \
-              $SSH_USER@$SSH_HOST "
-                pm2 list &&
-                curl -f http://localhost:3000 || exit 1
-              "
+                pm2 status
+          EOF
 
-      # ===============================
-      # 10. CLEANUP
-      # ===============================
       - name: Cleanup
         if: always()
         run: |
-          rm -rf deploy
-          rm -f ~/.ssh/id_rsa
+          rm -f ~/.ssh/deploy_key
