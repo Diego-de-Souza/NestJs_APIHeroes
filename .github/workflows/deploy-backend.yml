@@ -1,110 +1,55 @@
-name: Deploy API Heroes to EC2
+name: Deploy API Heroes Platform
 
 on:
   push:
-    branches: [ main, master ]
-  workflow_dispatch:
-
-env:
-  AWS_REGION: us-east-1
-  SSH_HOST: ${{ secrets.EC2_HOST }}
-  SSH_USER: ec2-user
-  SSH_PORT: 22
-  APP_DIR: /opt/app
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      # -----------------------------
-      # DEPENDÊNCIAS
-      # -----------------------------
-      - name: Install dependencies (with devDependencies)
-        run: |
-          echo "📦 Installing dependencies..."
-          npm ci
+      - name: 📦 Install dependencies
+        run: npm ci
 
-      # GARANTIA ABSOLUTA DO CLI
-      - name: Ensure NestJS CLI is available
-        run: |
-          echo "🔧 Ensuring NestJS CLI..."
-          npm install -D @nestjs/cli
+      - name: 🔨 Build NestJS
+        run: npm run build
 
-      # -----------------------------
-      # BUILD
-      # -----------------------------
-      - name: Build NestJS
-        run: |
-          echo "🔨 Building NestJS..."
-          rm -rf dist
-          npm run build
+      - name: 📤 Copy files to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: |
+            dist
+            package.json
+            package-lock.json
+          target: /opt/app
 
-          echo "📁 Verifying dist..."
-          if [ ! -f dist/main.js ]; then
-            echo "❌ dist/main.js not found"
-            find dist -type f
-            exit 1
-          fi
+      - name: 🚀 Restart API with PM2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /opt/app
 
-      # -----------------------------
-      # SSH CONFIG
-      # -----------------------------
-      - name: Configure SSH key
-        run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          sed -i 's/\\n/\n/g' ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
+            echo "📦 Installing production dependencies..."
+            npm ci --omit=dev
 
-      - name: Test SSH connection
-        run: |
-          ssh -o StrictHostKeyChecking=no \
-              -o ConnectTimeout=10 \
-              -i ~/.ssh/deploy_key \
-              $SSH_USER@$SSH_HOST "echo '✅ SSH OK'"
-
-      # -----------------------------
-      # DEPLOY
-      # -----------------------------
-      - name: Deploy to EC2
-        run: |
-          echo "🚀 Deploying to EC2..."
-
-          rsync -avz \
-            --delete \
-            -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key" \
-            dist package.json package-lock.json ecosystem.config.js \
-            $SSH_USER@$SSH_HOST:$APP_DIR/
-
-          ssh -o StrictHostKeyChecking=no \
-              -i ~/.ssh/deploy_key \
-              $SSH_USER@$SSH_HOST << EOF
-                set -e
-                cd $APP_DIR
-
-                echo "📦 Installing production dependencies..."
-                npm ci --omit=dev
-
-                echo "🚀 Restarting PM2..."
-                pm2 delete app || true
-                pm2 start ecosystem.config.js --env production
-                pm2 save
-
-                pm2 status
-          EOF
-
-      - name: Cleanup
-        if: always()
-        run: |
-          rm -f ~/.ssh/deploy_key
+            echo "🚀 Restarting PM2..."
+            pm2 delete api-heroes || true
+            pm2 start dist/main.js --name api-heroes
+            pm2 save
