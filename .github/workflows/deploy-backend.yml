@@ -44,7 +44,7 @@ jobs:
         run: |
           echo "🔨 Building NestJS..."
           rm -rf dist
-          npm run build
+          npx nest build
 
           echo "📁 Validating dist structure..."
           if [ ! -f "dist/main.js" ]; then
