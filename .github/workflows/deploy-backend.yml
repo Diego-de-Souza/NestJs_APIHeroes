@@ -111,10 +111,10 @@ jobs:
               export PGPASSWORD="\$DB_PASSWORD"
 
               psql \
-                -h \$DB_HOST \
-                -U \$DB_USERNAME \
-                -d \$DB_NAME \
-                -f database/postgres-init/01-schema.sql
+                "host=$DB_HOST hostaddr=$(getent ahostsv4 $DB_HOST | awk '{print $1; exit}')" \
+                -U $DB_USERNAME \
+                -d $DB_NAME \
+                -f database/postgres-init/0-schema.sql
 
               echo "🚀 Restarting PM2..."
               pm2 delete api-heroes 2>/dev/null || true
