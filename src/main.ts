@@ -64,7 +64,8 @@ async function bootstrap() {
       'Content-Type',
       'Authorization',
       'X-Requested-With',
-      'Accept'
+      'Accept',
+      'x-session-token',
     ]
   });
   app.useGlobalPipes(new ValidationPipe({transform: true, whitelist: true, forbidNonWhitelisted: true}));
