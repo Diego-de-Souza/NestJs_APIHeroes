@@ -13,19 +13,6 @@ import * as express from 'express';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
-  
-
-  logger.log('Environment PORT: ' + process.env.PORT);
-  logger.log('SERVICE_ROLE_KEY com process: ' + process.env.SERVICE_ROLE_KEY);
-  logger.log('R2_ACCESS_KEY: ' + process.env.R2_ACCESS_KEY);
-  logger.log('NODE_ENV: ' + process.env.NODE_ENV);
-  logger.log('DB_HOST: ' + process.env.DB_HOST);
-  logger.log('DB_NAME: ' + process.env.DB_NAME);
-  logger.log('DB_USERNAME: ' + process.env.DB_USERNAME);
-  logger.log('DB_PASSWORD: ' + process.env.DB_PASSWORD);
-  logger.log('DB_PORT: ' + process.env.DB_PORT);
-  logger.log('DB_SSL: ' + process.env.DB_SSL);
-  logger.log('FRONTEND_URL: ' + process.env.FRONTEND_URL);
 
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
@@ -104,13 +91,8 @@ async function bootstrap() {
     logger.log(`🚀 API rodando na porta ${port}`);
     logger.log('Environment PORT: ' + process.env.PORT);
     logger.log('Config Service PORT: ' + configService.get('PORT'));
-    logger.log('url banco de dados: ' + configService.get('DB_HOST'));
     logger.log('Banco de dados:' + ' ' + configService.get('DB_NAME'));
     logger.log('URL frontend: ' + configService.get('FRONTEND_URL'));
-    logger.log('SERVICE_ROLE_KEY: ' + configService.get('SERVICE_ROLE_KEY'));
-    logger.log('R2_ACCESS_KEY: ' + configService.get('R2_ACCESS_KEY'));
-    logger.log('SERVICE_ROLE_KEY com process: ' + process.env.SERVICE_ROLE_KEY);
-    logger.log('R2_ACCESS_KEY: ' + process.env.R2_ACCESS_KEY);
   }
 
   return app;

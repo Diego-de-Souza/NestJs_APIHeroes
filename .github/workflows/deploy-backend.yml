@@ -67,6 +67,7 @@ jobs:
           mkdir deploy-package
 
           cp -r dist deploy-package/
+          cp -r database deploy-package/
           cp package.json package-lock.json ecosystem.config.js deploy-package/
 
           echo "📦 Deploy package:"
@@ -88,6 +89,7 @@ jobs:
             "sudo mkdir -p $APP_DIR && sudo chown -R $SSH_USER:$SSH_USER $APP_DIR"
 
           rsync -az --delete \
+            --exclude='.env' \
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
             deploy-package/ \
             $SSH_USER@$SSH_HOST:$APP_DIR/
@@ -99,6 +101,18 @@ jobs:
 
               echo "📦 Installing production dependencies..."
               npm ci --omit=dev
+
+              echo "🔐 Loading environment variables..."
+              set -a
+              source .env
+              set +a
+
+              echo "🗄️ Running database schema..."
+              psql \
+                -h \$DB_HOST \
+                -U \$DB_USERNAME \
+                -d \$DB_NAME \
+                -f database/postgres-init/0-schema.sql
 
               echo "🚀 Restarting PM2..."
               pm2 delete api-heroes 2>/dev/null || true
