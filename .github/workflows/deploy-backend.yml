@@ -109,7 +109,7 @@ jobs:
 
               echo "🗄️ Running database schema..."
               psql "$DATABASE_URL" \
-                -f database/postgres-init/0-schema.sql
+                -f database/postgres-init/01-schema.sql
 
               echo "🚀 Restarting PM2..."
               pm2 delete api-heroes 2>/dev/null || true
