@@ -110,10 +110,7 @@ jobs:
               echo "🗄️ Running database schema..."
               export PGPASSWORD="\$DB_PASSWORD"
 
-              IPV4=$(getent ahostsv4 "$DB_HOST" | awk '{print $1; exit}')
-              
-              psql \
-                "host=$DB_HOST hostaddr=$IPV4 port=5432 dbname=$DB_NAME user=$DB_USERNAME sslmode=require" \
+              psql "$DATABASE_URL" \
                 -f database/postgres-init/0-schema.sql
 
               echo "🚀 Restarting PM2..."
