@@ -30,17 +30,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  logger.log('Config Service PORT: ' + configService.get('PORT'));
-    logger.log('url banco de dados: ' + configService.get('DB_HOST'));
-    logger.log('Banco de dados:' + ' ' + configService.get('DB_NAME'));
-    logger.log('URL frontend: ' + configService.get('FRONTEND_URL'));
-    logger.log('SERVICE_ROLE_KEY: ' + configService.get('SERVICE_ROLE_KEY'));
-    logger.log('R2_ACCESS_KEY: ' + configService.get('R2_ACCESS_KEY'));
-
-
   const port = process.env.PORT || configService.get('PORT') || 3000;
-
-  
   app.use('/api/payment/webhook', express.raw({ type: '*/*' }));
   
   app.use(cookieParser());

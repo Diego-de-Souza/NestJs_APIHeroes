@@ -17,7 +17,7 @@ import { AccessLogInterceptor } from './shared/interceptors/AccessLogInterceptor
             isGlobal: true,
          }),
     ScheduleModule.forRoot(), 
-    SequelizeModule.forRootAsync(sequelizeAsyncConfig),,
+    SequelizeModule.forRootAsync(sequelizeAsyncConfig),
     ...appModules
   ],
   controllers: [AppController, MigrationsController],
