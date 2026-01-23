@@ -24,6 +24,7 @@ export const sequelizeAsyncConfig: SequelizeModuleAsyncOptions = {
       logging: false,
 
       dialectOptions: {
+        family: 4,
         ssl: config.get('DB_SSL') === 'true'
           ? {
               require: true,
