@@ -29,4 +29,4 @@ import { AuthModule } from "./auth.module";
     ],
     exports: [CuriosityService]
 })
-export class CuriositiesModule {}
+export class CuriosidadesModule {}
