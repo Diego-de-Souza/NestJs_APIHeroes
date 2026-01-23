@@ -1,132 +1,132 @@
-name: Deploy to EC2
+# name: Deploy to EC2
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+# on:
+#   push:
+#     branches: [ main ]
+#   workflow_dispatch:
 
-env:
-  SSH_HOST: ${{ secrets.EC2_HOST }}
-  SSH_USER: ec2-user
-  SSH_PORT: 22
-  APP_DIR: /opt/app
+# env:
+#   SSH_HOST: ${{ secrets.EC2_HOST }}
+#   SSH_USER: ec2-user
+#   SSH_PORT: 22
+#   APP_DIR: /opt/app
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 20
+#           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+#       - name: Install dependencies
+#         run: npm ci
 
-      - name: Build application
-        run: |
-          echo "🔨 Building NestJS..."
-          rm -rf dist
-          npm run build
+#       - name: Build application
+#         run: |
+#           echo "🔨 Building NestJS..."
+#           rm -rf dist
+#           npm run build
 
-          if [ ! -f "dist/main.js" ]; then
-            echo "❌ dist/main.js not found"
-            find dist -type f
-            exit 1
-          fi
+#           if [ ! -f "dist/main.js" ]; then
+#             echo "❌ dist/main.js not found"
+#             find dist -type f
+#             exit 1
+#           fi
 
-          echo "✅ Build OK"
+#           echo "✅ Build OK"
 
-      - name: Create PM2 ecosystem file
-        run: |
-          cat > ecosystem.config.js << 'EOF'
-          module.exports = {
-            apps: [{
-              name: 'api-heroes',
-              script: './dist/main.js',
-              cwd: '/opt/app',
+#       - name: Create PM2 ecosystem file
+#         run: |
+#           cat > ecosystem.config.js << 'EOF'
+#           module.exports = {
+#             apps: [{
+#               name: 'api-heroes',
+#               script: './dist/main.js',
+#               cwd: '/opt/app',
 
-              exec_mode: 'fork',
-              instances: 1,
+#               exec_mode: 'fork',
+#               instances: 1,
 
-              autorestart: true,
-              watch: false,
-              max_memory_restart: '400M',
+#               autorestart: true,
+#               watch: false,
+#               max_memory_restart: '400M',
 
-              env: {
-                NODE_ENV: 'production',
-                NODE_OPTIONS: '--dns-result-order=ipv4first'
-              }
-            }]
-          }
-          EOF
+#               env: {
+#                 NODE_ENV: 'production',
+#                 NODE_OPTIONS: '--dns-result-order=ipv4first'
+#               }
+#             }]
+#           }
+#           EOF
 
-      - name: Prepare deploy package
-        run: |
-          rm -rf deploy-package
-          mkdir deploy-package
+#       - name: Prepare deploy package
+#         run: |
+#           rm -rf deploy-package
+#           mkdir deploy-package
 
-          cp -r dist deploy-package/
-          cp -r database deploy-package/
-          cp package.json package-lock.json ecosystem.config.js deploy-package/
+#           cp -r dist deploy-package/
+#           cp -r database deploy-package/
+#           cp package.json package-lock.json ecosystem.config.js deploy-package/
 
-          echo "📦 Deploy package:"
-          ls -la deploy-package
+#           echo "📦 Deploy package:"
+#           ls -la deploy-package
 
-      - name: Configure SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          sed -i 's/\\n/\n/g' ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
+#       - name: Configure SSH key
+#         run: |
+#           mkdir -p ~/.ssh
+#           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+#           sed -i 's/\\n/\n/g' ~/.ssh/deploy_key
+#           chmod 600 ~/.ssh/deploy_key
 
-      - name: Deploy to EC2
-        run: |
-          echo "🚀 Deploying to EC2..."
+#       - name: Deploy to EC2
+#         run: |
+#           echo "🚀 Deploying to EC2..."
 
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            $SSH_USER@$SSH_HOST \
-            "sudo mkdir -p $APP_DIR && sudo chown -R $SSH_USER:$SSH_USER $APP_DIR"
+#           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+#             $SSH_USER@$SSH_HOST \
+#             "sudo mkdir -p $APP_DIR && sudo chown -R $SSH_USER:$SSH_USER $APP_DIR"
 
-          rsync -az --delete \
-            --exclude='.env' \
-            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            deploy-package/ \
-            $SSH_USER@$SSH_HOST:$APP_DIR/
+#           rsync -az --delete \
+#             --exclude='.env' \
+#             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+#             deploy-package/ \
+#             $SSH_USER@$SSH_HOST:$APP_DIR/
 
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            $SSH_USER@$SSH_HOST << 'EOF'
-              set -e
-              cd /opt/app
+#           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+#             $SSH_USER@$SSH_HOST << 'EOF'
+#               set -e
+#               cd /opt/app
 
-              echo "📦 Installing production dependencies..."
-              npm ci --omit=dev
+#               echo "📦 Installing production dependencies..."
+#               npm ci --omit=dev
 
-              echo "🔐 Loading environment variables..."
-              set -a
-              source .env
-              set +a
+#               echo "🔐 Loading environment variables..."
+#               set -a
+#               source .env
+#               set +a
 
-              echo "🗄️ Running database schema..."
-              psql "$DATABASE_URL" \
-                -f database/postgres-init/01-schema.sql
+#               echo "🗄️ Running database schema..."
+#               psql "$DATABASE_URL" \
+#                 -f database/postgres-init/01-schema.sql
 
-              echo "🚀 Restarting PM2..."
-              pm2 delete api-heroes 2>/dev/null || true
-              pm2 start ecosystem.config.js
-              pm2 save
+#               echo "🚀 Restarting PM2..."
+#               pm2 delete api-heroes 2>/dev/null || true
+#               pm2 start ecosystem.config.js
+#               pm2 save
 
-              pm2 status api-heroes
-          EOF
+#               pm2 status api-heroes
+#           EOF
 
-      - name: Cleanup
-        if: always()
-        run: |
-          rm -f ~/.ssh/deploy_key
-          rm -rf deploy-package
+#       - name: Cleanup
+#         if: always()
+#         run: |
+#           rm -f ~/.ssh/deploy_key
+#           rm -rf deploy-package
 
