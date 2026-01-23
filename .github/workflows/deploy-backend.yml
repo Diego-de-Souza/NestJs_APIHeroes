@@ -114,7 +114,7 @@ jobs:
                 -h \$DB_HOST \
                 -U \$DB_USERNAME \
                 -d \$DB_NAME \
-                -f database/postgres-init/0-schema.sql
+                -f database/postgres-init/01-schema.sql
 
               echo "🚀 Restarting PM2..."
               pm2 delete api-heroes 2>/dev/null || true
