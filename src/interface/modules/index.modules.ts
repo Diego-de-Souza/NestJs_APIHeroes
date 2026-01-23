@@ -1,4 +1,4 @@
-import { ArticleModule } from "./articles.module";
+import { ArticleModule } from "./article.module";
 import { AuthModule } from "./auth.module";
 import { CuriositiesModule } from "./curiosities.module";
 import { DadosHeroisModule } from "./dados-herois.module";
