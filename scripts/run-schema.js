@@ -11,7 +11,7 @@ async function runSchema() {
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: {
-      rejectUnauthorized: false // ✅ IMPORTANTE para Render PostgreSQL
+      rejectUnauthorized: false
     }
   });
 
