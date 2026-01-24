@@ -22,29 +22,29 @@ export class ImageService {
     }
     
     async saveImageBase64(imageBase64: string, imageName: string, folderName: string): Promise<string> {
-        let imageUrl = "";
         try{
             // Converte base64 para buffer
             const imageBuffer = await this.converterImageUseCase.convertBase64ToImageFile(imageBase64, imageName);
             // Gera nome único para imagem
             const fileName = `${folderName}/${uuidv4()}.jpg`;
             
-            // Faz upload
+            // Faz upload (R2 não suporta ACL, então removemos)
             await this.connection_s3.send(new PutObjectCommand({
                 Bucket: process.env.R2_BUCKET,
                 Key: fileName,
                 Body: imageBuffer,
-                ContentType: "image/jpeg",
-                ACL: "public-read"
+                ContentType: "image/jpeg"
             }));
 
             // Monta URL pública
-            imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
+            const imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
+            this.logger.log(`Imagem salva com sucesso: ${imageUrl}`);
             return imageUrl;
         }catch(error){
             this.logger.error("Error saving image:", error);
+            // Lança o erro para que o chamador possa tratá-lo
+            throw new Error(`Falha ao salvar imagem: ${error.message || error}`);
         }
-
     }
 
     async saveImageBuffer(imageBuffer: Buffer | Uint8Array, folderName: string, contentType: string = "image/jpeg"): Promise<string> {
@@ -73,13 +73,12 @@ export class ImageService {
             // Gera nome único para imagem
             const fileName = `${folderName}/${uuidv4()}.${extension}`;
             
-            // Faz upload
+            // Faz upload (R2 não suporta ACL, então removemos)
             await this.connection_s3.send(new PutObjectCommand({
                 Bucket: process.env.R2_BUCKET,
                 Key: fileName,
                 Body: buffer,
-                ContentType: detectedContentType,
-                ACL: "public-read"
+                ContentType: detectedContentType
             }));
 
             // Monta URL pública

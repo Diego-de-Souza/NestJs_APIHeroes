@@ -13,7 +13,33 @@ export class CreateRegisterEventsUseCase {
 
     async createEvent(eventDto: any): Promise<ApiResponseInterface<string>> {
         try{
-            const imageUploadResult = await this.imageService.saveImageBase64(eventDto.image, eventDto.image_name, 'events');
+            let imageUploadResult: string;
+            
+            // Valida se a imagem foi fornecida
+            if (!eventDto.image) {
+                return {
+                    status: 400,
+                    message: 'A imagem do evento é obrigatória.',
+                };
+            }
+            
+            // Tenta fazer upload da imagem
+            try {
+                imageUploadResult = await this.imageService.saveImageBase64(eventDto.image, eventDto.image_name, 'events');
+                
+                if (!imageUploadResult || imageUploadResult.trim() === '') {
+                    return {
+                        status: 400,
+                        message: 'Falha ao salvar a imagem do evento. URL da imagem não foi gerada.',
+                    };
+                }
+            } catch (imageError) {
+                return {
+                    status: 400,
+                    message: 'Erro ao fazer upload da imagem do evento.',
+                    error: imageError.message || imageError,
+                };
+            }
 
             let eventData = {
                 ...eventDto,

@@ -24,7 +24,21 @@ export class CreateArticleUseCase {
         }
 
         if(articleDto.image){
-            imageUploadResult = await this.imageService.saveImageBase64(articleDto.image, 'articles', 'images');
+            try {
+                imageUploadResult = await this.imageService.saveImageBase64(articleDto.image, 'articles', 'images');
+                if (!imageUploadResult) {
+                    return {
+                        status: HttpStatus.BAD_REQUEST,
+                        message: "Erro ao fazer upload da imagem do artigo."
+                    };
+                }
+            } catch (error) {
+                return {
+                    status: HttpStatus.BAD_REQUEST,
+                    message: "Erro ao fazer upload da imagem do artigo.",
+                    error: error.message || error
+                };
+            }
         }
 
         const articleToSave = {
