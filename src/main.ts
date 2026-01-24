@@ -12,12 +12,12 @@ import * as bodyParser from 'body-parser';
 import * as express from 'express';
 
 async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap');
 
-  const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-
   const port = process.env.PORT || configService.get('PORT') || 3000;
+
   app.use('/api/payment/webhook', express.raw({ type: '*/*' }));
   
   app.use(cookieParser());
@@ -73,12 +73,8 @@ async function bootstrap() {
 
   await app.init();
   if (require.main === module) {
-    await app.listen(port, '0.0.0.0');
+    await app.listen(port);
     logger.log(`🚀 API rodando na porta ${port}`);
-    logger.log('Environment PORT: ' + process.env.PORT);
-    logger.log('Config Service PORT: ' + configService.get('PORT'));
-    logger.log('Banco de dados:' + ' ' + configService.get('DB_NAME'));
-    logger.log('URL frontend: ' + configService.get('FRONTEND_URL'));
   }
 
   return app;
