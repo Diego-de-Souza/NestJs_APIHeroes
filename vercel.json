@@ -2,17 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "src/main.ts",
+      "src": "api/index.ts",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "dist/main.js"
+      "dest": "/api/index.ts"
     }
-  ],
-  "buildCommand": "nest build",  
-  "outputDirectory": "dist",
-  "installCommand": "npm install --legacy-peer-deps"
+  ]
 }
