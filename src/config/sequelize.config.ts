@@ -7,12 +7,22 @@ const logger = new Logger('SequelizeConfig');
 export const sequelizeAsyncConfig: SequelizeModuleAsyncOptions = {
   inject: [ConfigService],
   useFactory: async (config: ConfigService) => {
+    try {
+      // Tenta carregar o pg explicitamente
+      const pg = await import('pg');
+      logger.log('Driver PostgreSQL (pg) carregado com sucesso');
+    } catch (error) {
+      logger.error('❌ Driver pg não encontrado. Instale com: npm install pg');
+      throw new Error('Pacote pg não instalado. Execute: npm install pg');
+    }
+
     const host = config.get<string>('DB_HOST');
+    const useSSL = config.get('DB_SSL') === 'true';
+    
+    logger.log(`Conectando ao PostgreSQL em ${host} (SSL: ${useSSL})`);
 
-    logger.log(`Conectando ao PostgreSQL em ${host}`);
-
-    return {
-      dialect: 'postgres',
+    const configObj = {
+      dialect: 'postgres' as const,
       host,
       port: Number(config.get<number>('DB_PORT') || 5432),
       username: config.get<string>('DB_USERNAME'),
@@ -21,17 +31,17 @@ export const sequelizeAsyncConfig: SequelizeModuleAsyncOptions = {
 
       autoLoadModels: true,
       synchronize: false,
-      logging: false,
+      logging: process.env.NODE_ENV !== 'production', // Log apenas em dev
 
-      dialectOptions: {
-        family: 4,
-        ssl: config.get('DB_SSL') === 'true'
-          ? {
-              require: true,
-              rejectUnauthorized: false,
-            }
-          : false,
-      },
+      // Opções de SSL condicionais
+      ...(useSSL ? {
+        dialectOptions: {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false,
+          },
+        },
+      } : {}),
 
       pool: {
         max: 10,
@@ -40,5 +50,8 @@ export const sequelizeAsyncConfig: SequelizeModuleAsyncOptions = {
         idle: 10000,
       },
     };
+
+    logger.debug('Configuração do Sequelize:', configObj);
+    return configObj;
   },
 };
