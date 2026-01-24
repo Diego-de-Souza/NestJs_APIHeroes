@@ -41,32 +41,17 @@ async function bootstrap() {
   }
 
   app.setGlobalPrefix('api');
-  const allowedOrigins = [
-    'https://heroesplatform.com.br',
-    'https://www.heroesplatform.com.br'
-  ];
-
   app.enableCors({
-    origin: (origin, callback) => {
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error('CORS not allowed'), false);
-    },
-    credentials: true,
+    origin: [configService.get('FRONTEND_URL')],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: [
-      'Content-Type',
+      'Content-Type', 
+      'Accept', 
       'Authorization',
       'X-Requested-With',
-      'Accept',
-      'x-session-token',
-    ]
+      'x-session-token' 
+    ],
+    credentials: true
   });
   app.useGlobalPipes(new ValidationPipe({transform: true, whitelist: true, forbidNonWhitelisted: true}));
   
