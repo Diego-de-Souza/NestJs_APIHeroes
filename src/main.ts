@@ -42,7 +42,12 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
   app.enableCors({
-    origin: [configService.get('FRONTEND_URL')],
+    origin: [
+      'https://heroesplatform.com.br',
+      'https://www.heroesplatform.com.br',
+      'http://localhost:4200', 
+      'http://localhost:3000' 
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: [
       'Content-Type', 
