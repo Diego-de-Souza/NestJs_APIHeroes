@@ -52,13 +52,14 @@ export const sequelizeAsyncConfig: SequelizeModuleAsyncOptions = {
             keepAliveInitialDelayMillis: 10000,
           },
           
-          // Pool otimizado para serverless (menos conexões)
+          // Pool mínimo para Supabase Session mode (limite rigoroso de conexões)
+          // Supabase: "max clients reached - in Session mode max clients are limited to pool_size"
           pool: {
-            max: process.env.VERCEL ? 2 : 10, // Menos conexões no Vercel
+            max: 1, // 1 conexão por instância serverless para não exceder limite Supabase
             min: 0,
-            acquire: 60000, // Timeout maior para adquirir conexão
-            idle: 10000,
-            evict: 1000, // Remove conexões idle rapidamente no serverless
+            acquire: 60000,
+            idle: 5000,
+            evict: 1000,
           },
         };
       } catch (error) {
@@ -97,11 +98,12 @@ export const sequelizeAsyncConfig: SequelizeModuleAsyncOptions = {
           },
         } : {}),
 
+        // Pool reduzido para Supabase (Session mode limita conexões)
         pool: {
-          max: 10,
-          min: 2,
+          max: host?.includes('supabase.co') ? 1 : 10,
+          min: host?.includes('supabase.co') ? 0 : 2,
           acquire: 30000,
-          idle: 10000,
+          idle: host?.includes('supabase.co') ? 5000 : 10000,
         },
       };
     }
