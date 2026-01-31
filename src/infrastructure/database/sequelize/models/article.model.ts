@@ -99,6 +99,11 @@ export class Article extends Model<Article> {
     image: string;
 
     @Column({
+        type: DataType.STRING(255),
+    })
+    image_source: string;
+
+    @Column({
         type: DataType.STRING(50),
         allowNull: false,
     })

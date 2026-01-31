@@ -61,6 +61,10 @@ export class CreateArticleDto {
     @IsString({ message: "Imagem deve ser uma string base64" })
     readonly image?: string;
 
+    @ValidateIf(o => o.image_source !== undefined)
+    @IsString({ message: "Fonte da imagem deve ser uma string" })
+    readonly image_source?: string;
+
     @IsOptional()
     @IsString({ message: "Autor deve ser string" })
     @MaxLength(50, { message: "Autor deve conter menos de 50 caracteres" })
