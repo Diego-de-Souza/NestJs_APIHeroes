@@ -1,16 +1,17 @@
-import { HttpStatus, Injectable, NotFoundException, Logger, InternalServerErrorException } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, NotFoundException, Logger, InternalServerErrorException } from '@nestjs/common';
 import { ApiResponseInterface } from '../../../domain/interfaces/APIResponse.interface';
-import { CommentsRepository } from '../../../infrastructure/repositories/comments.repository';
+import type { ICommentsRepository } from '../../../application/ports/out/comments.port';
+import type { ILikeCommentPort } from '../../../application/ports/in/comments/like-comment.port';
 
 @Injectable()
-export class LikeCommentUseCase {
+export class LikeCommentUseCase implements ILikeCommentPort {
   private readonly logger = new Logger(LikeCommentUseCase.name);
 
   constructor(
-    private readonly commentsRepository: CommentsRepository,
+    @Inject('ICommentsRepository') private readonly commentsRepository: ICommentsRepository,
   ) {}
 
-  async execute(commentId: number, userId: number): Promise<ApiResponseInterface<{ likes: number; dislikes: number }>> {
+  async execute(commentId: string, userId: string): Promise<ApiResponseInterface<{ likes: number; dislikes: number }>> {
     try {
       const comment = await this.commentsRepository.findById(commentId);
 

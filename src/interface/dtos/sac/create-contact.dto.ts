@@ -33,4 +33,8 @@ export class CreateContactDto {
         message: "Prioridade deve ser: low, normal, high ou urgent"
     })
     readonly priority?: 'low' | 'normal' | 'high' | 'urgent';
+
+    @IsOptional()
+    @IsString()
+    readonly usuario_id?: string;
 }

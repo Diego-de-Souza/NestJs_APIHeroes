@@ -1,20 +1,19 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { User } from "../../../infrastructure/database/sequelize/models/user.model";
-import { UserRepository } from "../../../infrastructure/repositories/user.repository";
+import type { IUserRepository } from "../../ports/out/user.port";
 import { UpdateUserDTO } from "../../../interface/dtos/user/UserUpdate.dto";
 import { GenenerateHashUseCase } from "../auth/generate-hash.use-case";
-
+import type { IUpdateUserPort } from "../../ports/in/user/update-user.port";
 
 @Injectable()
-export class UpdateUserByIdUseCase {
-
-    constructor( 
-        private readonly userRepository: UserRepository,
+export class UpdateUserByIdUseCase implements IUpdateUserPort {
+    constructor(
+        @Inject('IUserRepository') private readonly userRepository: IUserRepository,
         private readonly generateHashUseCase: GenenerateHashUseCase
-    ){}
+    ) {}
 
-    async update(id: number, userDto: UpdateUserDTO): Promise<ApiResponseInterface<User>>{
+    async execute(id: string, userDto: UpdateUserDTO): Promise<ApiResponseInterface<User>> {
         const exists = await this.userRepository.findById(id);
 
         if(!exists){

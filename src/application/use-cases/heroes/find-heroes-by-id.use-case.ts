@@ -1,21 +1,22 @@
-import { HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { HttpStatus, Injectable, Logger, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import { HeroesRepository } from "../../../infrastructure/repositories/heroes.repository";
-import { StudioRepository } from "../../../infrastructure/repositories/studio.repository";
-import { TeamRepository } from "../../../infrastructure/repositories/team.repository";
+import type { IHeroesRepository } from "../../ports/out/heroes.port";
+import type { IStudioRepository } from "../../ports/out/studio.port";
+import type { ITeamRepository } from "../../ports/out/team.port";
 import { HeroesData } from "../../../domain/interfaces/card_heroes.interface";
+import type { IFindHeroesByIdPort } from "../../ports/in/heroes/find-heroes-by-id.port";
 
 @Injectable()
-export class FindHeroesByIdUseCase {
+export class FindHeroesByIdUseCase implements IFindHeroesByIdPort {
     private readonly logger = new Logger(FindHeroesByIdUseCase.name);
 
     constructor(
-        private readonly heroesRepository: HeroesRepository,
-        private readonly studioRepository: StudioRepository,
-        private readonly teamRepository: TeamRepository
-    ){}
+        @Inject('IHeroesRepository') private readonly heroesRepository: IHeroesRepository,
+        @Inject('IStudioRepository') private readonly studioRepository: IStudioRepository,
+        @Inject('ITeamRepository') private readonly teamRepository: ITeamRepository
+    ) {}
 
-    async findHeroesById(id: number): Promise<ApiResponseInterface<HeroesData>>{
+    async execute(id: string): Promise<ApiResponseInterface<HeroesData>> {
         try{
             const heroes = await this.heroesRepository.findHeroesById(id);
 
@@ -43,7 +44,7 @@ export class FindHeroesByIdUseCase {
                 power_type: heroes.power_type,
                 morality: heroes.morality,
                 first_appearance: heroes.first_appearance,
-                release_data: heroes.release_date,
+                release_data: heroes.release_date instanceof Date ? heroes.release_date : new Date(heroes.release_date as string | Date),
                 creator: heroes.creator,
                 weak_point: heroes.weak_point,
                 affiliation: heroes.affiliation,
@@ -59,14 +60,14 @@ export class FindHeroesByIdUseCase {
                 message: "Herói encontrado com sucesso.",
                 dataUnit: data_heroes
             }
-        }catch(error){
-            this.logger.error('Erro ao buscar dados do herói:', error);        
+        } catch (error: unknown) {
+            const err = error as Error;
+            this.logger.error('Erro ao buscar dados do herói:', error);
             return {
                 status: HttpStatus.INTERNAL_SERVER_ERROR,
                 message: "Erro interno do servidor ao buscar dados do herói",
-                error: error.message || error
+                error: (err?.message ?? String(error)),
             };
         }
-        
     }
 }

@@ -32,7 +32,7 @@ export class AccessLogService {
     }
 
     async trackHomeAccess(
-        userId: number | null,
+        userId: string | null,
         ip: string,
         userAgent: string | undefined,
         route?: string

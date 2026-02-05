@@ -5,11 +5,13 @@ import { UserSocial } from './user-social.model';
 @Table({ tableName: 'users', timestamps: true, underscored: true })
 export class User extends Model<User> {
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    allowNull: false,
     primaryKey: true,
-    autoIncrement: true,
+    unique: true
   })
-  id: number;
+  id: string;
 
   @Column({ type: DataType.STRING(100), allowNull: false })
   fullname: string;

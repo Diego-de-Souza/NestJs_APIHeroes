@@ -1,29 +1,44 @@
-import { HttpStatus, Injectable, Logger, ForbiddenException } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import { NewsRepository } from "../../../infrastructure/repositories/news.repository";
+import type { INewsletterRepository } from "src/application/ports/out/newsletter.port";
+import type { IDeleteNewsPort } from "src/application/ports/in/newsletter/delete-news.port";
+import { ImageService } from "src/application/services/image.service";
 
 @Injectable()
-export class DeleteNewsUseCase {
+export class DeleteNewsUseCase implements IDeleteNewsPort {
     private readonly logger = new Logger(DeleteNewsUseCase.name);
 
     constructor(
-        private readonly newsRepository: NewsRepository
-    ){}
+        @Inject('INewsletterRepository') private readonly newsletterRepository: INewsletterRepository,
+        private readonly imageService: ImageService
+    ) {}
 
-    async deleteNews(id: number, usuario_id: number): Promise<ApiResponseInterface<number>>{
+    async execute(id: string, usuario_id: string): Promise<ApiResponseInterface<number>> {
         try {
-            const news = await this.newsRepository.findNewsByIdAndUserId(id, usuario_id);
-            
-            if(!news){
+            const news = await this.newsletterRepository.findNewsByIdAndUserId(id, usuario_id);
+
+            if (!news) {
                 return {
                     status: HttpStatus.NOT_FOUND,
                     message: "Notícia não encontrada ou você não tem permissão para excluí-la."
                 };
             }
 
-            const deletedCount = await this.newsRepository.deleteNewsByUserId(id, usuario_id);
+            if(news.image){
+                const deletedImage = await this.imageService.deleteImage(news.image);
+                
+                if(!deletedImage){
+                    return {
+                        status: HttpStatus.NOT_FOUND,
+                        message: "Erro ao excluir imagem."
+                    };
+                    
+                }
+            }
 
-            if(deletedCount === 0){
+            const deletedCount = await this.newsletterRepository.deleteNewsByUserId(id, usuario_id);
+
+            if (deletedCount === 0) {
                 return {
                     status: HttpStatus.NOT_FOUND,
                     message: "Erro ao excluir notícia."

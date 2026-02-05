@@ -1,17 +1,17 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { ImageService } from "../../../application/services/image.service";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import { EventsRepository } from "../../../infrastructure/repositories/events.repository";
-
+import type { IEventsRepository } from "../../../application/ports/out/events.port";
+import type { ICreateEventPort } from "../../../application/ports/in/events/create-event.port";
 
 @Injectable()
-export class CreateRegisterEventsUseCase {
+export class CreateRegisterEventsUseCase implements ICreateEventPort {
     constructor(
-        private readonly eventsRepository: EventsRepository,
+        @Inject('IEventsRepository') private readonly eventsRepository: IEventsRepository,
         private readonly imageService: ImageService
     ) {}
 
-    async createEvent(eventDto: any): Promise<ApiResponseInterface<string>> {
+    async execute(eventDto: any): Promise<ApiResponseInterface<string>> {
         try{
             let imageUploadResult: string;
             
@@ -45,7 +45,7 @@ export class CreateRegisterEventsUseCase {
                 ...eventDto,
                 url_image: imageUploadResult,
             }
-            const event = await this.eventsRepository.createRegisterEvent(eventData);
+            const event = await this.eventsRepository.createRegisterEvent(eventData as any);
 
             return {
                 status: 201,

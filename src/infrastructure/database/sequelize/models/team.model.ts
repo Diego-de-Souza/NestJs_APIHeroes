@@ -5,15 +5,14 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
   timestamps: false,
 })
 export class Team extends Model<Team> {
-
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
     allowNull: false,
-    autoIncrement: true,
     primaryKey: true,
-    unique: true,
+    unique: true
   })
-  id: number;
+  id: string;
 
   @Column({ 
       type: DataType.STRING(100),

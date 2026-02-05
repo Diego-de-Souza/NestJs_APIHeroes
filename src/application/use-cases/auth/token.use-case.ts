@@ -45,7 +45,7 @@ export class TokenUseCase {
         }
     }
 
-    async generateBinario(number: number): Promise<string> {
-        return number.toString(2);
+    async generateBinario(id: string | number): Promise<string> {
+        return typeof id === 'number' ? id.toString(2) : id;
     }
 }

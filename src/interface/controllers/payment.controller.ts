@@ -1,14 +1,14 @@
-import { Controller, Post, Body, UseGuards, Request, Get, Headers, RawBodyRequest, Req, Logger } from '@nestjs/common';
-import { PaymentService } from '../../application/services/payment.service';
+import { Controller, Post, Body, UseGuards, Request, Get, Headers, RawBodyRequest, Req, Logger, Inject } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { CreatePaymentIntentDto } from '../dtos/payment/payment.dto';
 import { Request as ExpressRequest } from 'express';
+import type { IPaymentPort } from '../../application/ports/in/payment/payment.port';
 
 @Controller('payment')
 export class PaymentController {
   private readonly logger = new Logger(PaymentController.name);
 
-  constructor(private readonly paymentService: PaymentService) {}
+  constructor(@Inject('IPaymentPort') private readonly paymentPort: IPaymentPort) {}
 
   @Post('create-payment-intent')
   @UseGuards(AuthGuard)
@@ -16,12 +16,12 @@ export class PaymentController {
     const { planType, amount, currency = 'brl' } = body;
     const userId = req.user.id;
 
-    return await this.paymentService.createPaymentIntent(userId, planType, amount, currency);
+    return await this.paymentPort.createPaymentIntent(userId, planType, amount, currency);
   }
 
   @Get('plans')
   async getAvailablePlans() {
-    return await this.paymentService.getAvailablePlans();
+    return await this.paymentPort.getAvailablePlans();
   }
 
   @Post('create-subscription')
@@ -30,19 +30,25 @@ export class PaymentController {
     const { planType, customerId } = body;
     const userId = req.user.id;
 
-    return await this.paymentService.createSubscription(userId, planType, customerId);
+    return await this.paymentPort.createSubscription(userId, planType, customerId);
   }
 
   @Get('premium-status')
   @UseGuards(AuthGuard)
   async checkPremiumStatus(@Request() req) {
     const userId = req.user.id;
-    const statusDetails = await this.paymentService.checkPremiumStatus(userId);
+    const statusDetails = await this.paymentPort.checkPremiumStatus(userId) as {
+      hasPremium: boolean;
+      daysRemaining?: number;
+      subscription?: unknown;
+      planType?: string;
+      expiresAt?: unknown;
+    };
 
     return {
       ...statusDetails,
-      message: statusDetails.hasPremium 
-        ? `Acesso premium ativo - ${statusDetails.daysRemaining} dias restantes` 
+      message: statusDetails.hasPremium
+        ? `Acesso premium ativo - ${statusDetails.daysRemaining} dias restantes`
         : 'Usuário não tem acesso premium'
     };
   }
@@ -51,7 +57,7 @@ export class PaymentController {
   @UseGuards(AuthGuard)
   async cancelSubscription(@Request() req) {
     const userId = req.user.id;
-    return await this.paymentService.cancelSubscription(userId);
+    return await this.paymentPort.cancelSubscription(userId);
   }
 
   @Post('webhook')
@@ -62,7 +68,7 @@ export class PaymentController {
     // req.body será um Buffer devido ao express.raw configurado no main.ts
     const body = req.body as Buffer;
     this.logger.debug('Stripe Webhook recebido:', { signature, bodyLength: body?.length });
-    return await this.paymentService.handleWebhook(body, signature);
+    return await this.paymentPort.handleWebhook(body, signature);
   }
 
   @Get('health')

@@ -1,16 +1,18 @@
-import { BadRequestException, HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, HttpStatus, Injectable, Logger, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Heroes } from "../../../infrastructure/database/sequelize/models/heroes.model";
-import { HeroesRepository } from "../../../infrastructure/repositories/heroes.repository";
-
+import type { IHeroesRepository } from "../../ports/out/heroes.port";
+import type { IFindHeroesByTeamPort } from "../../ports/in/heroes/find-heroes-by-team.port";
 
 @Injectable()
-export class FindHeroesByTeamUseCase {
+export class FindHeroesByTeamUseCase implements IFindHeroesByTeamPort {
     private readonly logger = new Logger(FindHeroesByTeamUseCase.name);
 
-    constructor(private readonly heroesRepository: HeroesRepository) {}
+    constructor(
+        @Inject('IHeroesRepository') private readonly heroesRepository: IHeroesRepository
+    ) {}
 
-    async findHeroesByTeam(teamName: string): Promise<ApiResponseInterface<Heroes>>{
+    async execute(teamName: string): Promise<ApiResponseInterface<Heroes>> {
         try{
             if (!teamName) {
                 throw new BadRequestException('Name team is required');

@@ -1,16 +1,17 @@
-import { HttpStatus, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { HttpStatus, Injectable, Logger, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import { SacRepository } from "../../../infrastructure/repositories/sac.repository";
+import type { ISacRepository } from "../../ports/out/sac.port";
+import type { IDeleteContactPort } from "../../ports/in/sac/delete-contact.port";
 
 @Injectable()
-export class DeleteContactUseCase {
+export class DeleteContactUseCase implements IDeleteContactPort {
     private readonly logger = new Logger(DeleteContactUseCase.name);
 
     constructor(
-        private readonly sacRepository: SacRepository
+        @Inject('ISacRepository') private readonly sacRepository: ISacRepository
     ){}
 
-    async deleteContact(id: number): Promise<ApiResponseInterface<void>>{
+    async execute(id: string): Promise<ApiResponseInterface<void>>{
         try {
             const contact = await this.sacRepository.findContactById(id);
 

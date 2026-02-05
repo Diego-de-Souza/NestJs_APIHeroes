@@ -1,14 +1,15 @@
-import { Injectable } from "@nestjs/common";
-import { HighlightsRepository } from "../../../infrastructure/repositories/highlights.repository";
-
+import { Injectable, Inject } from "@nestjs/common";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import type { IHighlightsRepository } from "../../ports/out/highlights.port";
+import type { IFindHighlightsPort } from "../../ports/in/highlights/find-highlights.port";
 
 @Injectable()
-export class FindHighlightsUseCase {
+export class FindHighlightsUseCase implements IFindHighlightsPort {
     constructor(
-        private readonly highlightsRepository: HighlightsRepository,
+        @Inject('IHighlightsRepository') private readonly highlightsRepository: IHighlightsRepository
     ) {}
 
-    async findHighlights(): Promise<any> {
+    async execute(): Promise<ApiResponseInterface<unknown>> {
         const highlights = [];
         try{
             const [
@@ -34,25 +35,18 @@ export class FindHighlightsUseCase {
                 }
             }
 
-            if(games && games.length > 0){
-                const topGames = games
-                    .filter(game => {
-                        // Verifica se o game e os relacionamentos existem
-                        return game && 
-                               game.Game && 
-                               game.Game.name && 
-                               game.User && 
-                               game.User.nickname;
-                    })
-                    .map((game) => ({
-                        gameName: game.Game.name,
-                        playerNickname: game.User.nickname,
-                        level: game.lvl_user || 0,
-                        score: game.score || 0
+            if (games && games.length > 0) {
+                type GameItem = { Game?: { name: string }; User?: { nickname: string }; lvl_user?: number; score?: number };
+                const topGames = (games as GameItem[])
+                    .filter((game: GameItem) => game?.Game?.name && game?.User?.nickname)
+                    .map((game: GameItem) => ({
+                        gameName: game.Game!.name,
+                        playerNickname: game.User!.nickname,
+                        level: game.lvl_user ?? 0,
+                        score: game.score ?? 0,
                     }));
-                
                 if (topGames.length > 0) {
-                    highlights.push({label: "Games", items: topGames});
+                    highlights.push({ label: "Games", items: topGames });
                 }
             }
 
@@ -85,11 +79,12 @@ export class FindHighlightsUseCase {
                 data: highlights
             };
 
-        }catch(error){
+        } catch (error: unknown) {
+            const err = error as Error;
             return {
                 status: 500,
                 message: 'Erro inesperado ao buscar destaques.',
-                error: error.message || error,
+                error: (err?.message ?? String(error)),
             };
         }
     }

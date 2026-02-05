@@ -10,7 +10,7 @@ export class UpdateQuizUseCase {
         private readonly quizRepository: QuizRepository
     ){}
 
-    async updateQuiz(id: number, quizDto: UpdateQuizDto): Promise<ApiResponseInterface<unknown>> {
+    async updateQuiz(id: string, quizDto: UpdateQuizDto): Promise<ApiResponseInterface<unknown>> {
         try {
             const _payloadQuiz = {
                 name: quizDto.name,

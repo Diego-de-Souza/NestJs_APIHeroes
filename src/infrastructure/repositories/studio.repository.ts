@@ -2,9 +2,10 @@ import { InjectModel } from "@nestjs/sequelize";
 import { Studio } from "../database/sequelize/models/studio.model";
 import { Injectable } from "@nestjs/common";
 import { CreateStudioDto } from "../../interface/dtos/studio/create-studio.dto";
+import type { IStudioRepository } from "../../application/ports/out/studio.port";
 
 @Injectable()
-export class StudioRepository {
+export class StudioRepository implements IStudioRepository {
     constructor(@InjectModel(Studio) private readonly studioModel: typeof Studio) {}
 
     async findStudioByName(name: string): Promise<Studio | null>{
@@ -19,15 +20,15 @@ export class StudioRepository {
         return await this.studioModel.findAll();
     }
 
-    async DeleteStudio(id: number): Promise<number>{
+    async DeleteStudio(id: string): Promise<number>{
         return await this.studioModel.destroy({where: {id}});
     }
 
-    async findStudioById(id: number): Promise<Studio | null> {
+    async findStudioById(id: string): Promise<Studio | null> {
         return await this.studioModel.findOne({where: {id}});
     }
 
-    async updateStudio(id: number, studioDto: CreateStudioDto): Promise<void>{
+    async updateStudio(id: string, studioDto: CreateStudioDto): Promise<void>{
         const studio = new Studio(studioDto)
         await this.studioModel.update(studio, {where: {id}});
     }

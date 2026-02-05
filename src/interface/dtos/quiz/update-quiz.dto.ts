@@ -4,9 +4,9 @@ import { PartialType, OmitType } from "@nestjs/mapped-types";
 import { CreateQuizDto, QuizLevelDto } from "./quizCreate.dto";
 
 export class UpdateQuizLevelDto extends PartialType(QuizLevelDto) {
-    @IsInt({ message: "id deve ser inteiro" })
+    @IsString({ message: "id deve ser uma string" })
     @IsOptional()
-    readonly id?: number;
+    readonly id?: string;
 
     @IsBoolean({ message: "unlocked deve ser boolean" })
     @IsOptional()

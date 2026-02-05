@@ -1,17 +1,16 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Team } from "../../../infrastructure/database/sequelize/models/equipes.model";
-import { TeamRepository } from "../../../infrastructure/repositories/team.repository";
-
+import type { ITeamRepository } from "../../ports/out/team.port";
+import type { IFindAllTeamPort } from "../../ports/in/team/find-all-team.port";
 
 @Injectable()
-export class FindAllTeamUseCase {
-
+export class FindAllTeamUseCase implements IFindAllTeamPort {
     constructor(
-        private readonly teamRepository: TeamRepository
-    ){}
+        @Inject('ITeamRepository') private readonly teamRepository: ITeamRepository
+    ) {}
 
-    async findAllTeam(): Promise<ApiResponseInterface<Team>>{
+    async execute(): Promise<ApiResponseInterface<Team>> {
         const teamFull = await this.teamRepository.findAllTeam();
 
         if(!teamFull){

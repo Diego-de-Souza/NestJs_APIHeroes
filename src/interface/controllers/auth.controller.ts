@@ -1,12 +1,12 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Logger, Param, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Inject, Logger, Param, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiResponseInterface } from '../../domain/interfaces/APIResponse.interface';
 import { SignInResponse, SignOutResponse } from '../../domain/interfaces/auth.interface';
-import { AuthService } from '../../application/services/auth.service';
 import { CreateUserLoginDto } from '../dtos/user/userLoginCreate.dto';
 import { AuthGuard } from '../guards/auth.guard';
 import { Request } from 'express';
+import type { IAuthPort } from '../../application/ports/in/auth/auth.port';
 
 @ApiTags('Auth') 
 @Controller('auth')
@@ -14,7 +14,7 @@ export class AuthController {
   private readonly logger = new Logger(AuthController.name);
 
   constructor(
-    private readonly authService: AuthService
+    @Inject('IAuthPort') private readonly authPort: IAuthPort
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -24,17 +24,22 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Login realizado com sucesso' })
   @ApiResponse({ status: 400, description: 'Email ou senha não fornecidos' })
   @ApiResponse({ status: 401, description: 'Credenciais inválidas' })
-  async signIn(@Body("data") signInDto: CreateUserLoginDto, @Req() req: Request): Promise<ApiResponseInterface> {
+  async signIn(@Body() body: Record<string, any>, @Req() req: Request): Promise<ApiResponseInterface> {
     try {
-      if(!signInDto.email || !signInDto.password){
+      // Aceita body em { data: { email, password } } ou { email, password } na raiz (formato do front)
+      const data = body?.data ?? body;
+      const email = data?.email?.trim?.() ?? data?.email;
+      const password = data?.password;
+
+      if (!email || !password) {
         return {
           status: 400,
           message: 'Email ou senha não fornecidos!',
         };
       }
 
-      const result = await this.authService.signIn(signInDto.email, signInDto.password, req);
-      return result;
+      const result = await this.authPort.signIn(email, password, req);
+      return result as ApiResponseInterface;
     } catch (error) {
       throw new BadRequestException({
         status: 401,
@@ -59,8 +64,8 @@ export class AuthController {
         throw new UnauthorizedException('Refresh token não fornecido');
       }
 
-      const result = await this.authService.refreshToken(refreshToken, res);
-      return result;
+      const result = await this.authPort.refreshToken(refreshToken, res);
+      return result as ApiResponseInterface;
     } catch (error) {
       throw new UnauthorizedException({
         status: 401,
@@ -79,7 +84,7 @@ export class AuthController {
         };
       }
 
-      const result = await this.authService.googleAuth(idToken, res);
+      const result = await this.authPort.googleAuth(idToken, res);
       return result;
     } catch (error) {
       throw new BadRequestException({
@@ -97,7 +102,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ): Promise<ApiResponseInterface> {
     try {
-      const result = await this.authService.changePassword(newPassword, req);
+      const result = await this.authPort.changePassword(newPassword, req);
       return result;
     } catch (error) {
       throw new BadRequestException({
@@ -111,7 +116,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   async generateTotpQRCode(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<ApiResponseInterface> {
     try {
-      const result = await this.authService.generateTotpQRCode(req);
+      const result = await this.authPort.generateTotpQRCode(req);
       return result;
     } catch (error) {
       throw new BadRequestException({
@@ -125,7 +130,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   async generateMfaCode(@Req() req: Request,@Body('typeCanal') typeCanal: string): Promise<ApiResponseInterface> {
     try {
-      const result = await this.authService.generateMfaCode(req, typeCanal);
+      const result = await this.authPort.generateMfaCode(req, typeCanal);
       return result;
     } catch (error) {
       throw new BadRequestException({
@@ -139,7 +144,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   async disableTwoFactorAuth(@Req() req: Request): Promise<ApiResponseInterface> {
     try {
-      const result = await this.authService.disableTwoFactorAuth(req);
+      const result = await this.authPort.disableTwoFactorAuth(req);
       return result;
     }
     catch (error) {
@@ -154,7 +159,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   async validateTotpCode(@Req() req: Request, @Body('code') code: string): Promise<ApiResponseInterface> {
     try {
-      const result = await this.authService.validateTotpCode(req, code);
+      const result = await this.authPort.validateTotpCode(req, code);
       return result;
     } catch (error) {
       if (error instanceof UnauthorizedException) {
@@ -171,7 +176,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   async validateMfaCode(@Req() req: Request, @Body('code') code: string, @Body('typeCanal') typeCanal: string): Promise<ApiResponseInterface> {
     try {
-      const result = await this.authService.validateMfaCode(req, code, typeCanal);
+      const result = await this.authPort.validateMfaCode(req, code, typeCanal);
       return result;
     } catch (error) {
       if (error instanceof UnauthorizedException) {
@@ -191,7 +196,7 @@ export class AuthController {
     @Query('type') type: string
   ): Promise<ApiResponseInterface> {
     try {
-      const result = await this.authService.getUserSettings(req, type);
+      const result = await this.authPort.getUserSettings(req, type);
       return result;
     } catch (error) {
       throw new BadRequestException({
@@ -204,7 +209,7 @@ export class AuthController {
   @Post('generate/code-password')
   async generateCodePassword(@Body('typeCanal') typeCanal: string, @Body('data') data: string): Promise<ApiResponseInterface> {
     try {
-      const result = await this.authService.generateCodePassword(typeCanal, data);
+      const result = await this.authPort.generateCodePassword(typeCanal, data);
       return result;
     } catch (error) {
       throw new BadRequestException({
@@ -257,7 +262,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Não autenticado' })
   async logout(@Req() req: Request): Promise<SignOutResponse> {
     try {
-      const result = await this.authService.signOut(req);
+      const result = await this.authPort.signOut(req);
       return result;
     } catch (error) {
       throw new BadRequestException({
@@ -275,7 +280,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Não autenticado' })
   async logoutCurrentSession(@Req() req: Request): Promise<SignOutResponse> {
     try{
-      const result = await this.authService.signOutCurrentSession(req);
+      const result = await this.authPort.signOutCurrentSession(req);
       return result;
     }catch(error){
       throw new BadRequestException({
@@ -293,7 +298,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Não autenticado' })
   async logoutCurrentSessionById(@Param('id') id: string, @Req() req: Request): Promise<SignOutResponse> {
     try{
-      const result = await this.authService.signOutCurrentSessionById(id, req);
+      const result = await this.authPort.signOutCurrentSessionById(id, req);
       return result;
     }catch(error){
       throw new BadRequestException({
@@ -326,8 +331,8 @@ export class AuthController {
         throw new Error('ID do usuário não encontrado no token JWT');
       }
 
-      const result = await this.authService.getActiveSessions(userId, currentSessionToken);
-      return result;
+      const result = await this.authPort.getActiveSessions(userId, currentSessionToken);
+      return result as ApiResponseInterface;
     } catch (error) {
       this.logger.error('❌ Erro no controller getActiveSessions:', error);
       throw new BadRequestException({
@@ -342,7 +347,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Acesso registrado ou já foi registrado recentemente' })
   async registerAcessoUser(@Req() req: Request): Promise<ApiResponseInterface<{ registered: boolean; message: string }>> {
     try {
-      const result = await this.authService.registerAcessoUser(req);
+      const result = await this.authPort.registerAcessoUser(req);
       return result;
     } catch (error) {
       throw new BadRequestException({

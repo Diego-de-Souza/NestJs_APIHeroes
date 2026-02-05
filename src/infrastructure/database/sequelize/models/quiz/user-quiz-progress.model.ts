@@ -6,23 +6,25 @@ import { QuizLevel } from './quiz-level.model';
 @Table({ tableName: 'user_quiz_progress', timestamps: false })
 export class UserQuizProgress extends Model<UserQuizProgress> {
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    allowNull: false,
     primaryKey: true,
-    autoIncrement: true,
+    unique: true
   })
-  id: number;
+  id: string;
 
   @ForeignKey(() => User)
-  @Column({ type: DataType.INTEGER, allowNull: false, field: 'user_id' })
-  user_id: number;
+  @Column({ type: DataType.UUID, allowNull: false, field: 'user_id' })
+  user_id: string;
 
   @ForeignKey(() => Quiz)
-  @Column({ type: DataType.INTEGER, allowNull: false, field: 'quiz_id' })
-  quiz_id: number;
+  @Column({ type: DataType.UUID, allowNull: false, field: 'quiz_id' })
+  quiz_id: string;
 
   @ForeignKey(() => QuizLevel)
-  @Column({ type: DataType.INTEGER, allowNull: false, field: 'quiz_level_id' })
-  quiz_level_id: number;
+  @Column({ type: DataType.UUID, allowNull: false, field: 'quiz_level_id' })
+  quiz_level_id: string;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   completed: boolean;

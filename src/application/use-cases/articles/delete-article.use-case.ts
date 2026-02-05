@@ -1,19 +1,20 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ImageService } from "../../../application/services/image.service";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import { ArticlesRepository } from "../../../infrastructure/repositories/articles.repository";
+import type { IDeleteArticlePort } from "src/application/ports/in/article/delete-article.port";
+import type { IArticlePort } from "src/application/ports/out/article.port";
 
 @Injectable()
-export class DeleteArticleUseCase {
+export class DeleteArticleUseCase implements IDeleteArticlePort {
 
     constructor(
-        private readonly articlesRepository: ArticlesRepository,
+        @Inject('IArticlePort') private readonly articleRepository: IArticlePort,
         private readonly imageService: ImageService
     ){}
 
-    async deleteArticle(id: number): Promise<ApiResponseInterface<number>> {
+    async execute(id: string): Promise<ApiResponseInterface<number>> {
         try{
-            const articleExists = await this.articlesRepository.findArticleById(id);
+            const articleExists = await this.articleRepository.findArticleById(id);
             
             if(!articleExists){
                 return {
@@ -22,7 +23,7 @@ export class DeleteArticleUseCase {
                 }
             }
 
-            const deleteArticle = await this.articlesRepository.DeleteArticle(id);
+            const deleteArticle = await this.articleRepository.DeleteArticle(id);
 
             if(deleteArticle !== 1){
                 return {

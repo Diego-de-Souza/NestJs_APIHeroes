@@ -9,7 +9,7 @@ export class FindQuestionByIdUseCase {
         private readonly quizRepository: QuizRepository
     ){}
 
-    async findQuestionById(id: number): Promise<ApiResponseInterface>{
+    async findQuestionById(id: string): Promise<ApiResponseInterface>{
         try{
             const quiz_level = await this.quizRepository.findQuizLevelById(id);
 

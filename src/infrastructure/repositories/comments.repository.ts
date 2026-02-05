@@ -5,9 +5,10 @@ import { Comment } from '../database/sequelize/models/comment.model';
 import { CommentLike } from '../database/sequelize/models/comment-like.model';
 import { User } from '../database/sequelize/models/user.model';
 import { Article } from '../database/sequelize/models/article.model';
+import type { ICommentsRepository } from '../../application/ports/out/comments.port';
 
 @Injectable()
-export class CommentsRepository {
+export class CommentsRepository implements ICommentsRepository {
   constructor(
     @InjectModel(Comment) private readonly commentModel: typeof Comment,
     @InjectModel(CommentLike) private readonly commentLikeModel: typeof CommentLike,
@@ -17,10 +18,10 @@ export class CommentsRepository {
    * Criar comentário
    */
   async create(data: {
-    articleId: number;
-    userId: number;
+    articleId: string;
+    userId: string;
     content: string;
-    parentId?: number | null;
+    parentId?: string | null;
   }): Promise<Comment> {
     return await this.commentModel.create({
       articleId: data.articleId,
@@ -33,7 +34,7 @@ export class CommentsRepository {
   /**
    * Buscar comentário por ID
    */
-  async findById(id: number, includeDeleted: boolean = false): Promise<Comment | null> {
+  async findById(id: string, includeDeleted: boolean = false): Promise<Comment | null> {
     const where: WhereOptions = { id };
     if (!includeDeleted) {
       where.isDeleted = false;
@@ -53,9 +54,9 @@ export class CommentsRepository {
    * Buscar comentários com filtros
    */
   async findAll(filters: {
-    articleId?: number;
-    userId?: number;
-    parentId?: number | null;
+    articleId?: string;
+    userId?: string;
+    parentId?: string | null;
     sortBy?: 'newest' | 'oldest' | 'mostLiked';
     limit?: number;
     offset?: number;
@@ -109,7 +110,7 @@ export class CommentsRepository {
   /**
    * Atualizar comentário
    */
-  async update(id: number, data: { content: string }): Promise<[number]> {
+  async update(id: string, data: { content: string }): Promise<[number]> {
     return await this.commentModel.update(
       {
         content: data.content,
@@ -124,7 +125,7 @@ export class CommentsRepository {
   /**
    * Soft delete comentário
    */
-  async softDelete(id: number): Promise<[number]> {
+  async softDelete(id: string): Promise<[number]> {
     return await this.commentModel.update(
       { isDeleted: true },
       {
@@ -136,7 +137,7 @@ export class CommentsRepository {
   /**
    * Buscar like/dislike de usuário em comentário
    */
-  async findUserLike(commentId: number, userId: number): Promise<CommentLike | null> {
+  async findUserLike(commentId: string, userId: string): Promise<CommentLike | null> {
     return await this.commentLikeModel.findOne({
       where: {
         commentId,
@@ -149,8 +150,8 @@ export class CommentsRepository {
    * Criar like/dislike
    */
   async createLike(data: {
-    commentId: number;
-    userId: number;
+    commentId: string;
+    userId: string;
     type: 'like' | 'dislike';
   }): Promise<CommentLike> {
     // Verificar se já existe e atualizar ou criar novo
@@ -171,7 +172,7 @@ export class CommentsRepository {
   /**
    * Remover like/dislike
    */
-  async removeLike(commentId: number, userId: number): Promise<number> {
+  async removeLike(commentId: string, userId: string): Promise<number> {
     return await this.commentLikeModel.destroy({
       where: {
         commentId,
@@ -183,7 +184,7 @@ export class CommentsRepository {
   /**
    * Atualizar contadores de likes/dislikes
    */
-  async updateCounters(commentId: number): Promise<void> {
+  async updateCounters(commentId: string): Promise<void> {
     const likesCount = await this.commentLikeModel.count({
       where: { commentId, type: 'like' },
     });
@@ -207,8 +208,8 @@ export class CommentsRepository {
    * Buscar likes/dislikes de múltiplos comentários para um usuário
    */
   async findUserLikesForComments(
-    commentIds: number[],
-    userId: number,
+    commentIds: string[],
+    userId: string,
   ): Promise<CommentLike[]> {
     if (commentIds.length === 0) {
       return [];
@@ -227,7 +228,7 @@ export class CommentsRepository {
   /**
    * Verificar se artigo existe
    */
-  async articleExists(articleId: number): Promise<boolean> {
+  async articleExists(articleId: string): Promise<boolean> {
     const article = await Article.findByPk(articleId);
     return article !== null;
   }
@@ -235,7 +236,7 @@ export class CommentsRepository {
   /**
    * Verificar se comentário pai existe
    */
-  async parentExists(parentId: number): Promise<boolean> {
+  async parentExists(parentId: string): Promise<boolean> {
     const parent = await this.commentModel.findOne({
       where: { id: parentId, isDeleted: false },
     });

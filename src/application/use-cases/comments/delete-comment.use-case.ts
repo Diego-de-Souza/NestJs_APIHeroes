@@ -1,16 +1,17 @@
-import { HttpStatus, Injectable, NotFoundException, ForbiddenException, Logger, InternalServerErrorException } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, NotFoundException, ForbiddenException, Logger, InternalServerErrorException } from '@nestjs/common';
 import { ApiResponseInterface } from '../../../domain/interfaces/APIResponse.interface';
-import { CommentsRepository } from '../../../infrastructure/repositories/comments.repository';
+import type { ICommentsRepository } from '../../../application/ports/out/comments.port';
+import type { IDeleteCommentPort } from '../../../application/ports/in/comments/delete-comment.port';
 
 @Injectable()
-export class DeleteCommentUseCase {
+export class DeleteCommentUseCase implements IDeleteCommentPort {
   private readonly logger = new Logger(DeleteCommentUseCase.name);
 
   constructor(
-    private readonly commentsRepository: CommentsRepository,
+    @Inject('ICommentsRepository') private readonly commentsRepository: ICommentsRepository,
   ) {}
 
-  async execute(id: number, userId: number, isAdmin: boolean = false): Promise<ApiResponseInterface<void>> {
+  async execute(id: string, userId: string, isAdmin: boolean = false): Promise<ApiResponseInterface<void>> {
     try {
       const comment = await this.commentsRepository.findById(id);
 

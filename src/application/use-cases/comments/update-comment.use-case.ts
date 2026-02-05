@@ -1,19 +1,20 @@
-import { HttpStatus, Injectable, NotFoundException, ForbiddenException, Logger, InternalServerErrorException } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, NotFoundException, ForbiddenException, Logger, InternalServerErrorException } from '@nestjs/common';
 import { ApiResponseInterface } from '../../../domain/interfaces/APIResponse.interface';
-import { CommentsRepository } from '../../../infrastructure/repositories/comments.repository';
+import type { ICommentsRepository } from '../../../application/ports/out/comments.port';
+import type { IUpdateCommentPort } from '../../../application/ports/in/comments/update-comment.port';
 import { UpdateCommentDto } from '../../../interface/dtos/comments/update-comment.dto';
 import { Comment } from '../../../infrastructure/database/sequelize/models/comment.model';
 import { sanitizeContent } from '../../../shared/utils/sanitize-content.util';
 
 @Injectable()
-export class UpdateCommentUseCase {
+export class UpdateCommentUseCase implements IUpdateCommentPort {
   private readonly logger = new Logger(UpdateCommentUseCase.name);
 
   constructor(
-    private readonly commentsRepository: CommentsRepository,
+    @Inject('ICommentsRepository') private readonly commentsRepository: ICommentsRepository,
   ) {}
 
-  async execute(id: number, updateCommentDto: UpdateCommentDto, userId: number): Promise<ApiResponseInterface<Comment>> {
+  async execute(id: string, updateCommentDto: UpdateCommentDto, userId: string): Promise<ApiResponseInterface<Comment>> {
     try {
       const comment = await this.commentsRepository.findById(id);
 

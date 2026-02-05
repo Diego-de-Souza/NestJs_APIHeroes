@@ -1,4 +1,4 @@
-import { IsArray, IsInt, IsNotEmpty, IsString, ValidateNested, ArrayMinSize, IsOptional } from "class-validator";
+import { IsArray, IsNotEmpty, IsString, ValidateNested, ArrayMinSize, IsOptional } from "class-validator";
 import { Type, Transform } from "class-transformer";
 
 export class QuestionDto {
@@ -18,22 +18,14 @@ export class QuestionDto {
 
 export class CreateQuestionsDto {
     @IsOptional()
-    @IsInt({ message: "quiz_id deve ser inteiro" })
-    @Transform(({ value }) => {
-        if (value === null || value === undefined || value === '') return undefined;
-        return typeof value === 'string' ? parseInt(value, 10) : value;
-    })
-    readonly quiz_id?: number;
+    @IsString({ message: "quiz_id deve ser uma string" })
+    @Transform(({ value }) => (value != null && value !== '' ? String(value) : undefined))
+    readonly quiz_id?: string;
 
-    @IsInt({ message: "quiz_level_id deve ser inteiro" })
+    @IsString({ message: "quiz_level_id deve ser uma string" })
     @IsNotEmpty({ message: "quiz_level_id não pode estar vazio" })
-    @Transform(({ value }) => {
-        if (typeof value === 'string') {
-            return parseInt(value, 10);
-        }
-        return value;
-    })
-    readonly quiz_level_id: number;
+    @Transform(({ value }) => (value != null && value !== '' ? String(value) : undefined))
+    readonly quiz_level_id: string;
 
     @IsArray({ message: "questions deve ser um array" })
     @ArrayMinSize(1, { message: "Deve ter no mínimo 1 pergunta" })

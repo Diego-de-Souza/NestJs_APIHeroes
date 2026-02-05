@@ -7,9 +7,10 @@ import { SacAttachment } from "../database/sequelize/models/sac-attachment.model
 import { CreateContactDto } from "../../interface/dtos/sac/create-contact.dto";
 import { CreateResponseDto } from "../../interface/dtos/sac/create-response.dto";
 import { FilterContactsDto } from "../../interface/dtos/sac/filter-contacts.dto";
+import type { ISacRepository } from "../../application/ports/out/sac.port";
 
 @Injectable()
-export class SacRepository {
+export class SacRepository implements ISacRepository {
 
     constructor(
         @InjectModel(SacContact) private readonly sacContactModel: typeof SacContact,
@@ -58,7 +59,7 @@ export class SacRepository {
         return `TKT-${year}-${String(lastNumber).padStart(4, '0')}`;
     }
 
-    async createContact(contactDto: CreateContactDto, usuario_id: number): Promise<SacContact> {
+    async createContact(contactDto: CreateContactDto, usuario_id: string): Promise<SacContact> {
         const transaction = await this.sacContactModel.sequelize.transaction();
         
         try {
@@ -80,7 +81,7 @@ export class SacRepository {
         }
     }
 
-    async findContactById(id: number): Promise<SacContact> {
+    async findContactById(id: string): Promise<SacContact | null> {
         return await this.sacContactModel.findOne({
             where: { id },
             include: [
@@ -90,7 +91,7 @@ export class SacRepository {
         });
     }
 
-    async findContactByIdAndUserId(id: number, usuario_id: number): Promise<SacContact> {
+    async findContactByIdAndUserId(id: string, usuario_id: string): Promise<SacContact | null> {
         return await this.sacContactModel.findOne({
             where: { id, usuario_id },
             include: [
@@ -100,7 +101,7 @@ export class SacRepository {
         });
     }
 
-    async findContactsByUserId(usuario_id: number, filters?: { type?: string, status?: string }): Promise<SacContact[]> {
+    async findContactsByUserId(usuario_id: string, filters?: { type?: string, status?: string }): Promise<SacContact[]> {
         const where: any = { usuario_id };
         
         if (filters?.type) {
@@ -174,15 +175,15 @@ export class SacRepository {
         return { contacts: rows, total: count };
     }
 
-    async updateContactStatus(id: number, status: string): Promise<void> {
+    async updateContactStatus(id: string, status: string): Promise<void> {
         await this.sacContactModel.update({ status }, { where: { id } });
     }
 
-    async deleteContact(id: number): Promise<number> {
+    async deleteContact(id: string): Promise<number> {
         return await this.sacContactModel.destroy({ where: { id } });
     }
 
-    async createResponse(contact_id: number, responseDto: CreateResponseDto, author: string): Promise<SacResponse> {
+    async createResponse(contact_id: string, responseDto: CreateResponseDto, author: string): Promise<SacResponse> {
         return await this.sacResponseModel.create({
             ...responseDto,
             contact_id,
@@ -190,7 +191,7 @@ export class SacRepository {
         });
     }
 
-    async findResponsesByContactId(contact_id: number): Promise<SacResponse[]> {
+    async findResponsesByContactId(contact_id: string): Promise<SacResponse[]> {
         return await this.sacResponseModel.findAll({
             where: { contact_id },
             order: [['createdAt', 'ASC']],
@@ -201,8 +202,8 @@ export class SacRepository {
     }
 
     async createAttachment(attachmentData: {
-        contact_id?: number | null,
-        response_id?: number | null,
+        contact_id?: string | null,
+        response_id?: string | null,
         file_name: string,
         file_path: string,
         file_size: number,
@@ -211,7 +212,7 @@ export class SacRepository {
         return await this.sacAttachmentModel.create(attachmentData);
     }
 
-    async findAttachmentById(id: number): Promise<SacAttachment> {
+    async findAttachmentById(id: string): Promise<SacAttachment> {
         return await this.sacAttachmentModel.findOne({ where: { id } });
     }
 }

@@ -18,6 +18,7 @@ export const sequelizeAsyncConfig: SequelizeModuleAsyncOptions = {
 
     // Verifica se existe DATABASE_URL (comum no Supabase/Vercel)
     const databaseUrl = config.get<string>('DATABASE_URL');
+    const synchronizeDB = process.env.NODE_ENV !== 'production';
     
     let configObj: any;
 
@@ -38,7 +39,7 @@ export const sequelizeAsyncConfig: SequelizeModuleAsyncOptions = {
           database: url.pathname.slice(1), // Remove a barra inicial
           
           autoLoadModels: true,
-          synchronize: false,
+          synchronize: synchronizeDB,
           logging: process.env.NODE_ENV !== 'production',
           
           // Supabase sempre requer SSL
@@ -52,10 +53,10 @@ export const sequelizeAsyncConfig: SequelizeModuleAsyncOptions = {
             keepAliveInitialDelayMillis: 10000,
           },
           
-          // Pool mínimo para Supabase Session mode (limite rigoroso de conexões)
-          // Supabase: "max clients reached - in Session mode max clients are limited to pool_size"
+          // Pool reduzido para Supabase Session mode (evitar "max clients reached")
+          // Use Connection Pooler do Supabase (porta 6543) se ainda der limite de conexões
           pool: {
-            max: 1, // 1 conexão por instância serverless para não exceder limite Supabase
+            max: 2, // 2 conexões por instância (login + outra requisição)
             min: 0,
             acquire: 60000,
             idle: 5000,

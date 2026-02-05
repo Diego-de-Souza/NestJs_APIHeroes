@@ -1,17 +1,17 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ImageService } from "../../../application/services/image.service";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import { EventsRepository } from "../../../infrastructure/repositories/events.repository";
-
+import type { IEventsRepository } from "../../../application/ports/out/events.port";
+import type { IDeleteEventPort } from "../../../application/ports/in/events/delete-event.port";
 
 @Injectable()
-export class DeleteEventsUseCase {
+export class DeleteEventsUseCase implements IDeleteEventPort {
     constructor(
-        private readonly eventsRepository: EventsRepository,
+        @Inject('IEventsRepository') private readonly eventsRepository: IEventsRepository,
         private readonly imageService: ImageService
     ){}
 
-    async deleteEvent(id: number): Promise<ApiResponseInterface<number>>{
+    async execute(id: string): Promise<ApiResponseInterface<number>>{
         try{
             const eventDeleted = await this.eventsRepository.findEventById(id);
             

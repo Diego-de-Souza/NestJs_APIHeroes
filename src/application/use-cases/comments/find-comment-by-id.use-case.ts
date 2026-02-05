@@ -1,18 +1,18 @@
-import { HttpStatus, Injectable, NotFoundException, Logger, InternalServerErrorException } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, NotFoundException, Logger, InternalServerErrorException } from '@nestjs/common';
 import { ApiResponseInterface } from '../../../domain/interfaces/APIResponse.interface';
-import { CommentsRepository } from '../../../infrastructure/repositories/comments.repository';
+import type { ICommentsRepository } from '../../../application/ports/out/comments.port';
+import type { IFindCommentByIdPort } from '../../../application/ports/in/comments/find-comment-by-id.port';
 import { Comment } from '../../../infrastructure/database/sequelize/models/comment.model';
-import { CommentLike } from '../../../infrastructure/database/sequelize/models/comment-like.model';
 
 @Injectable()
-export class FindCommentByIdUseCase {
+export class FindCommentByIdUseCase implements IFindCommentByIdPort {
   private readonly logger = new Logger(FindCommentByIdUseCase.name);
 
   constructor(
-    private readonly commentsRepository: CommentsRepository,
+    @Inject('ICommentsRepository') private readonly commentsRepository: ICommentsRepository,
   ) {}
 
-  async execute(id: number, userId?: number): Promise<ApiResponseInterface<Comment>> {
+  async execute(id: string, userId?: string): Promise<ApiResponseInterface<Comment>> {
     try {
       const comment = await this.commentsRepository.findById(id);
 

@@ -24,29 +24,30 @@ import { User } from './user.model';
 })
 export class Validation extends Model<Validation> {
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
     allowNull: false,
-    autoIncrement: true,
     primaryKey: true,
-    unique: true,
+    unique: true
   })
-  id: number;
+  id: string;
 
   @ForeignKey(() => User)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
     allowNull: false,
+    field: 'user_id'
   })
-  user_id: number;
+  user_id: string;
 
   @Column({
-    type: DataType.STRING(255),
+    type: DataType.STRING(512),
     allowNull: true,
   })
   access_token: string;
 
   @Column({
-    type: DataType.STRING(255),
+    type: DataType.STRING(512),
     allowNull: true,
   })
   refresh_token: string;
@@ -58,11 +59,11 @@ export class Validation extends Model<Validation> {
   expires_at: Date;
 
   @Column({
-    type: DataType.STRING(32),
+    type: DataType.STRING(64),
     allowNull: false,
     unique: true,
   })
-  token_id: string; 
+  token_id: string;
 
   @Column({
     type: DataType.BOOLEAN,
@@ -72,7 +73,7 @@ export class Validation extends Model<Validation> {
   is_active: boolean;
 
   @Column({
-    type: DataType.STRING(255),
+    type: DataType.TEXT,
     allowNull: true,
   })
   device_info: string;

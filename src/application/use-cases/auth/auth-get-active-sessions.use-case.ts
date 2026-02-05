@@ -10,7 +10,7 @@ export class AuthGetActiveSessionsUseCase {
     private readonly httpService: HttpService
   ) {}
 
-  async getActiveSessions(userId: number, currentSessionToken?: string): Promise<any> {
+  async getActiveSessions(userId: string, currentSessionToken?: string): Promise<any> {
     try {
       const sessions = await this.authRepository.findValidationsByUserId(userId);
       

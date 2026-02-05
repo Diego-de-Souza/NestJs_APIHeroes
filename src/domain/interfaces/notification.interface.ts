@@ -1,6 +1,6 @@
 export interface NotificationInterface {
-  id: number;
-  usuario_id: number;
+  id: string;
+  usuario_id: string;
   title: string;
   message: string;
   image: string | null;

@@ -25,6 +25,7 @@ import { UpdateQuestionsUseCase } from '../../application/use-cases/quiz/update-
     controllers: [QuizController],
     providers: [
         QuizService,
+        { provide: 'IQuizPort', useClass: QuizService },
         CreateQuizUseCase,
         CreateQuestionUseCase,
         FindProgressQuestionsByThemeUseCase,

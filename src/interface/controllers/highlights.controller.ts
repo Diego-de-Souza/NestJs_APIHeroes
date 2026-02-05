@@ -1,24 +1,23 @@
-import { Controller, Get } from "@nestjs/common";
-import { HighlightsService } from "../../application/services/highlights.service";
-
+import { Controller, Get, Inject } from "@nestjs/common";
+import type { IFindHighlightsPort } from "../../application/ports/in/highlights/find-highlights.port";
 
 @Controller('highlights')
 export class HighlightsController {
-    constructor(
-        private readonly highlightsService: HighlightsService
-    ) {}
+  constructor(
+    @Inject('IFindHighlightsPort') private readonly findHighlightsPort: IFindHighlightsPort
+  ) {}
 
-    @Get()
-    async getHighlights() {
-        try{
-            const result = await this.highlightsService.getHighlights();
-            return result;
-        }catch(error){
-            return {
-                status: 500,
-                message: 'Erro inesperado ao buscar destaques.',
-                error: error.message || error,
-            };
-        }
+  @Get()
+  async getHighlights() {
+    try {
+      return await this.findHighlightsPort.execute();
+    } catch (error: unknown) {
+      const err = error as Error;
+      return {
+        status: 500,
+        message: 'Erro inesperado ao buscar destaques.',
+        error: err?.message || error,
+      };
     }
+  }
 }

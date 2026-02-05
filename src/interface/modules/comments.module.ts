@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { CommentsController } from '../controllers/comments.controller';
-import { CommentsService } from '../../application/services/comments.service';
 import { CommentsRepository } from '../../infrastructure/repositories/comments.repository';
 import { CreateCommentUseCase } from '../../application/use-cases/comments/create-comment.use-case';
 import { FindCommentsUseCase } from '../../application/use-cases/comments/find-comments.use-case';
@@ -20,7 +19,6 @@ import { AuthModule } from './auth.module';
   ],
   controllers: [CommentsController],
   providers: [
-    CommentsService,
     CommentsRepository,
     CreateCommentUseCase,
     FindCommentsUseCase,
@@ -29,7 +27,14 @@ import { AuthModule } from './auth.module';
     DeleteCommentUseCase,
     LikeCommentUseCase,
     DislikeCommentUseCase,
+    { provide: 'ICreateCommentPort', useClass: CreateCommentUseCase },
+    { provide: 'IFindCommentsPort', useClass: FindCommentsUseCase },
+    { provide: 'IFindCommentByIdPort', useClass: FindCommentByIdUseCase },
+    { provide: 'IUpdateCommentPort', useClass: UpdateCommentUseCase },
+    { provide: 'IDeleteCommentPort', useClass: DeleteCommentUseCase },
+    { provide: 'ILikeCommentPort', useClass: LikeCommentUseCase },
+    { provide: 'IDislikeCommentPort', useClass: DislikeCommentUseCase },
+    { provide: 'ICommentsRepository', useClass: CommentsRepository },
   ],
-  exports: [CommentsService],
 })
 export class CommentsModule {}

@@ -1,20 +1,22 @@
-import { HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ImageService } from "../../../application/services/image.service";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import { ArticlesRepository } from "../../../infrastructure/repositories/articles.repository";
+import type { IDeleteManyClientArticlePort } from "src/application/ports/in/article/delete-many-client-article.port";
+import type{ DeleteManyArticlesDto } from "src/interface/dtos/articles/delete-many-articles.dto";
+import type { IArticlePort } from "src/application/ports/out/article.port";
 
 @Injectable()
-export class DeleteManyClientArticlesUseCase {
+export class DeleteManyClientArticlesUseCase implements IDeleteManyClientArticlePort {
     private readonly logger = new Logger(DeleteManyClientArticlesUseCase.name);
 
     constructor(
-        private readonly articlesRepository: ArticlesRepository,
+        @Inject('IArticlePort') private readonly articlesRepository: IArticlePort,
         private readonly imageService: ImageService
     ){}
 
-    async deleteManyClientArticles(ids: number[], usuario_id: number): Promise<ApiResponseInterface<number>>{
+    async execute(deleteDto: DeleteManyArticlesDto, usuario_id: string): Promise<ApiResponseInterface<number>>{
         try {
-            if(!ids || ids.length === 0){
+            if(!deleteDto || deleteDto.ids.length === 0){
                 return {
                     status: HttpStatus.BAD_REQUEST,
                     message: "Nenhum ID fornecido."
@@ -22,8 +24,8 @@ export class DeleteManyClientArticlesUseCase {
             }
 
             // Buscar todos os artigos do usuário para deletar as imagens
-            const articles = await this.articlesRepository.findArticlesByUserId(usuario_id);
-            const articlesToDelete = articles.filter(article => ids.includes(article.id));
+            const articles = await this.articlesRepository.findAllArticlesByUserId(usuario_id);
+            const articlesToDelete = articles.filter(article => deleteDto.ids.includes(article.id));
 
             // Deletar imagens dos artigos
             for (const article of articlesToDelete) {
@@ -36,7 +38,7 @@ export class DeleteManyClientArticlesUseCase {
                 }
             }
 
-            const deletedCount = await this.articlesRepository.deleteManyArticles(ids, usuario_id);
+            const deletedCount = await this.articlesRepository.deleteManyArticles(deleteDto.ids, usuario_id);
 
             return {
                 status: HttpStatus.OK,

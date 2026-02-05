@@ -1,18 +1,19 @@
-import { HttpStatus, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { HttpStatus, Injectable, Logger, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { SacContact } from "../../../infrastructure/database/sequelize/models/sac-contact.model";
-import { SacRepository } from "../../../infrastructure/repositories/sac.repository";
 import { UpdateStatusDto } from "../../../interface/dtos/sac/update-status.dto";
+import type { ISacRepository } from "../../ports/out/sac.port";
+import type { IUpdateContactStatusPort } from "../../ports/in/sac/update-contact-status.port";
 
 @Injectable()
-export class UpdateContactStatusUseCase {
+export class UpdateContactStatusUseCase implements IUpdateContactStatusPort {
     private readonly logger = new Logger(UpdateContactStatusUseCase.name);
 
     constructor(
-        private readonly sacRepository: SacRepository
+        @Inject('ISacRepository') private readonly sacRepository: ISacRepository
     ){}
 
-    async updateStatus(id: number, statusDto: UpdateStatusDto): Promise<ApiResponseInterface<SacContact>>{
+    async execute(id: string, statusDto: UpdateStatusDto): Promise<ApiResponseInterface<SacContact>>{
         try {
             const contact = await this.sacRepository.findContactById(id);
 

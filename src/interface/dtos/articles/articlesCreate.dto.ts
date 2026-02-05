@@ -71,8 +71,8 @@ export class CreateArticleDto {
     readonly author: string;
 
     @IsOptional()
-    @IsInt({ message: "Usuario ID deve ser um número inteiro" })
-    readonly usuario_id?: number;
+    @IsString({ message: "Usuario ID deve ser uma string" })
+    readonly usuario_id?: string;
 
     @IsOptional()
     @IsInt({ message: "Role do artigo deve ser um número inteiro (1:root, 2:admin, 3:client)" })

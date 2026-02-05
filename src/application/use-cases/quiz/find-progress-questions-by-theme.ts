@@ -11,7 +11,7 @@ export class FindProgressQuestionsByThemeUseCase {
         private readonly quizRepository: QuizRepository
     ){}
 
-    async getProgressQuiz(userId: number): Promise<ApiResponseInterface> {
+    async getProgressQuiz(userId: string): Promise<ApiResponseInterface> {
         try {
             const quizzes: Quiz[] = await this.quizRepository.findAllQuizzes();
             const dataQuizzes: QuizWithLevelsInterface[] = quizzes.map(q => ({
@@ -34,8 +34,8 @@ export class FindProgressQuestionsByThemeUseCase {
             if (!dataQuizLevel) {
                 dataQuizLevel = {
                     user_id: userId,
-                    quiz_id: 1,
-                    quiz_level_id: 0,
+                    quiz_id: '',
+                    quiz_level_id: '',
                     completed: false,
                     score: 0,
                     skipped_questions: [],
@@ -69,8 +69,10 @@ export class FindProgressQuestionsByThemeUseCase {
     updateStatusQuizzes(quizzes: QuizWithLevelsInterface[], userProgress: UserQuizProgressInterface) {
         return quizzes.map(quiz => {
             if (quiz.id === userProgress.quiz_id) {
-                quiz.quiz_levels = quiz.quiz_levels.map((level) => {
-                    if (level.id <= userProgress.quiz_level_id || level.id === userProgress.quiz_level_id + 1) {
+                const currentLevelIndex = quiz.quiz_levels.findIndex(l => l.id === userProgress.quiz_level_id);
+                const unlockUpToIndex = currentLevelIndex >= 0 ? currentLevelIndex + 1 : 0;
+                quiz.quiz_levels = quiz.quiz_levels.map((level, index) => {
+                    if (index < unlockUpToIndex || level.id === userProgress.quiz_level_id) {
                         return { ...level, unlocked: true };
                     }
                     return level;

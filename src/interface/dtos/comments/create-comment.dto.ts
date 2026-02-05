@@ -2,10 +2,10 @@ import { IsNotEmpty, IsString, IsInt, IsOptional, MinLength, MaxLength } from 'c
 import { Transform } from 'class-transformer';
 
 export class CreateCommentDto {
-  @IsInt({ message: 'articleId deve ser um número inteiro' })
+  @IsString({ message: 'articleId deve ser uma string' })
   @IsNotEmpty({ message: 'articleId é obrigatório' })
-  @Transform(({ value }) => typeof value === 'string' ? parseInt(value, 10) : value)
-  articleId: number;
+  @Transform(({ value }) => (value != null && value !== '' ? String(value) : undefined))
+  articleId: string;
 
   @IsString({ message: 'content deve ser uma string' })
   @IsNotEmpty({ message: 'content é obrigatório' })
@@ -15,6 +15,6 @@ export class CreateCommentDto {
 
   @IsInt({ message: 'parentId deve ser um número inteiro' })
   @IsOptional()
-  @Transform(({ value }) => value ? (typeof value === 'string' ? parseInt(value, 10) : value) : null)
-  parentId?: number | null;
+  @Transform(({ value }) => (value != null && value !== '' ? String(value) : undefined))
+  parentId?: string | null;
 }

@@ -1,18 +1,51 @@
-import { Controller, Post, Body, UseInterceptors, UploadedFiles, BadRequestException, HttpStatus, Get, ParseIntPipe, Param, Put, Delete, UseGuards} from '@nestjs/common';
-import {FilesInterceptor } from '@nestjs/platform-express';
-import {ApiResponseInterface} from '../../domain/interfaces/APIResponse.interface';
+import {
+  Controller,
+  Post,
+  Body,
+  UseInterceptors,
+  UploadedFiles,
+  Get,
+  ParseIntPipe,
+  Param,
+  Put,
+  Delete,
+  UseGuards,
+  Inject,
+} from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { ApiResponseInterface } from '../../domain/interfaces/APIResponse.interface';
 import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../guards/auth.guard';
-import { DataHeroesService } from '../../application/services/data-heroes.service';
 import { CreateDadosHeroisDto } from '../dtos/dados-herois/create-dados-herois.dto';
 import { LogInterceptor } from '../../shared/interceptors/LogInterceptor';
 import { UpdateDadosHeroisDto } from '../dtos/dados-herois/update-dados-herois.dto';
 import type { Express } from 'express';
+import type { ICreateHeroesPort } from '../../application/ports/in/heroes/create-heroes.port';
+import type { IFindAllHeroesPort } from '../../application/ports/in/heroes/find-all-heroes.port';
+import type { IFindHeroesByIdPort } from '../../application/ports/in/heroes/find-heroes-by-id.port';
+import type { IUpdateHeroesPort } from '../../application/ports/in/heroes/update-heroes.port';
+import type { IDeleteHeroesPort } from '../../application/ports/in/heroes/delete-heroes.port';
+import type { IFindHeroesByStudioPort } from '../../application/ports/in/heroes/find-heroes-by-studio.port';
+import type { IFindHeroesByTeamPort } from '../../application/ports/in/heroes/find-heroes-by-team.port';
+import type { IFindHeroesByReleaseYearPort } from '../../application/ports/in/heroes/find-heroes-by-release-year.port';
+import type { IFindHeroesByMoralityPort } from '../../application/ports/in/heroes/find-heroes-by-morality.port';
+import type { IFindHeroesByGenrePort } from '../../application/ports/in/heroes/find-heroes-by-genre.port';
 
 @ApiTags('Herois')
 @Controller('herois')
 export class DadosHeroisController {
-  constructor(private readonly dadosHeroisService: DataHeroesService) {}
+  constructor(
+    @Inject('ICreateHeroesPort') private readonly createHeroesPort: ICreateHeroesPort,
+    @Inject('IFindAllHeroesPort') private readonly findAllHeroesPort: IFindAllHeroesPort,
+    @Inject('IFindHeroesByIdPort') private readonly findHeroesByIdPort: IFindHeroesByIdPort,
+    @Inject('IUpdateHeroesPort') private readonly updateHeroesPort: IUpdateHeroesPort,
+    @Inject('IDeleteHeroesPort') private readonly deleteHeroesPort: IDeleteHeroesPort,
+    @Inject('IFindHeroesByStudioPort') private readonly findHeroesByStudioPort: IFindHeroesByStudioPort,
+    @Inject('IFindHeroesByTeamPort') private readonly findHeroesByTeamPort: IFindHeroesByTeamPort,
+    @Inject('IFindHeroesByReleaseYearPort') private readonly findHeroesByReleaseYearPort: IFindHeroesByReleaseYearPort,
+    @Inject('IFindHeroesByMoralityPort') private readonly findHeroesByMoralityPort: IFindHeroesByMoralityPort,
+    @Inject('IFindHeroesByGenrePort') private readonly findHeroesByGenrePort: IFindHeroesByGenrePort,
+  ) {}
 
   @UseGuards(AuthGuard)
   @ApiTags('Herois')
@@ -23,14 +56,7 @@ export class DadosHeroisController {
     schema: {
       type: 'object',
       properties: {
-        imagens: {
-          type: 'array',
-          items: {
-            type: 'string',
-            format: 'binary',
-          },
-        },
-        // Abaixo você pode colocar os campos que o DTO espera, exemplo:
+        imagens: { type: 'array', items: { type: 'string', format: 'binary' } },
         nome: { type: 'string' },
         poder: { type: 'string' },
         idade: { type: 'integer' },
@@ -38,48 +64,42 @@ export class DadosHeroisController {
     },
   })
   @ApiResponse({ status: 201, description: 'Herói criado com sucesso' })
-  @UseInterceptors(
-    FilesInterceptor('imagens'),
-    LogInterceptor, // Log de dados
-  )
+  @UseInterceptors(FilesInterceptor('imagens'), LogInterceptor)
   @Post()
   async insere(
-      @UploadedFiles() files: Array<Express.Multer.File>,
-      @Body() createDadosHeroisDto: CreateDadosHeroisDto
-  ) : Promise<ApiResponseInterface> {
-      try {
-          if (files.length > 0) {
-              createDadosHeroisDto.image1 = files[0]?.buffer || null;
-              createDadosHeroisDto.image2 = files[1]?.buffer || null;
-          }
-  
-          const result = await this.dadosHeroisService.create(createDadosHeroisDto);
-    
-          return result;
-      } catch (error) {
-        return {
-          status: 500,
-          message: 'Erro inesperado ao atualizar um estúdio.',
-          error: error.message || error,
-        };      
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Body('data') createDadosHeroisDto: CreateDadosHeroisDto,
+  ): Promise<ApiResponseInterface<unknown>> {
+    try {
+      if (files?.length > 0) {
+        createDadosHeroisDto.image1 = files[0]?.buffer ?? null;
+        createDadosHeroisDto.image2 = files[1]?.buffer ?? null;
       }
+      return await this.createHeroesPort.execute(createDadosHeroisDto);
+    } catch (error: unknown) {
+      const err = error as Error;
+      return {
+        status: 500,
+        message: 'Erro inesperado ao criar herói.',
+        error: (err?.message ?? String(error)),
+      };
+    }
   }
 
   @ApiTags('Herois')
   @ApiOperation({ summary: 'Busca todos os heróis' })
   @ApiResponse({ status: 200, description: 'Lista de heróis' })
   @Get('find-all-heroes')
-  async getHeroesAllHeroes(): Promise<ApiResponseInterface> {
-    try{
-      const result = await this.dadosHeroisService.findAllHeroes()
-      return result;
-    }
-    catch(error){
+  async getHeroesAllHeroes(): Promise<ApiResponseInterface<unknown>> {
+    try {
+      return await this.findAllHeroesPort.execute();
+    } catch (error: unknown) {
+      const err = error as Error;
       return {
         status: 500,
         message: 'Erro inesperado.',
-        error: error.message || error,
-      };      
+        error: (err?.message ?? String(error)),
+      };
     }
   }
 
@@ -88,20 +108,17 @@ export class DadosHeroisController {
   @ApiParam({ name: 'id', type: Number, description: 'ID do herói' })
   @ApiResponse({ status: 200, description: 'Herói encontrado' })
   @Get('find-one-hero/:id')
-  async getHeroById(@Param("id", ParseIntPipe) id : number): Promise<ApiResponseInterface> {
-    try{
-      const result = await this.dadosHeroisService.findHeroesById(id);
-      return result;
-    }
-    catch(error){
+  async getHeroById(@Param('id') id: string): Promise<ApiResponseInterface<unknown>> {
+    try {
+      return await this.findHeroesByIdPort.execute(id);
+    } catch (error: unknown) {
+      const err = error as Error;
       return {
         status: 500,
         message: 'Erro inesperado.',
-        error: error.message || error,
-      };  
-
+        error: (err?.message ?? String(error)),
+      };
     }
-  
   }
 
   @UseGuards(AuthGuard)
@@ -113,13 +130,7 @@ export class DadosHeroisController {
     schema: {
       type: 'object',
       properties: {
-        imagens: {
-          type: 'array',
-          items: {
-            type: 'string',
-            format: 'binary',
-          },
-        },
+        imagens: { type: 'array', items: { type: 'string', format: 'binary' } },
         nome: { type: 'string' },
         poder: { type: 'string' },
         idade: { type: 'integer' },
@@ -128,34 +139,26 @@ export class DadosHeroisController {
   })
   @ApiParam({ name: 'id', type: Number, description: 'ID do herói a ser atualizado' })
   @ApiResponse({ status: 200, description: 'Herói atualizado com sucesso' })
-  @UseInterceptors(
-    FilesInterceptor('imagens'), // Intercepta o upload
-    LogInterceptor, // Log de dados
-  )
-  @Put("Update/:id")
+  @UseInterceptors(FilesInterceptor('imagens'), LogInterceptor)
+  @Put('Update/:id')
   async Upadate(
-    @Param("id", ParseIntPipe) id : number,
-    @Body() updateDadosHeroisDto : UpdateDadosHeroisDto,
+    @Param('id') id: string,
+    @Body('data') updateDadosHeroisDto: UpdateDadosHeroisDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
-    ) : Promise<ApiResponseInterface> {
-    try{
-
-      if (files.length > 0) {
-        // Converte arquivos para buffer antes de salvar no banco
-        updateDadosHeroisDto.image1 = files[0]?.buffer || null;
-        updateDadosHeroisDto.image2 = files[1]?.buffer || null;
-    }
-      const result = await this.dadosHeroisService.updateHeroes(id, updateDadosHeroisDto);
-      return result;
-
-    }
-    catch(error){
+  ): Promise<ApiResponseInterface<unknown>> {
+    try {
+      if (files?.length > 0) {
+        updateDadosHeroisDto.image1 = files[0]?.buffer ?? null;
+        updateDadosHeroisDto.image2 = files[1]?.buffer ?? null;
+      }
+      return await this.updateHeroesPort.execute(id, updateDadosHeroisDto);
+    } catch (error: unknown) {
+      const err = error as Error;
       return {
         status: 500,
         message: 'Erro inesperado.',
-        error: error.message || error,
-      }; 
-
+        error: (err?.message ?? String(error)),
+      };
     }
   }
 
@@ -164,30 +167,17 @@ export class DadosHeroisController {
   @ApiOperation({ summary: 'Remove herói pelo ID' })
   @ApiParam({ name: 'id', type: Number, description: 'ID do herói a ser removido' })
   @ApiResponse({ status: 200, description: 'Herói removido' })
-  @Delete("delete/:id")
-  async Delete(@Param("id", ParseIntPipe) id : number) : Promise<ApiResponseInterface>{
-      
-    try{
-    
-      const result = this.dadosHeroisService.DeleteHeroes(id);
-    
-
-      return result;
-
-    }
-
-    catch(error){
-
-      return { 
-
+  @Delete('delete/:id')
+  async Delete(@Param('id') id: string): Promise<ApiResponseInterface<unknown>> {
+    try {
+      return await this.deleteHeroesPort.execute(id);
+    } catch (error: unknown) {
+      const err = error as Error;
+      return {
         status: 500,
-
-        message: 'Erro inesperado ao registrar estúdio.',
-
-        error: error.message || error,
-
+        message: 'Erro inesperado ao remover herói.',
+        error: (err?.message ?? String(error)),
       };
-
     }
   }
 
@@ -195,90 +185,91 @@ export class DadosHeroisController {
   @ApiOperation({ summary: 'Busca heróis por estúdio' })
   @ApiParam({ name: 'studioId', type: Number, description: 'ID do estúdio' })
   @ApiResponse({ status: 200, description: 'Lista de heróis do estúdio' })
-  @Get("editora/:studioId")
-  async findHeroesByStudio(@Param("studioId") studioId: number) : Promise<ApiResponseInterface>{
-      try {
-          const result = await this.dadosHeroisService.findHeroesByStudio(studioId);
-          return result;
-      } catch (error) {
-          return {
-              status: 500,
-              message: 'Erro inesperado ao buscar heróis por estúdio.',
-              error: error.message || error,
-          };
-      }
+  @Get('editora/:studioId')
+  async findHeroesByStudio(@Param('studioId') studioId: string): Promise<ApiResponseInterface<unknown>> {
+    try {
+      return await this.findHeroesByStudioPort.execute(studioId);
+    } catch (error: unknown) {
+      const err = error as Error;
+      return {
+        status: 500,
+        message: 'Erro inesperado ao buscar heróis por estúdio.',
+        error: (err?.message ?? String(error)),
+      };
+    }
   }
 
   @ApiTags('Get Heroes by Team')
   @ApiOperation({ summary: 'Busca heróis por Team' })
   @ApiParam({ name: 'name', type: String, description: 'Nome do Team' })
   @ApiResponse({ status: 200, description: 'Lista de heróis do Team' })
-  @Get("team/:name")
-  async findHeroesByTeam(@Param("name") teamName: string) : Promise<ApiResponseInterface>{
-      try {
-          const result = await this.dadosHeroisService.findHeroesByTeam(teamName);
-          return result;
-      } catch (error) {
-          return {
-              status: 500,
-              message: 'Erro inesperado ao buscar heróis por team.',
-              error: error.message || error,
-          };
-      }
+  @Get('team/:name')
+  async findHeroesByTeam(@Param('name') teamName: string): Promise<ApiResponseInterface<unknown>> {
+    try {
+      return await this.findHeroesByTeamPort.execute(teamName);
+    } catch (error: unknown) {
+      const err = error as Error;
+      return {
+        status: 500,
+        message: 'Erro inesperado ao buscar heróis por team.',
+        error: (err?.message ?? String(error)),
+      };
+    }
   }
 
   @ApiTags('Get Heroes by Release Year')
   @ApiOperation({ summary: 'Busca heróis por ano de lançamento' })
   @ApiParam({ name: 'anoLancamento', type: Number, description: 'Ano de lançamento' })
   @ApiResponse({ status: 200, description: 'Lista de heróis do ano de lançamento' })
-  @Get("ano_lancamento/:anoLancamento")
-  async findHeroesByReleaseYear(@Param("anoLancamento", ParseIntPipe) anoLancamento: number) : Promise<ApiResponseInterface>{
-      try {
-          const result = await this.dadosHeroisService.findHeroesByReleaseYear(anoLancamento);
-          return result;
-      } catch (error) {
-          return {
-              status: 500,
-              message: 'Erro inesperado ao buscar heróis por ano de lançamento.',
-              error: error.message || error,
-          };
-      }
+  @Get('ano_lancamento/:anoLancamento')
+  async findHeroesByReleaseYear(
+    @Param('anoLancamento', ParseIntPipe) anoLancamento: number,
+  ): Promise<ApiResponseInterface<unknown>> {
+    try {
+      return await this.findHeroesByReleaseYearPort.execute(anoLancamento);
+    } catch (error: unknown) {
+      const err = error as Error;
+      return {
+        status: 500,
+        message: 'Erro inesperado ao buscar heróis por ano de lançamento.',
+        error: (err?.message ?? String(error)),
+      };
+    }
   }
 
   @ApiTags('Get Heroes by Morality')
   @ApiOperation({ summary: 'Busca heróis por moralidade' })
   @ApiParam({ name: 'morality', type: String, description: 'Moralidade do herói (herói/vilão)' })
   @ApiResponse({ status: 200, description: 'Lista de heróis pela moralidade' })
-  @Get("morality/:morality")
-  async findHeroesByMorality(@Param("morality") morality: string) : Promise<ApiResponseInterface>{
-      try {
-          const result = await this.dadosHeroisService.findHeroesByMorality(morality);
-          return result;
-      } catch (error) {
-          return {
-              status: 500,
-              message: 'Erro inesperado ao buscar heróis por moralidade.',
-              error: error.message || error,
-          };
-      }
+  @Get('morality/:morality')
+  async findHeroesByMorality(@Param('morality') morality: string): Promise<ApiResponseInterface<unknown>> {
+    try {
+      return await this.findHeroesByMoralityPort.execute(morality);
+    } catch (error: unknown) {
+      const err = error as Error;
+      return {
+        status: 500,
+        message: 'Erro inesperado ao buscar heróis por moralidade.',
+        error: (err?.message ?? String(error)),
+      };
+    }
   }
 
   @ApiTags('Get Heroes by Genre')
   @ApiOperation({ summary: 'Busca heróis por gênero' })
   @ApiParam({ name: 'genre', type: String, description: 'Gênero do herói' })
   @ApiResponse({ status: 200, description: 'Lista de heróis pelo gênero' })
-  @Get("genre/:genre")
-  async findHeroesByGenre(@Param("genre") genre: string) : Promise<ApiResponseInterface>{
-      try {
-          const result = await this.dadosHeroisService.findHeroesByGenre(genre);
-          return result;
-      } catch (error) {
-          return {
-              status: 500,
-              message: 'Erro inesperado ao buscar heróis por gênero.',
-              error: error.message || error,
-          };
-      }
+  @Get('genre/:genre')
+  async findHeroesByGenre(@Param('genre') genre: string): Promise<ApiResponseInterface<unknown>> {
+    try {
+      return await this.findHeroesByGenrePort.execute(genre);
+    } catch (error: unknown) {
+      const err = error as Error;
+      return {
+        status: 500,
+        message: 'Erro inesperado ao buscar heróis por gênero.',
+        error: (err?.message ?? String(error)),
+      };
+    }
   }
-      
 }

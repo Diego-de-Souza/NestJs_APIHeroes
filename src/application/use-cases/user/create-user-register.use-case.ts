@@ -1,22 +1,23 @@
-import { BadRequestException, ConflictException, HttpStatus, Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
+import { BadRequestException, ConflictException, HttpStatus, Injectable, InternalServerErrorException, Logger, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { User } from "../../../infrastructure/database/sequelize/models/user.model";
 import { CreateUserDTO } from "../../../interface/dtos/user/userCreate.dto";
-import { RoleService } from "../../../application/services/role.service";
-import { UserRepository } from "../../../infrastructure/repositories/user.repository";
+import type { IUserRepository } from "../../ports/out/user.port";
+import type { IRoleRepository } from "../../ports/out/role.port";
 import { GenenerateHashUseCase } from "../auth/generate-hash.use-case";
+import type { ICreateUserPort } from "../../ports/in/user/create-user.port";
 
 @Injectable()
-export class CreateUserRegisterUseCase {
+export class CreateUserRegisterUseCase implements ICreateUserPort {
   private readonly logger = new Logger(CreateUserRegisterUseCase.name);
 
   constructor(
-    private readonly userRepository: UserRepository,
-    private readonly roleService: RoleService,
+    @Inject('IUserRepository') private readonly userRepository: IUserRepository,
+    @Inject('IRoleRepository') private readonly roleRepository: IRoleRepository,
     private readonly generateHashUseCase: GenenerateHashUseCase
-    ) {}
+  ) {}
 
-  async register(userDto: CreateUserDTO): Promise<ApiResponseInterface<User>> {
+  async execute(userDto: CreateUserDTO): Promise<ApiResponseInterface<User>> {
     const exists = await this.userRepository.findByEmail(userDto.firstemail);
 
     if (exists) {
@@ -37,7 +38,7 @@ export class CreateUserRegisterUseCase {
         throw new InternalServerErrorException('Erro ao criar o usuário.');
     }
 
-    await this.roleService.assignDefaultRole(userCreated.id); 
+    await this.roleRepository.create({ role: "client", usuario_id: userCreated.id, access: "root" }); 
 
     return {
         status: HttpStatus.CREATED,

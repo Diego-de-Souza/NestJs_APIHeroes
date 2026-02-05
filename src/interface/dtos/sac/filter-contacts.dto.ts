@@ -10,9 +10,8 @@ import { Type } from "class-transformer";
 
 export class FilterContactsDto {
     @IsOptional()
-    @Type(() => Number)
-    @IsInt({ message: "Usuario ID deve ser um número inteiro" })
-    readonly usuario_id?: number;
+    @IsString({ message: "Usuario ID deve ser uma string (UUID)" })
+    readonly usuario_id?: string;
 
     @IsOptional()
     @IsString({ message: "Tipo deve ser string" })

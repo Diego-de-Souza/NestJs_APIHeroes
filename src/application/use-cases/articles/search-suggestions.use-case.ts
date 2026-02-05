@@ -1,19 +1,15 @@
-import { HttpStatus, Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, InternalServerErrorException, Inject } from '@nestjs/common';
 import { ApiResponseInterface } from '../../../domain/interfaces/APIResponse.interface';
-import { ArticlesRepository } from '../../../infrastructure/repositories/articles.repository';
 import { SearchSuggestionsDto } from '../../../interface/dtos/articles/search-suggestions.dto';
-import { Article } from '../../../infrastructure/database/sequelize/models/article.model';
-import { Op, QueryTypes } from 'sequelize';
-import { Sequelize } from 'sequelize-typescript';
-import { InjectConnection } from '@nestjs/sequelize';
+import type { IGetSearchSuggestionsPort } from 'src/application/ports/in/article/get-search-suggestions.port';
+import type { IArticlePort } from 'src/application/ports/out/article.port';
 
 @Injectable()
-export class SearchSuggestionsUseCase {
+export class SearchSuggestionsUseCase implements IGetSearchSuggestionsPort {
   private readonly logger = new Logger(SearchSuggestionsUseCase.name);
 
   constructor(
-    private readonly articlesRepository: ArticlesRepository,
-    @InjectConnection() private readonly sequelize: Sequelize,
+    @Inject('IArticlePort') private readonly articleRepository: IArticlePort
   ) {}
 
   async execute(dto: SearchSuggestionsDto): Promise<ApiResponseInterface<string>> {
@@ -21,16 +17,8 @@ export class SearchSuggestionsUseCase {
       const limit = dto.limit || 5;
       
       // Buscar sugestões baseadas nos títulos dos artigos
-      const results = await this.sequelize.query(`
-        SELECT DISTINCT title 
-        FROM articles 
-        WHERE title ILIKE :query 
-        LIMIT :limit
-      `, {
-        replacements: { query: `%${dto.query}%`, limit },
-        type: QueryTypes.SELECT,
-      }) as any[];
-
+      const results = await this.articleRepository.getSearchSuggestions(dto, limit);
+      
       const titles = results.map((s: any) => s.title).filter(Boolean);
 
       return {

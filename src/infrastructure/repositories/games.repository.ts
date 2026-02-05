@@ -2,20 +2,21 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Games } from "../database/sequelize/models/games/games.model";
 import { UserGameProcess } from "../database/sequelize/models/games/user-game-progress.model";
+import type { IGamesRepository } from "../../application/ports/out/games.port";
 
 @Injectable()
-export class GamesRepository {
+export class GamesRepository implements IGamesRepository {
   
     constructor(
         @InjectModel(Games) private readonly gamesModel: typeof Games,
         @InjectModel(UserGameProcess) private readonly userGameProgressModel: typeof UserGameProcess
     ){}
 
-    createGame(gameData: any): Promise<Games> {
+    createGame(gameData: Record<string, unknown>): Promise<Games> {
         return this.gamesModel.create(gameData);
     }
 
-    updateGame(id: number, gameData: any): Promise<number> {
+    updateGame(id: string, gameData: Record<string, unknown>): Promise<number> {
         return this.gamesModel.update(gameData, {
             where: {
                 id: id
@@ -23,11 +24,11 @@ export class GamesRepository {
         }).then(([affectedCount]) => affectedCount);
     }
 
-    findGameById(id: number): Promise<Games | null> {
+    findGameById(id: string): Promise<Games | null> {
         return this.gamesModel.findByPk(id);
     }
 
-    deleteGame(id: number): Promise<number> {
+    deleteGame(id: string): Promise<number> {
         return this.gamesModel.destroy({
             where: {
                 id: id
@@ -44,7 +45,7 @@ export class GamesRepository {
         });
     }
 
-    findOneProcess(userId: number, idGame: number): Promise<UserGameProcess | null> {
+    findOneProcess(userId: string, idGame: string): Promise<UserGameProcess | null> {
         return this.userGameProgressModel.findOne({
             where: {
                 user_id: userId,
@@ -57,7 +58,7 @@ export class GamesRepository {
         return this.userGameProgressModel.create(data);
     }
 
-    update(data: Partial<UserGameProcess>, userId: number, idGame: number): Promise<[number]> {
+    update(data: Partial<UserGameProcess>, userId: string, idGame: string): Promise<[number]> {
         return this.userGameProgressModel.update(data, {
             where: {
                 user_id: userId,
@@ -66,7 +67,7 @@ export class GamesRepository {
         });
     }
 
-    findGameByPk(id: number): Promise<Games | null> {
+    findGameByPk(id: string): Promise<Games | null> {
         return this.gamesModel.findByPk(id);
     }
 

@@ -1,5 +1,5 @@
 export interface CreateSubscriptionData {
-    userId: number;
+    userId: string;
     stripeCustomerId: string;
     stripeSubscriptionId: string;
     stripePriceId: string;
@@ -25,7 +25,7 @@ export interface UpdateSubscriptionData {
 }
 
 export interface CreatePaymentData {
-    userId: number;
+    userId: string;
     stripePaymentIntentId: string;
     stripeChargeId?: string;
     amount: number;

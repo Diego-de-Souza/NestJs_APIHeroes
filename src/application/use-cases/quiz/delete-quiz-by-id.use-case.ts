@@ -9,7 +9,7 @@ export class DeleteQuizByIdUseCase{
         private readonly quizRepository: QuizRepository
     ){}
 
-    async deleteQuizById(id: number, levelId: number): Promise<ApiResponseInterface<any>> {
+    async deleteQuizById(id: string, levelId: string): Promise<ApiResponseInterface<any>> {
         try{
             const quiz = await this.quizRepository.findQuizById(id);
 

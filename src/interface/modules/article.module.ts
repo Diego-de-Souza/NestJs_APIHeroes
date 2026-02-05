@@ -3,9 +3,7 @@ import { SequelizeModule } from "@nestjs/sequelize";
 import { HttpModule } from "@nestjs/axios";
 import { models } from '../../infrastructure/database/sequelize/models/index.model';
 import { ArticlesController } from "../controllers/articles.Controller";
-import { ClientArticlesController } from "../controllers/client-articles.controller";
 import { AuthModule } from "./auth.module";
-import { ArticlesService } from "../../application/services/articles.service";
 import { ArticlesRepository } from "../../infrastructure/repositories/articles.repository";
 import { CreateArticleUseCase } from "../../application/use-cases/articles/create-articles.use-case";
 import { DeleteArticleUseCase } from "../../application/use-cases/articles/delete-article.use-case";
@@ -37,9 +35,8 @@ import { UserModule } from "./user.module";
         AuthModule, 
         UserModule,
     ],
-    controllers: [ArticlesController, ClientArticlesController],
+    controllers: [ArticlesController],
     providers: [
-        ArticlesService,
         ArticlesRepository,
         CreateArticleUseCase,
         UpdateArticleUseCase,
@@ -57,8 +54,28 @@ import { UserModule } from "./user.module";
         FindClientArticleByIdUseCase,
         FindClientArticlesByUserIdUseCase,
         DeleteClientArticleUseCase,
-        DeleteManyClientArticlesUseCase
+        DeleteManyClientArticlesUseCase,
+
+        //in
+        { provide: 'ISearchArticlePort', useClass: SearchArticlesUseCase },
+        { provide: 'IGetSearchSuggestionsPort', useClass: SearchSuggestionsUseCase },
+        { provide: 'IFindArticlesForHomepagePort', useClass: FindArticlesForHomepageUseCase },
+        { provide: 'ICreateArticlePort', useClass: CreateArticleUseCase },
+        { provide: 'IUpdateArticlePort', useClass: UpdateArticleUseCase },
+        { provide: 'IFindArticleByIdPort', useClass: FindArticleByIdUseCase },
+        { provide: 'IFindAllArticlePort', useClass: FindAllArticleUseCase },
+        { provide: 'IDeleteArticlePort', useClass: DeleteArticleUseCase },
+        { provide: 'IDeleteClientArticlePort', useClass: DeleteClientArticleUseCase },
+        { provide: 'IDeleteManyClientArticlePort', useClass: DeleteManyClientArticlesUseCase },
+        { provide: 'ICreateClientArticlePort', useClass: CreateClientArticleUseCase },
+        { provide: 'IUpdateClientArticlePort', useClass: UpdateClientArticleUseCase },
+        { provide: 'IFindClientArticleByIdPort', useClass: FindClientArticleByIdUseCase },
+        { provide: 'IFindClientArticlesByUserIdPort', useClass: FindClientArticlesByUserIdUseCase },
+
+        //out
+        { provide: 'IArticlePort', useClass: ArticlesRepository },
+
     ],
-    exports: [ArticlesService]
+    exports: []
 })
 export class ArticleModule {}

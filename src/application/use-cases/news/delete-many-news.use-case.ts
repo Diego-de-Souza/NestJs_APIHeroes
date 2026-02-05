@@ -1,25 +1,26 @@
-import { HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import { NewsRepository } from "../../../infrastructure/repositories/news.repository";
+import type { INewsletterRepository } from "src/application/ports/out/newsletter.port";
+import type { IDeleteManyNewsPort } from "src/application/ports/in/newsletter/delete-many-news.port";
 
 @Injectable()
-export class DeleteManyNewsUseCase {
+export class DeleteManyNewsUseCase implements IDeleteManyNewsPort {
     private readonly logger = new Logger(DeleteManyNewsUseCase.name);
 
     constructor(
-        private readonly newsRepository: NewsRepository
-    ){}
+        @Inject('INewsletterRepository') private readonly newsletterRepository: INewsletterRepository
+    ) {}
 
-    async deleteManyNews(ids: number[], usuario_id: number): Promise<ApiResponseInterface<number>>{
+    async execute(ids: string[], usuario_id: string): Promise<ApiResponseInterface<number>> {
         try {
-            if(!ids || ids.length === 0){
+            if (!ids || ids.length === 0) {
                 return {
                     status: HttpStatus.BAD_REQUEST,
                     message: "Nenhum ID fornecido."
                 };
             }
 
-            const deletedCount = await this.newsRepository.deleteManyNews(ids, usuario_id);
+            const deletedCount = await this.newsletterRepository.deleteManyNews(ids, usuario_id);
 
             return {
                 status: HttpStatus.OK,

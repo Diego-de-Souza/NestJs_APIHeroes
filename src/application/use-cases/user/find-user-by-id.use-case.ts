@@ -1,15 +1,16 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { User } from "../../../infrastructure/database/sequelize/models/user.model";
-import { UserRepository } from "../../../infrastructure/repositories/user.repository";
+import type { IUserRepository } from "../../ports/out/user.port";
+import type { IFindUserByIdPort } from "../../ports/in/user/find-user-by-id.port";
 
 @Injectable()
-export class FindUserByIdUseCase {
+export class FindUserByIdUseCase implements IFindUserByIdPort {
   constructor(
-    private readonly userRepository: UserRepository
+    @Inject('IUserRepository') private readonly userRepository: IUserRepository
   ) {}
 
-  async getUserById(id: number): Promise<ApiResponseInterface<User>> {
+  async execute(id: string): Promise<ApiResponseInterface<User>> {
     const user = await this.userRepository.findById(id);
 
     if (!user) {

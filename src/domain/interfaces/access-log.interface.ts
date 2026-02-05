@@ -1,9 +1,11 @@
+import { strict } from "assert";
+
 export interface AccessLogData {
     route: string;
     method: string;
     ip: string;
     userAgent?: string;
-    userId?: number | null;
+    userId?: string | null;
     timestamp: Date;
     statusCode?: number;
     responseTime?: number;

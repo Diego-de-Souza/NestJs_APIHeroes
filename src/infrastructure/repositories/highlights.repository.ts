@@ -3,10 +3,10 @@ import { InjectModel } from "@nestjs/sequelize";
 import { Article } from "../database/sequelize/models/article.model";
 import { Op } from "sequelize";
 import { Events, Games, User, UserGameProcess } from "../database/sequelize/models/index.model";
-
+import type { IHighlightsRepository } from "../../application/ports/out/highlights.port";
 
 @Injectable()
-export class HighlightsRepository {
+export class HighlightsRepository implements IHighlightsRepository {
     constructor(
         @InjectModel(Article) private readonly articleModel: typeof Article,
         @InjectModel(UserGameProcess) private readonly userGameProcessModel: typeof UserGameProcess,
@@ -30,7 +30,7 @@ export class HighlightsRepository {
         });
     }
 
-    async findTopPlayersByScore(): Promise<any[]> {
+    async findTopPlayersByScore(): Promise<unknown[]> {
         return this.userGameProcessModel.findAll({
             include: [
                 {

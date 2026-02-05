@@ -1,27 +1,25 @@
-import { HttpStatus, Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
 import { ApiResponseInterface } from '../../../domain/interfaces/APIResponse.interface';
-import { CommentsRepository } from '../../../infrastructure/repositories/comments.repository';
+import type { ICommentsRepository } from '../../../application/ports/out/comments.port';
+import type { IFindCommentsPort } from '../../../application/ports/in/comments/find-comments.port';
 import { CommentFiltersDto } from '../../../interface/dtos/comments/comment-filters.dto';
 import { CommentWithUser } from '../../../domain/interfaces/comment.interface';
 import { CommentLike } from '../../../infrastructure/database/sequelize/models/comment-like.model';
 
 @Injectable()
-export class FindCommentsUseCase {
+export class FindCommentsUseCase implements IFindCommentsPort {
   private readonly logger = new Logger(FindCommentsUseCase.name);
 
   constructor(
-    private readonly commentsRepository: CommentsRepository,
+    @Inject('ICommentsRepository') private readonly commentsRepository: ICommentsRepository,
   ) {}
 
-  /**
-   * Construir árvore de comentários
-   */
   private buildCommentTree(comments: any[], userLikes?: CommentLike[]): CommentWithUser[] {
-    const commentMap = new Map<number, CommentWithUser>();
+    const commentMap = new Map<string, CommentWithUser>();
     const rootComments: CommentWithUser[] = [];
 
     // Criar mapa de likes do usuário
-    const likeMap = new Map<number, 'like' | 'dislike'>();
+    const likeMap = new Map<string, 'like' | 'dislike'>();
     if (userLikes) {
       userLikes.forEach((like) => {
         likeMap.set(like.commentId, like.type);
@@ -57,7 +55,7 @@ export class FindCommentsUseCase {
     return rootComments;
   }
 
-  async execute(filters: CommentFiltersDto, userId?: number): Promise<ApiResponseInterface<CommentWithUser>> {
+  async execute(filters: CommentFiltersDto, userId?: string): Promise<ApiResponseInterface<CommentWithUser>> {
     try {
       // Buscar comentários
       const comments = await this.commentsRepository.findAll({

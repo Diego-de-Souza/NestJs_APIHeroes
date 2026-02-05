@@ -18,11 +18,11 @@ export class AuthRepository {
         return await this.userModel.findOne({where: {firstemail: email}}) 
     }
 
-    async findRoleByUserId(usuario_id: number): Promise<Role>{
+    async findRoleByUserId(usuario_id: string): Promise<Role>{
         return await this.roleModel.findOne({where: {usuario_id}});
     }
 
-    async findUserById(id:number): Promise<User>{
+    async findUserById(id:string): Promise<User>{
         return await this.userModel.findOne({where:{id}});
     }
 
@@ -47,14 +47,14 @@ export class AuthRepository {
         return newUserSocial ? newUserSocial.get({plain:true}): null;
     }
 
-    async saveSecretTOTP(userId: number, secret: string): Promise<void>{
+    async saveSecretTOTP(userId: string, secret: string): Promise<void>{
         await this.userModel.update(
             { totp_secret: secret },
             { where: { id: userId } }
         );
     }
 
-    async saveMfaCode(userId: number, secret: string): Promise<void>{
+    async saveMfaCode(userId: string, secret: string): Promise<void>{
         await this.userModel.update(
             { mfa_secret: secret },
             { where: { id: userId } }
@@ -70,7 +70,7 @@ export class AuthRepository {
         );
     }
 
-    async deleteTotpSecret(userId: number): Promise<boolean> {
+    async deleteTotpSecret(userId: string): Promise<boolean> {
         const [numberOfAffectedRows] = await this.userModel.update(
             { totp_secret: null },
             { where: { id: userId, totp_secret: { [Op.ne]: null } } }
@@ -104,7 +104,7 @@ export class AuthRepository {
         );
     }
 
-    async deleteAllUserValidations(userId: number): Promise<number>{
+    async deleteAllUserValidations(userId: string): Promise<number>{
         return await this.validationModel.destroy({
             where: {
                 user_id: userId
@@ -138,7 +138,7 @@ export class AuthRepository {
         });
     }
 
-    async findValidationsByUserId(userId: number): Promise<Validation[]>{
+    async findValidationsByUserId(userId: string): Promise<Validation[]>{
         return await this.validationModel.findAll({
             where: {
                 user_id: userId,

@@ -1,5 +1,5 @@
 import { Transform } from "class-transformer";
-import {IsDate, IsNotEmpty, IsNumber, IsString, MinDate, MinLength} from "class-validator";
+import { IsDate, IsNotEmpty, IsOptional, IsString, MinDate, MinLength } from "class-validator";
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateDadosHeroisDto {
@@ -9,10 +9,9 @@ export class CreateDadosHeroisDto {
     readonly name: string;
 
     @ApiProperty()
-    @IsNumber({}, { message: "estudio deve ser um número" })
+    @IsString({ message: "estudio deve ser uma string" })
     @IsNotEmpty({message: "estudio não pode estar vazio"})
-    @Transform(({ value }) => parseInt(value)) 
-    readonly studio_id: number;
+    readonly studio_id: string;
 
     @ApiProperty()
     @IsString({message: "Tipo de poder deve ser string"})
@@ -66,10 +65,9 @@ export class CreateDadosHeroisDto {
     readonly story : string;
 
     @ApiProperty()
-    @IsNumber({}, { message: "Time deve ser um número" })
+    @IsString({ message: "Time deve ser uma string" })
     @IsNotEmpty({message: "Time não pode estar vazio"})
-    @Transform(({ value }) => parseInt(value)) 
-    readonly team_id: number;
+    readonly team_id: string;
 
     @ApiProperty()
     @IsString({message: "genero deve ser string"})
@@ -77,10 +75,13 @@ export class CreateDadosHeroisDto {
     @IsNotEmpty({message: "genero não pode estar vazio"})
     readonly genre : string;
 
-    //variaveis para salvar as imagens (recebe Buffer, mas será convertido para URL string após upload)
-    @ApiProperty()
-    image1?: Buffer; // Buffer recebido, será substituído pela URL após upload no S3/CloudFront
-    @ApiProperty()
-    image2?: Buffer; // Buffer recebido, será substituído pela URL após upload no S3/CloudFront
+    // variaveis para salvar as imagens (recebe Buffer do upload ou URL string do body)
+    @ApiProperty({ required: false })
+    @IsOptional()
+    image1?: Buffer | string;
+
+    @ApiProperty({ required: false })
+    @IsOptional()
+    image2?: Buffer | string;
 
 }

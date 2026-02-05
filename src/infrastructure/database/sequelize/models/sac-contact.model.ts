@@ -10,21 +10,21 @@ import { SacAttachment } from './sac-attachment.model';
 })
 export class SacContact extends Model<SacContact> {
     @Column({
-        type: DataType.INTEGER,
+        type: DataType.UUID,
+        defaultValue: DataType.UUIDV4,
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
         unique: true
     })
-    id: number;
+    id: string;
 
     @ForeignKey(() => User)
     @Column({
-        type: DataType.INTEGER,
+        type: DataType.UUID,
         allowNull: false,
         field: 'usuario_id'
     })
-    usuario_id: number;
+    usuario_id: string;
 
     @Column({
         type: DataType.STRING(20),

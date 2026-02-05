@@ -1,19 +1,20 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ImageService } from "../../../application/services/image.service";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Article } from "../../../infrastructure/database/sequelize/models/article.model";
-import { ArticlesRepository } from "../../../infrastructure/repositories/articles.repository";
 import { UpdateArticlesDto } from "../../../interface/dtos/articles/articlesUpdate.dto";
+import type { IUpdateArticlePort } from "src/application/ports/in/article/update-article.port";
+import type { IArticlePort } from "src/application/ports/out/article.port";
 
 @Injectable()
-export class UpdateArticleUseCase {
+export class UpdateArticleUseCase implements IUpdateArticlePort {
 
     constructor(
-        private readonly articleRepository: ArticlesRepository,
+        @Inject('IArticlePort') private readonly articleRepository: IArticlePort,
         private readonly imageService: ImageService
     ){}
 
-    async updateArticle(id: number, articleDto:UpdateArticlesDto): Promise<ApiResponseInterface<Article>>{
+    async execute(id: string, articleDto:UpdateArticlesDto): Promise<ApiResponseInterface<Article>>{
         const article = await this.articleRepository.findArticleById(id);
 
         if(!article){

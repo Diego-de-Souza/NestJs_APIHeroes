@@ -4,9 +4,10 @@ import { Op } from "sequelize";
 import { AccessLog, Events, User } from "../database/sequelize/models/index.model";
 import { Article } from "../database/sequelize/models/article.model";
 import { AccessByMonth } from "../../domain/interfaces/dashboard.interface";
+import type { IDashboardRepository } from "../../application/ports/out/dashboard.port";
 
 @Injectable()
-export class DashboardRepository {
+export class DashboardRepository implements IDashboardRepository {
     constructor(
         @InjectModel(User) private readonly userModel: typeof User,
         @InjectModel(Article) private readonly articleModel: typeof Article,

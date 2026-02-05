@@ -1,17 +1,18 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../../domain/interfaces/APIResponse.interface";
-import { GamesRepository } from "../../../../infrastructure/repositories/games.repository";
+import type { IGamesRepository } from "../../../ports/out/games.port";
+import type { IFindDataMemoryGamePort } from "../../../ports/in/games/find-data-memory-game.port";
 
 @Injectable()
-export class FindDataMemoryGameUseCase {
-    
+export class FindDataMemoryGameUseCase implements IFindDataMemoryGamePort {
     constructor(
-        private readonly gamesRepository: GamesRepository
-    ){}
+        @Inject('IGamesRepository') private readonly gamesRepository: IGamesRepository
+    ) {}
 
-    async getDataMemoryGame(payload: any): Promise<ApiResponseInterface> {
+    async execute(payload: Record<string, unknown>): Promise<ApiResponseInterface<unknown>> {
         try{
-            const _id_game = await this.gamesRepository.findGameByType(payload.type);
+            const type = payload.type as string;
+            const _id_game = await this.gamesRepository.findGameByType(type);
 
             if (!_id_game) {
                 return {
@@ -20,7 +21,8 @@ export class FindDataMemoryGameUseCase {
                 };
             }
 
-            const userProgress = await this.gamesRepository.findOneProcess(payload.userId, _id_game.id);
+            const userId = payload.userId as string;
+            const userProgress = await this.gamesRepository.findOneProcess(userId, _id_game.id);
 
             if (!userProgress) {
                 return {
@@ -37,13 +39,12 @@ export class FindDataMemoryGameUseCase {
                 data: [{game: true}]
             };
 
-        }catch (error) {
-            console.error('Erro ao buscar heróis por estúdio:', error);
-                    
+        } catch (error: unknown) {
+            const err = error as Error;
             return {
                 status: HttpStatus.INTERNAL_SERVER_ERROR,
-                message: 'Erro interno do servidor ao buscar heróis por estúdio.',
-                error: error.message || error,
+                message: 'Erro interno ao buscar dados do jogo da memória.',
+                error: (err?.message ?? String(error)),
             };
         }
     }

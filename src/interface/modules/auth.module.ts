@@ -44,6 +44,7 @@ import { AuthGuard } from '../../interface/guards/auth.guard';
   controllers: [AuthController],
   providers: [
     AuthService,
+    { provide: 'IAuthPort', useClass: AuthService },
     AuthSignInUseCase,
     AuthSignInGoogleUseCase,
     AuthChangePasswordUseCase,

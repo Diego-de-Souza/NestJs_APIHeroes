@@ -1,21 +1,22 @@
-import { HttpStatus, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { News } from "../../../infrastructure/database/sequelize/models/news.model";
-import { NewsRepository } from "../../../infrastructure/repositories/news.repository";
+import type { INewsletterRepository } from "src/application/ports/out/newsletter.port";
+import type { IFindNewsByIdPort } from "src/application/ports/in/newsletter/find-news-by-id.port";
 
 @Injectable()
-export class FindNewsByIdUseCase {
+export class FindNewsByIdUseCase implements IFindNewsByIdPort {
     private readonly logger = new Logger(FindNewsByIdUseCase.name);
 
     constructor(
-        private readonly newsRepository: NewsRepository
-    ){}
+        @Inject('INewsletterRepository') private readonly newsletterRepository: INewsletterRepository
+    ) {}
 
-    async findNewsById(id: number, usuario_id: number): Promise<ApiResponseInterface<News>>{
+    async execute(id: string, usuario_id: string): Promise<ApiResponseInterface<News>> {
         try {
-            const news = await this.newsRepository.findNewsByIdAndUserId(id, usuario_id);
+            const news = await this.newsletterRepository.findNewsByIdAndUserId(id, usuario_id);
 
-            if(!news){
+            if (!news) {
                 return {
                     status: HttpStatus.NOT_FOUND,
                     message: "Notícia não encontrada ou você não tem permissão para visualizá-la."

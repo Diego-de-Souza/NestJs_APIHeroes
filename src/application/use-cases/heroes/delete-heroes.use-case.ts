@@ -1,15 +1,15 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import { HeroesRepository } from "../../../infrastructure/repositories/heroes.repository";
+import type { IHeroesRepository } from "../../ports/out/heroes.port";
+import type { IDeleteHeroesPort } from "../../ports/in/heroes/delete-heroes.port";
 
 @Injectable()
-export class DeleteHeroesUseCase {
-    
+export class DeleteHeroesUseCase implements IDeleteHeroesPort {
     constructor(
-        private readonly heroesRepository: HeroesRepository
-    ){}
+        @Inject('IHeroesRepository') private readonly heroesRepository: IHeroesRepository
+    ) {}
 
-    async DeleteHeroes(id: number): Promise<ApiResponseInterface<number>>{
+    async execute(id: string): Promise<ApiResponseInterface<number>> {
         const isDestroyHeroes = await this.heroesRepository.DeleteHeroes(id);
 
         if(isDestroyHeroes === 0){

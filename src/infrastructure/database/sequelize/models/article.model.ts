@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey } from 'sequelize-typescript';
+import { User } from './user.model';
 
 @Table({
     tableName: "articles",
@@ -6,13 +7,13 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
 })
 export class Article extends Model<Article> {
     @Column({
-        type: DataType.INTEGER,
+        type: DataType.UUID,
+        defaultValue: DataType.UUIDV4,
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
         unique: true
     })
-    id: number;
+    id: string;
 
     @Column({
         type: DataType.STRING(50),
@@ -109,12 +110,13 @@ export class Article extends Model<Article> {
     })
     author: string;
 
+    @ForeignKey(() => User)
     @Column({
-        type: DataType.INTEGER,
+        type: DataType.UUID,
         allowNull: true,
         field: 'usuario_id'
     })
-    usuario_id: number;
+    usuario_id: string;
 
     @Column({
         type: DataType.INTEGER,

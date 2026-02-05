@@ -1,18 +1,17 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Team } from "../../../infrastructure/database/sequelize/models/index.model";
-import { TeamRepository } from "../../../infrastructure/repositories/team.repository";
+import type { ITeamRepository } from "../../ports/out/team.port";
 import { CreateTeamDto } from "../../../interface/dtos/team/create-team.dto";
-
+import type { ICreateTeamPort } from "../../ports/in/team/create-team.port";
 
 @Injectable()
-export class CreateTeamUseCase {
-    
+export class CreateTeamUseCase implements ICreateTeamPort {
     constructor(
-        private readonly teamRepository: TeamRepository
-    ){}
+        @Inject('ITeamRepository') private readonly teamRepository: ITeamRepository
+    ) {}
 
-    async create(teamDTO: CreateTeamDto): Promise<ApiResponseInterface<Team>>{
+    async execute(teamDTO: CreateTeamDto): Promise<ApiResponseInterface<Team>> {
         const teamExists =  await this.teamRepository.findByTeam(teamDTO.name);
 
         if(teamExists){
@@ -27,7 +26,7 @@ export class CreateTeamUseCase {
         return {
             status: HttpStatus.CREATED,
             message: "Team criado com sucesso",
-            dataUnit: teamCreated
-        }
+            dataUnit: teamCreated,
+        };
     }
 }

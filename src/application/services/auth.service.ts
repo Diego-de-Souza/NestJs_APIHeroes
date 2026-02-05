@@ -13,9 +13,10 @@ import { AuthSignOutUseCase } from "../use-cases/auth/auth-signout.use-case";
 import { AuthRefreshTokenUseCase } from "../use-cases/auth/auth-refresh-token.use-case";
 import { AuthGetActiveSessionsUseCase } from "../use-cases/auth/auth-get-active-sessions.use-case";
 import { AuthRegisterAcessoUserUseCase } from "../use-cases/auth/auth-register-acesso-user.use-case";
+import type { IAuthPort } from "../ports/in/auth/auth.port";
 
 @Injectable()
-export class AuthService {
+export class AuthService implements IAuthPort {
     
     constructor(
         private readonly authSignInUseCase: AuthSignInUseCase,
@@ -87,7 +88,7 @@ export class AuthService {
         return await this.authSignOutUseCase.signOutCurrentSessionById(id, req);
     }
 
-    async getActiveSessions(userId: number, currentSessionToken?: string): Promise<any> {
+    async getActiveSessions(userId: string, currentSessionToken?: string): Promise<any> {
         return await this.authGetActiveSessionsUseCase.getActiveSessions(userId, currentSessionToken);
     }
 

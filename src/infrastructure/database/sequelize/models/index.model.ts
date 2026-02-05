@@ -3,7 +3,6 @@ import { Studio } from './studio.model';
 import { Team } from './equipes.model';
 import { User } from './user.model';
 import { Role } from './roles.model';
-import { Curiosities } from './curiosities.model';
 import { Article } from './article.model';
 import { Quiz } from './quiz/quiz.model';
 import { UserGameProcess } from './games/user-game-progress.model';
@@ -32,7 +31,6 @@ export {
   Team, 
   User, 
   Role, 
-  Curiosities,
   Article,
   Quiz, 
   QuizLevel, 
@@ -62,7 +60,6 @@ export const models = [
   Team, 
   User, 
   Role, 
-  Curiosities, 
   Article, 
   Quiz,  
   QuizLevel, 

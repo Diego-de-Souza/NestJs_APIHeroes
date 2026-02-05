@@ -1,17 +1,18 @@
-import { HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { HttpStatus, Injectable, Logger, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Notification } from "../../../infrastructure/database/sequelize/models/notification.model";
-import { NotificationsRepository } from "../../../infrastructure/repositories/notifications.repository";
+import type { INotificationsRepository } from "../../ports/out/notifications.port";
+import type { IFindNotificationsByUserIdPort } from "../../ports/in/notifications/find-notifications-by-user-id.port";
 
 @Injectable()
-export class FindNotificationsByUserIdUseCase {
+export class FindNotificationsByUserIdUseCase implements IFindNotificationsByUserIdPort {
     private readonly logger = new Logger(FindNotificationsByUserIdUseCase.name);
 
     constructor(
-        private readonly notificationsRepository: NotificationsRepository
-    ){}
+        @Inject('INotificationsRepository') private readonly notificationsRepository: INotificationsRepository
+    ) {}
 
-    async findNotificationsByUserId(usuario_id: number): Promise<ApiResponseInterface<Notification>>{
+    async execute(usuario_id: string): Promise<ApiResponseInterface<Notification>> {
         try {
             const notifications = await this.notificationsRepository.findNotificationsByUserId(usuario_id);
 

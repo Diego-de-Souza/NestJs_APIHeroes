@@ -58,7 +58,20 @@ async function bootstrap() {
     ],
     credentials: true
   });
-  app.useGlobalPipes(new ValidationPipe({transform: true, whitelist: true, forbidNonWhitelisted: true}));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+      // Adicione para ignorar validação em rotas sem DTO
+      skipMissingProperties: false,
+      skipUndefinedProperties: false,
+      skipNullProperties: false,
+    }),
+  );
   
   // MANTÉM o middleware de logging
   if (process.env.NODE_ENV !== 'production') {

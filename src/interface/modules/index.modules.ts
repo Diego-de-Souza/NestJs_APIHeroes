@@ -1,6 +1,5 @@
 import { ArticleModule } from "./article.module";
 import { AuthModule } from "./auth.module";
-import { CuriosidadesModule } from "./curiosidade.module";
 import { DadosHeroisModule } from "./dados-herois.module";
 import { GamesModule } from "./games.module";
 import { MenuPrincipalModule } from "./menu_principal.module";
@@ -21,7 +20,6 @@ import { SacModule } from "./sac.module";
 export const appModules = [
   ArticleModule,
   AuthModule,
-  CuriosidadesModule,
   DadosHeroisModule,
   GamesModule,
   MenuPrincipalModule,

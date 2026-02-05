@@ -8,7 +8,7 @@ export class RoleService {
         private readonly roleRepository: RoleRepository
     ){}
 
-    async assignDefaultRole(userId: number): Promise<void> {
+    async assignDefaultRole(userId: string): Promise<void> {
         await this.roleRepository.create({
             role: "client",
             usuario_id: userId,

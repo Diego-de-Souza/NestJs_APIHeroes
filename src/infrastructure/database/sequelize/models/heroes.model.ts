@@ -5,18 +5,20 @@ import { Team } from './team.model';
 @Table({ tableName: 'heroes', timestamps: false })
 export class Heroes extends Model<Heroes> {
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    allowNull: false,
     primaryKey: true,
-    autoIncrement: true,
+    unique: true
   })
-  id: number;
+  id: string;
 
   @Column({ type: DataType.STRING(100), allowNull: false })
   name: string;
 
   @ForeignKey(() => Studio)
-  @Column({ type: DataType.INTEGER, allowNull: false, field: 'studio_id' })
-  studio_id: number;
+  @Column({ type: DataType.UUID, allowNull: false, field: 'studio_id' })
+  studio_id: string;
 
   @Column({ type: DataType.STRING(50), field: 'power_type' })
   power_type: string;
@@ -43,8 +45,8 @@ export class Heroes extends Model<Heroes> {
   story: string;
 
   @ForeignKey(() => Team)
-  @Column({ type: DataType.INTEGER, field: 'team_id' })
-  team_id: number;
+  @Column({ type: DataType.UUID, field: 'team_id' })
+  team_id: string;
 
   @Column({ type: DataType.STRING(50) })
   genre: string;

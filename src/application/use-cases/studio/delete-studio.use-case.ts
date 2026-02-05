@@ -1,18 +1,18 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import { StudioRepository } from "../../../infrastructure/repositories/studio.repository";
+import type { IStudioRepository } from "../../ports/out/studio.port";
+import type { IDeleteStudioPort } from "../../ports/in/studio/delete-studio.port";
 
 @Injectable()
-export class DeleteStudioUseCase {
-
+export class DeleteStudioUseCase implements IDeleteStudioPort {
     constructor(
-        private readonly studioRepository: StudioRepository
-    ){}
+        @Inject('IStudioRepository') private readonly studioRepository: IStudioRepository
+    ) {}
 
-    async deleteStudio(id: number): Promise<ApiResponseInterface<number>>{
-        const deleteStudio = await this.studioRepository.DeleteStudio(id);
+    async execute(id: string): Promise<ApiResponseInterface<number>> {
+        const deleted = await this.studioRepository.DeleteStudio(id);
 
-        if(deleteStudio === 0){
+        if (deleted === 0) {
             return {
                 status: HttpStatus.NOT_FOUND,
                 message: "Studio não encontrado, remoção falhou."

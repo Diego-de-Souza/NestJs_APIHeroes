@@ -1,15 +1,16 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Games } from "../../../infrastructure/database/sequelize/models/games/games.model";
-import { GamesRepository } from "../../../infrastructure/repositories/games.repository";
+import type { IGamesRepository } from "../../ports/out/games.port";
+import type { IFindAllGamesPort } from "../../ports/in/games/find-all-games.port";
 
 @Injectable()
-export class FindAllGamesUseCase {
+export class FindAllGamesUseCase implements IFindAllGamesPort {
     constructor(
-        private readonly gamesRepository: GamesRepository
+        @Inject('IGamesRepository') private readonly gamesRepository: IGamesRepository
     ) {}
 
-    async findAllGames(): Promise<ApiResponseInterface<Games>> {
+    async execute(): Promise<ApiResponseInterface<Games>> {
         try {
             const games = await this.gamesRepository.findAllGames();
 

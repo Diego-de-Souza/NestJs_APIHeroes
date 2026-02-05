@@ -1,17 +1,18 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, Inject } from "@nestjs/common";
 import { ImageService } from "../../services/image.service";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import { GamesRepository } from "../../../infrastructure/repositories/games.repository";
+import type { IGamesRepository } from "../../ports/out/games.port";
+import type { ICreateGamePort } from "../../ports/in/games/create-game.port";
 
 @Injectable()
-export class CreateGameUseCase {
+export class CreateGameUseCase implements ICreateGamePort {
     private readonly logger = new Logger(CreateGameUseCase.name);
     constructor(
-        private readonly gamesRepository: GamesRepository,
+        @Inject('IGamesRepository') private readonly gamesRepository: IGamesRepository,
         private readonly imageService: ImageService
-    ){}
+    ) {}
 
-    async createGame(gameData: any): Promise<ApiResponseInterface>{
+    async execute(gameData: Record<string, unknown>): Promise<ApiResponseInterface<unknown>> {
         try{
             // Valida se o icon foi fornecido (é obrigatório)
             if (!gameData.icon) {
@@ -22,10 +23,10 @@ export class CreateGameUseCase {
             }
             
             let imageUploadResult: string;
-            
-            // Tenta fazer upload da imagem
+            const icon = gameData.icon as string;
+            const imageName = gameData.image_name as string;
             try {
-                imageUploadResult = await this.imageService.saveImageBase64(gameData.icon, gameData.image_name, 'games');
+                imageUploadResult = await this.imageService.saveImageBase64(icon, imageName, 'games');
                 this.logger.log(`Imagem do jogo salva: ${imageUploadResult}`);
                 
                 // Valida se a URL foi gerada corretamente
@@ -35,22 +36,23 @@ export class CreateGameUseCase {
                         message: 'Falha ao salvar a imagem do jogo. URL da imagem não foi gerada.',
                     };
                 }
-            } catch (imageError) {
+            } catch (imageError: unknown) {
+                const err = imageError as Error;
                 this.logger.error('Erro ao salvar imagem do jogo:', imageError);
                 return {
                     status: 400,
                     message: 'Erro ao fazer upload da imagem do jogo.',
-                    error: imageError.message || imageError,
+                    error: (err?.message ?? String(imageError)),
                 };
             }
             
-            const dataGame ={
+            const dataGame = {
                 name: gameData.name,
                 description: gameData.description,
                 type: gameData.type,
                 link: gameData.link,
                 url_icon: imageUploadResult,
-            }
+            } as Record<string, unknown>;
 
             const game = await this.gamesRepository.createGame(dataGame);
             
@@ -59,12 +61,13 @@ export class CreateGameUseCase {
                 message: 'Jogo criado com sucesso.',
                 dataUnit: game,
             };
-        }catch(error){
+        } catch (error: unknown) {
+            const err = error as Error;
             this.logger.error('Erro ao criar jogo:', error);
             return {
                 status: 500,
                 message: 'Erro inesperado ao criar jogo.',
-                error: error.message || error,
+                error: (err?.message ?? String(error)),
             };
         }
     }

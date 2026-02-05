@@ -1,9 +1,9 @@
 
 
 export interface UserQuizProgressInterface {
-    user_id: number;
-    quiz_id: number;
-    quiz_level_id: number;
+    user_id: string;
+    quiz_id: string;
+    quiz_level_id: string;
     completed: boolean;
     score: number;
     skipped_questions: number[];

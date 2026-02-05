@@ -1,14 +1,16 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { ArticlesRepository } from "../../../infrastructure/repositories/articles.repository";
+import type { IFindArticlesForHomepagePort } from "src/application/ports/in/article/find-articles-for-homepage.port";
+import { IArticlePort } from "src/application/ports/out/article.port";
 
 
 @Injectable()
-export class FindArticlesForHomepageUseCase {
+export class FindArticlesForHomepageUseCase implements IFindArticlesForHomepagePort {
     constructor(
-        private readonly articlesRepository: ArticlesRepository
+        @Inject('IArticlePort') private readonly articlesRepository: IArticlePort
     ) {}
 
-    async articlesForHomepage(): Promise<any> {
+    async execute(): Promise<any> {
         try{
             //destaques
             const latestArticles = await this.articlesRepository.findLatestArticles(3);

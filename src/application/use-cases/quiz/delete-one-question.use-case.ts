@@ -10,7 +10,7 @@ export class DeleteOneQuizUseCase {
         private readonly quizRepository: QuizRepository
     ){}
 
-    async deleteOneQuestion(quizLevelId: number, questionNumber: number): Promise<ApiResponseInterface<void>> {
+    async deleteOneQuestion(quizLevelId: string, questionNumber: string): Promise<ApiResponseInterface<void>> {
         try{
             const questions = await this.quizRepository.findQuestionQuiz(quizLevelId);
 
@@ -18,7 +18,8 @@ export class DeleteOneQuizUseCase {
                 throw new NotFoundException('Pergunta não encontrada');
             }
 
-            const registerDelete = questions[questionNumber-1].dataValues;
+            const index = parseInt(questionNumber, 10) - 1;
+            const registerDelete = questions[index].dataValues ?? questions[index];
 
             await this.quizRepository.deleteOneQuestion(registerDelete.id);
             return {

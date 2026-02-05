@@ -1,19 +1,22 @@
-import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpStatus, Injectable, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { UserGameProcess } from "../../../infrastructure/database/sequelize/models/index.model";
-import { GamesRepository } from "../../../infrastructure/repositories/games.repository";
+import type { IGamesRepository } from "../../ports/out/games.port";
+import type { ISaveUserGameProgressPort } from "../../ports/in/games/save-user-game-progress.port";
 
 @Injectable()
-export class SaveUserGameProgressUseCase {
-    constructor(private readonly gamesRepository: GamesRepository) {}
+export class SaveUserGameProgressUseCase implements ISaveUserGameProgressPort {
+    constructor(
+        @Inject('IGamesRepository') private readonly gamesRepository: IGamesRepository
+    ) {}
 
-    async saveUserGameProgress(data: {
-      user_id: number;
-      game_id: number;
+    async execute(data: {
+      user_id: string;
+      game_id: string;
       lvl_user: number;
       score: number;
       attempts: number;
-      metadata: Record<string, any>;
+      metadata: Record<string, unknown>;
     }): Promise<ApiResponseInterface<UserGameProcess | number>> {
       const gameExists = await this.gamesRepository.findGameByPk(data.game_id);
       

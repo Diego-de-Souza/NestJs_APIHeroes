@@ -25,28 +25,35 @@ import { CommentLike } from './comment-like.model';
 @Index(['is_deleted'])
 export class Comment extends Model<Comment> {
   @Column({
-    type: DataType.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-    allowNull: false,
+      type: DataType.UUID,
+      defaultValue: DataType.UUIDV4,
+      allowNull: false,
+      primaryKey: true,
+      unique: true
   })
-  id: number;
+  id: string;
 
   @ForeignKey(() => Article)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
     allowNull: false,
+    primaryKey: true,
+    unique: true,
     field: 'article_id',
   })
-  articleId: number;
+  articleId: string;
 
   @ForeignKey(() => User)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
     allowNull: false,
+    primaryKey: true,
+    unique: true,
     field: 'user_id',
   })
-  userId: number;
+  userId: string;
 
   @Column({
     type: DataType.TEXT,
@@ -55,11 +62,11 @@ export class Comment extends Model<Comment> {
   content: string;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
     allowNull: true,
     field: 'parent_id',
   })
-  parentId: number | null;
+  parentId: string | null;
 
   @Default(0)
   @Column({

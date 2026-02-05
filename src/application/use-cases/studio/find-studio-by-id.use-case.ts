@@ -1,16 +1,16 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Studio } from "../../../infrastructure/database/sequelize/models/studio.model";
-import { StudioRepository } from "../../../infrastructure/repositories/studio.repository";
+import type { IStudioRepository } from "../../ports/out/studio.port";
+import type { IFindStudioByIdPort } from "../../ports/in/studio/find-studio-by-id.port";
 
 @Injectable()
-export class FindStudioByIdUseCase {
-
+export class FindStudioByIdUseCase implements IFindStudioByIdPort {
     constructor(
-        private readonly studioRepository: StudioRepository
-    ){}
+        @Inject('IStudioRepository') private readonly studioRepository: IStudioRepository
+    ) {}
 
-    async findStudioById(id: number): Promise<ApiResponseInterface<Studio>>{
+    async execute(id: string): Promise<ApiResponseInterface<Studio>> {
         const studio = await this.studioRepository.findStudioById(id);
 
         if(!studio){

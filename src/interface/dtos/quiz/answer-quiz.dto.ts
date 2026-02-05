@@ -2,9 +2,9 @@ import { IsArray, IsInt, IsNotEmpty, IsString, ValidateNested, ArrayMinSize } fr
 import { Type } from "class-transformer";
 
 export class AnswerDto {
-    @IsInt({ message: "questionId deve ser inteiro" })
+    @IsString({ message: "questionId deve ser uma string" })
     @IsNotEmpty({ message: "questionId não pode estar vazio" })
-    readonly questionId: number;
+    readonly questionId: string;
 
     @IsString({ message: "selected deve ser string" })
     @IsNotEmpty({ message: "selected não pode estar vazio" })
@@ -12,13 +12,13 @@ export class AnswerDto {
 }
 
 export class AnswerQuizDto {
-    @IsInt({ message: "user_id deve ser inteiro" })
+    @IsString({ message: "user_id deve ser uma string" })
     @IsNotEmpty({ message: "user_id não pode estar vazio" })
-    readonly user_id: number;
+    readonly user_id: string;
 
-    @IsInt({ message: "quiz_level_id deve ser inteiro" })
+    @IsString({ message: "quiz_level_id deve ser uma string" })
     @IsNotEmpty({ message: "quiz_level_id não pode estar vazio" })
-    readonly quiz_level_id: number;
+    readonly quiz_level_id: string;
 
     @IsArray({ message: "answers deve ser um array" })
     @ArrayMinSize(1, { message: "Deve ter no mínimo 1 resposta" })

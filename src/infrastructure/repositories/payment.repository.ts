@@ -21,7 +21,7 @@ export class PaymentRepository {
         return await this.subscriptionModel.create(subscriptionData);
     }
 
-    async findSubscriptionByUserId(userId: number): Promise<Subscription | null> {
+    async findSubscriptionByUserId(userId: string): Promise<Subscription | null> {
         return await this.subscriptionModel.findOne({
             where: { userId, status: 'active' }
         });
@@ -33,13 +33,13 @@ export class PaymentRepository {
         });
     }
 
-    async updateSubscription(id: number, updateData: UpdateSubscriptionData): Promise<void> {
+    async updateSubscription(id: string, updateData: UpdateSubscriptionData): Promise<void> {
         await this.subscriptionModel.update(updateData, {
             where: { id }
         });
     }
 
-    async cancelSubscription(userId: number): Promise<void> {
+    async cancelSubscription(userId: string): Promise<void> {
         await this.subscriptionModel.update(
             { 
                 status: 'canceled', 
@@ -60,13 +60,13 @@ export class PaymentRepository {
         });
     }
 
-    async updatePayment(id: number, updateData: UpdatePaymentData): Promise<void> {
+    async updatePayment(id: string, updateData: UpdatePaymentData): Promise<void> {
         await this.paymentModel.update(updateData, {
             where: { id }
         });
     }
 
-    async findPaymentsByUserId(userId: number): Promise<Payment[]> {
+    async findPaymentsByUserId(userId: string): Promise<Payment[]> {
         return await this.paymentModel.findAll({
             where: { userId },
             order: [['createdAt', 'DESC']]
@@ -74,7 +74,7 @@ export class PaymentRepository {
     }
 
     // PREMIUM ACCESS VERIFICATION
-    async hasActiveSubscription(userId: number): Promise<boolean> {
+    async hasActiveSubscription(userId: string): Promise<boolean> {
         const subscription = await this.subscriptionModel.findOne({
             where: { 
                 userId, 
@@ -89,7 +89,7 @@ export class PaymentRepository {
     }
 
     // CRIAR SUBSCRIPTION COM PLANO ESPECÍFICO
-    async createSubscriptionWithPlan(userId: number, planType: PlanType, amount: number, stripePaymentIntentId?: string): Promise<Subscription> {
+    async createSubscriptionWithPlan(userId: string, planType: PlanType, amount: number, stripePaymentIntentId?: string): Promise<Subscription> {
         const startDate = new Date();
         const endDate = calculateExpirationDate(planType, startDate);
 
@@ -109,7 +109,7 @@ export class PaymentRepository {
     }
 
     // RENOVAR SUBSCRIPTION EXISTENTE
-    async renewSubscription(userId: number, planType: PlanType, amount: number): Promise<void> {
+    async renewSubscription(userId: string, planType: PlanType, amount: number): Promise<void> {
         const subscription = await this.findSubscriptionByUserId(userId);
         
         if (subscription) {
@@ -136,7 +136,7 @@ export class PaymentRepository {
     }
 
     // BUSCAR DETALHES DA SUBSCRIPTION ATIVA
-    async getActiveSubscriptionDetails(userId: number): Promise<{
+    async getActiveSubscriptionDetails(userId: string): Promise<{
         subscription: Subscription | null;
         isActive: boolean;
         daysRemaining: number;

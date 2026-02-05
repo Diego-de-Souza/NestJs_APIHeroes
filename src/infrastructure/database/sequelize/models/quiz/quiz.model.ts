@@ -8,13 +8,13 @@ import { QuizLevel } from './quiz-level.model';
 })
 export class Quiz extends Model<Quiz> {
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
     allowNull: false,
-    autoIncrement: true,
     primaryKey: true,
-    unique: true,
+    unique: true
   })
-  id: number;
+  id: string;
 
   @Column({
     type: DataType.STRING(100),

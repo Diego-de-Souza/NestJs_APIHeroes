@@ -1,22 +1,23 @@
-import { HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ImageService } from "../../../application/services/image.service";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Article } from "../../../infrastructure/database/sequelize/models/article.model";
-import { ArticlesRepository } from "../../../infrastructure/repositories/articles.repository";
 import { CreateArticleDto } from "../../../interface/dtos/articles/articlesCreate.dto";
 import { UserRepository } from "../../../infrastructure/repositories/user.repository";
+import type { ICreateClientArticlePort } from "src/application/ports/in/article/create-client-article.port";
+import type { IArticlePort } from "src/application/ports/out/article.port";
 
 @Injectable()
-export class CreateClientArticleUseCase {
+export class CreateClientArticleUseCase implements ICreateClientArticlePort {
     private readonly logger = new Logger(CreateClientArticleUseCase.name);
     
     constructor(
-        private readonly articleRepository: ArticlesRepository,
+        @Inject('IArticlePort') private readonly articleRepository: IArticlePort,
         private readonly imageService: ImageService,
         private readonly userRepository: UserRepository
     ){}
 
-    async createClientArticle(articleDto: CreateArticleDto, usuario_id: number): Promise<ApiResponseInterface<Article>>{
+    async execute(articleDto: CreateArticleDto, usuario_id: string): Promise<ApiResponseInterface<Article>>{
         try {
             const articlesExists = await this.articleRepository.findArticleByName(articleDto.title);
             

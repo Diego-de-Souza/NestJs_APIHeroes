@@ -6,13 +6,13 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
 })
 export class News extends Model<News> {
     @Column({
-        type: DataType.INTEGER,
+        type: DataType.UUID,
+        defaultValue: DataType.UUIDV4,
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
         unique: true
     })
-    id: number;
+    id: string;
 
     @Column({
         type: DataType.STRING(100),
@@ -27,23 +27,49 @@ export class News extends Model<News> {
     description: string;
 
     @Column({
-        type: DataType.TEXT,
+        type: DataType.STRING(255),
         allowNull: false,
     })
-    content: string;
+    image: string;
+
+    @Column({
+        type: DataType.STRING(255),
+        allowNull: false,
+    })
+    link: string;
 
     @Column({
         type: DataType.STRING(50),
         allowNull: false,
-        field: 'type_news_letter'
     })
-    type_news_letter: string;
+    category: string;
 
     @Column({
         type: DataType.STRING(50),
         allowNull: false,
     })
-    theme: string;
+    date: string;
+
+    @Column({
+        type: DataType.STRING(50),
+        allowNull: false,
+        field: 'read_time'
+    })
+    read_time: string;
+
+    @Column({
+        type: DataType.STRING(100),
+        allowNull: false,
+        defaultValue: 'Sistema'
+    })
+    author: string;
+
+    @Column({
+        type: DataType.UUID,
+        allowNull: true,
+        field: 'usuario_id'
+    })
+    usuario_id: string;
 
     @Column({
         type: DataType.DATE,
@@ -58,26 +84,4 @@ export class News extends Model<News> {
         allowNull: false,
     })
     updated_at: string;
-
-    @Column({
-        type: DataType.INTEGER,
-        defaultValue: 0,
-    })
-    views: number;
-
-    @Column({
-        type: DataType.INTEGER,
-        allowNull: true,
-        field: 'usuario_id'
-    })
-    usuario_id: number;
-
-    @Column({
-        type: DataType.INTEGER,
-        allowNull: true,
-        defaultValue: 3,
-        field: 'role_art',
-        comment: '1:root, 2:admin, 3:client'
-    })
-    role_art: number;
 }

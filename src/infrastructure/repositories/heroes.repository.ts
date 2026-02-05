@@ -1,18 +1,18 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Heroes } from "../database/sequelize/models/heroes.model";
 import { CreateDadosHeroisDto } from "../../interface/dtos/dados-herois/create-dados-herois.dto";
 import { UpdateDadosHeroisDto } from "../../interface/dtos/dados-herois/update-dados-herois.dto";
 import { WhereOptions, Op } from "sequelize";
-import { TeamRepository } from "./team.repository";
+import type { IHeroesRepository } from "../../application/ports/out/heroes.port";
+import type { ITeamRepository } from "../../application/ports/out/team.port";
 
 @Injectable()
-export class HeroesRepository {
-    
+export class HeroesRepository implements IHeroesRepository {
     constructor(
         @InjectModel(Heroes) private readonly heroesModel: typeof Heroes,
-        private readonly teamRepository: TeamRepository
-    ){}
+        @Inject('ITeamRepository') private readonly teamRepository: ITeamRepository
+    ) {}
 
     async create(heroesDto: CreateDadosHeroisDto): Promise<Heroes | null>{
         return await this.heroesModel.create(heroesDto as any);
@@ -22,15 +22,15 @@ export class HeroesRepository {
         return await this.heroesModel.findAll();
     }
 
-    async findHeroesById(id: number): Promise<Heroes | null>{
+    async findHeroesById(id: string): Promise<Heroes | null>{
         return await this.heroesModel.findOne({where: {id}});
     }
 
-    async updateHeroes(id:number, heroesDto: UpdateDadosHeroisDto): Promise<void>{
+    async updateHeroes(id: string, heroesDto: UpdateDadosHeroisDto): Promise<void> {
         await this.heroesModel.update(heroesDto as any, {where: {id}});
     }
 
-    async DeleteHeroes(id: number): Promise<number>{
+    async DeleteHeroes(id: string): Promise<number>{
         return await this.heroesModel.destroy({where: {id}});
     }
 
@@ -41,7 +41,7 @@ export class HeroesRepository {
         return await this.heroesModel.findAll({ where: whereCondition });
     }
 
-    async findAllByStudio(studioId: number): Promise<Heroes[] | null> {
+    async findAllByStudio(studioId: string): Promise<Heroes[] | null> {
         return this.findBy('studio_id', studioId);
     }
 

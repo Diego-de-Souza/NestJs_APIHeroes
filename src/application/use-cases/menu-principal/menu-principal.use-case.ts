@@ -1,15 +1,15 @@
-import { HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
+import { HttpStatus, Injectable, NotFoundException, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import { MenuPrincipalRepository } from "../../../infrastructure/repositories/menu-principal.repository";
+import type { IMenuPrincipalRepository } from "../../ports/out/menu-principal.port";
+import type { IFindMenuDataPort } from "../../ports/in/menu-principal/find-menu-data.port";
 
 @Injectable()
-export class MenuPrincipalUseCase {
-    
+export class MenuPrincipalUseCase implements IFindMenuDataPort {
     constructor(
-        private readonly menuPrincipalRepository: MenuPrincipalRepository
-    ){}
+        @Inject('IMenuPrincipalRepository') private readonly menuPrincipalRepository: IMenuPrincipalRepository
+    ) {}
 
-    async findData(): Promise<ApiResponseInterface<unknown>>{
+    async execute(): Promise<ApiResponseInterface<unknown>> {
         const dadosMenu = await Promise.all([
             this.menuPrincipalRepository.findAllStudio(),
             this.menuPrincipalRepository.findAllTeam(),

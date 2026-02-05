@@ -9,29 +9,29 @@ import { SacResponse } from './sac-response.model';
 })
 export class SacAttachment extends Model<SacAttachment> {
     @Column({
-        type: DataType.INTEGER,
+        type: DataType.UUID,
+        defaultValue: DataType.UUIDV4,
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
         unique: true
     })
-    id: number;
+    id: string;
 
     @ForeignKey(() => SacContact)
     @Column({
-        type: DataType.INTEGER,
-        allowNull: true,
+        type: DataType.UUID,
+        allowNull: false,
         field: 'contact_id'
     })
-    contact_id: number | null;
+    contact_id: string | null;
 
     @ForeignKey(() => SacResponse)
     @Column({
-        type: DataType.INTEGER,
+        type: DataType.UUID,
         allowNull: true,
         field: 'response_id'
     })
-    response_id: number | null;
+    response_id: string | null;
 
     @Column({
         type: DataType.STRING(255),

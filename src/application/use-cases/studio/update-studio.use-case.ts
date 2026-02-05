@@ -1,23 +1,23 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Studio } from "../../../infrastructure/database/sequelize/models/studio.model";
-import { StudioRepository } from "../../../infrastructure/repositories/studio.repository";
+import type { IStudioRepository } from "../../ports/out/studio.port";
 import { CreateStudioDto } from "../../../interface/dtos/studio/create-studio.dto";
+import type { IUpdateStudioPort } from "../../ports/in/studio/update-studio.port";
 
 @Injectable()
-export class UpdateStudioUseCase {
-    
+export class UpdateStudioUseCase implements IUpdateStudioPort {
     constructor(
-        private readonly studioRepository: StudioRepository
-    ){}
+        @Inject('IStudioRepository') private readonly studioRepository: IStudioRepository
+    ) {}
 
-    async updateStudio(id: number, studioDto: CreateStudioDto): Promise<ApiResponseInterface<Studio>>{
+    async execute(id: string, studioDto: CreateStudioDto): Promise<ApiResponseInterface<Studio>> {
         const studioExist = await this.studioRepository.findStudioById(id);
 
-        if(studioExist){
+        if(!studioExist){
             return {
-                status: HttpStatus.CONFLICT,
-                message: "Já existe um registro de studio."
+                status: HttpStatus.NOT_FOUND,
+                message: "Não existe um registro de studio."
             }
         }
         
@@ -25,7 +25,7 @@ export class UpdateStudioUseCase {
 
         return {
             status: HttpStatus.OK,
-            message: "Studio atualizado com sucesso."
-        }
+            message: "Studio atualizado com sucesso.",
+        };
     }
 }

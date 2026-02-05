@@ -8,7 +8,7 @@ export class FindOneQuizAndQuizLevelUseCase {
         private readonly quizRepository: QuizRepository
     ){}
 
-    async findOneQuizAndQuizLevel(quizId: number, levelId: number): Promise<ApiResponseInterface<any>> {
+    async findOneQuizAndQuizLevel(quizId: string, levelId: string): Promise<ApiResponseInterface<any>> {
         try{
             const quiz = await this.quizRepository.findQuizById(quizId);
             const quiz_level = await this.quizRepository.findQuizLevelById(levelId);

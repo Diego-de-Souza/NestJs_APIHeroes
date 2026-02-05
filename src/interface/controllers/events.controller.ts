@@ -1,67 +1,52 @@
-import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
-import { EventsService } from "../../application/services/events.service";
+import { Body, Controller, Delete, Get, Param, Post, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
-
+import type { ICreateEventPort } from "../../application/ports/in/events/create-event.port";
+import type { IFindEventsPort } from "../../application/ports/in/events/find-events.port";
+import type { IDeleteEventPort } from "../../application/ports/in/events/delete-event.port";
+import type { IFindEventsListHomePort } from "../../application/ports/in/events/find-events-list-home.port";
 
 @Controller('events')
 export class EventsController {
     constructor(
-        private readonly eventsService: EventsService
+        @Inject('ICreateEventPort') private readonly createEventPort: ICreateEventPort,
+        @Inject('IFindEventsPort') private readonly findEventsPort: IFindEventsPort,
+        @Inject('IDeleteEventPort') private readonly deleteEventPort: IDeleteEventPort,
+        @Inject('IFindEventsListHomePort') private readonly findEventsListHomePort: IFindEventsListHomePort
     ) {}
 
     @Post()
     async createEvent(@Body() eventDto: any): Promise<ApiResponseInterface<string>> {
-        try{
-            const result = await this.eventsService.createRegisterEvent(eventDto);
-            return result;
-        }catch(error){
-            return {
-                status: 500,
-                message: 'Erro inesperado ao criar evento.',
-                error: error.message || error,
-            };
+        try {
+            return await this.createEventPort.execute(eventDto);
+        } catch (error) {
+            return { status: 500, message: 'Erro inesperado ao criar evento.', error: error.message || error };
         }
     }
 
     @Get()
     async getEvents() {
-        try{
-            const result = await this.eventsService.getEvents();
-            return result;
-        }catch(error){
-            return {
-                status: 500,
-                message: 'Erro inesperado ao buscar eventos.',
-                error: error.message || error,
-            };
+        try {
+            return await this.findEventsPort.execute();
+        } catch (error) {
+            return { status: 500, message: 'Erro inesperado ao buscar eventos.', error: error.message || error };
         }
     }
 
     @Delete('delete/:id')
-    async deleteEvent(@Param("id") id: number): Promise<ApiResponseInterface<number>> {
-        try{
-            const result = await this.eventsService.deleteEvent(id);
-            return result;
-        }catch(error){
-            return {
-                status: 500,
-                message: 'Erro inesperado ao deletar evento.',
-                error: error.message || error,
-            };
+    async deleteEvent(@Param("id") id: string): Promise<ApiResponseInterface<number>> {
+        try {
+            return await this.deleteEventPort.execute(id);
+        } catch (error) {
+            return { status: 500, message: 'Erro inesperado ao deletar evento.', error: error.message || error };
         }
     }
 
     @Get('list-home')
     async listEventsHome() {
-        try{
-            const result = await this.eventsService.listEventsHome();
-            return result;
-        }catch(error){
-            return {
-                status: 500,
-                message: 'Erro inesperado ao buscar eventos para home.',
-                error: error.message || error,
-            };
+        try {
+            return await this.findEventsListHomePort.execute();
+        } catch (error) {
+            return { status: 500, message: 'Erro inesperado ao buscar eventos para home.', error: error.message || error };
         }
     }
 }

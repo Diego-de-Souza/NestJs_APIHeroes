@@ -1,15 +1,18 @@
-import { BadRequestException, HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, HttpStatus, Injectable, Logger, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Heroes } from "../../../infrastructure/database/sequelize/models/heroes.model";
-import { HeroesRepository } from "../../../infrastructure/repositories/heroes.repository";
+import type { IHeroesRepository } from "../../ports/out/heroes.port";
+import type { IFindHeroesByMoralityPort } from "../../ports/in/heroes/find-heroes-by-morality.port";
 
 @Injectable()
-export class FindHeroesByMoralityUseCase {
+export class FindHeroesByMoralityUseCase implements IFindHeroesByMoralityPort {
     private readonly logger = new Logger(FindHeroesByMoralityUseCase.name);
 
-    constructor(private readonly heroesRepository: HeroesRepository) {}
+    constructor(
+        @Inject('IHeroesRepository') private readonly heroesRepository: IHeroesRepository
+    ) {}
 
-    async findHeroesByMorality(morality: string): Promise<ApiResponseInterface<Heroes>> {
+    async execute(morality: string): Promise<ApiResponseInterface<Heroes>> {
         try{
             if (!morality || morality.trim() === '') {
                 throw new BadRequestException('Moralidade é obrigatória');

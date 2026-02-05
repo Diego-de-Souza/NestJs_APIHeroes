@@ -1,15 +1,18 @@
-import { BadRequestException, HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, HttpStatus, Injectable, Logger, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Heroes } from "../../../infrastructure/database/sequelize/models/heroes.model";
-import { HeroesRepository } from "../../../infrastructure/repositories/heroes.repository";
+import type { IHeroesRepository } from "../../ports/out/heroes.port";
+import type { IFindHeroesByGenrePort } from "../../ports/in/heroes/find-heroes-by-genre.port";
 
 @Injectable()
-export class FindHeroesByGenreUseCase {
+export class FindHeroesByGenreUseCase implements IFindHeroesByGenrePort {
     private readonly logger = new Logger(FindHeroesByGenreUseCase.name);
 
-    constructor(private readonly heroesRepository: HeroesRepository) {}
+    constructor(
+        @Inject('IHeroesRepository') private readonly heroesRepository: IHeroesRepository
+    ) {}
 
-    async findHeroesByGenre(genre: string): Promise<ApiResponseInterface<Heroes>> {
+    async execute(genre: string): Promise<ApiResponseInterface<Heroes>> {
         try{
             if (!genre || genre.trim() === '') {
                 throw new BadRequestException('Gênero é obrigatório');

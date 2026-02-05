@@ -1,16 +1,16 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Events } from "../../../infrastructure/database/sequelize/models/index.model";
-import { EventsRepository } from "../../../infrastructure/repositories/events.repository";
-
+import type { IEventsRepository } from "../../../application/ports/out/events.port";
+import type { IFindEventsPort } from "../../../application/ports/in/events/find-events.port";
 
 @Injectable()
-export class FindEventsUseCase {
+export class FindEventsUseCase implements IFindEventsPort {
     constructor(
-        private readonly eventsRepository: EventsRepository
+        @Inject('IEventsRepository') private readonly eventsRepository: IEventsRepository
     ){}
 
-    async findListOfEvents(): Promise<ApiResponseInterface<Events>>{
+    async execute(): Promise<ApiResponseInterface<Events>>{
         try{
             const events = await this.eventsRepository.findListOfEvents();
 

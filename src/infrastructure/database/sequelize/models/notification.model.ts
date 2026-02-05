@@ -8,21 +8,21 @@ import { User } from './user.model';
 })
 export class Notification extends Model<Notification> {
     @Column({
-        type: DataType.INTEGER,
+        type: DataType.UUID,
+        defaultValue: DataType.UUIDV4,
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
         unique: true
     })
-    id: number;
+    id: string;
 
     @ForeignKey(() => User)
     @Column({
-        type: DataType.INTEGER,
+        type: DataType.UUID,
         allowNull: false,
-        field: 'usuario_id'
-    })
-    usuario_id: number;
+        field: 'user_id'
+      })
+    usuario_id: string;
 
     @Column({
         type: DataType.STRING(200),

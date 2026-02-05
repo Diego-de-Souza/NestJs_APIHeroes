@@ -1,19 +1,19 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { ImageService } from "src/application/services/image.service";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { GamesRepository } from "src/infrastructure/repositories/games.repository";
-
+import { Injectable, Logger, Inject } from "@nestjs/common";
+import { ImageService } from "../../../application/services/image.service";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import type { IGamesRepository } from "../../ports/out/games.port";
+import type { IDeleteGamePort } from "../../ports/in/games/delete-game.port";
 
 @Injectable()
-export class DeleteGameUseCase {
+export class DeleteGameUseCase implements IDeleteGamePort {
     private readonly logger = new Logger(DeleteGameUseCase.name);
-    
-    constructor(
-        private readonly gamesRepository: GamesRepository,
-        private readonly imageService: ImageService
-    ){}
 
-    async deleteGame(id: number): Promise<ApiResponseInterface>{
+    constructor(
+        @Inject('IGamesRepository') private readonly gamesRepository: IGamesRepository,
+        private readonly imageService: ImageService
+    ) {}
+
+    async execute(id: string): Promise<ApiResponseInterface<unknown>> {
         try{
             const game = await this.gamesRepository.findGameById(id);
 
@@ -34,12 +34,13 @@ export class DeleteGameUseCase {
                 status: 200,
                 message: 'Jogo deletado com sucesso.',
             };
-        }catch(error){
+        } catch (error: unknown) {
+            const err = error as Error;
             this.logger.error('Erro ao deletar jogo:', error);
             return {
                 status: 500,
                 message: 'Erro inesperado ao deletar jogo.',
-                error: error.message || error,
+                error: (err?.message ?? String(error)),
             };
         }
     }

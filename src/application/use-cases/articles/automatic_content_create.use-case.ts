@@ -19,7 +19,7 @@ export class AutomaticContentCreateUseCase {
         
         const categorias = ['animes', 'manga', 'filmes', 'studios', 'games', 'tech'];
         let totalNovosArtigos = 0;
-        let idsParaManter: number[] = [];
+        let idsParaManter: string[] = [];
         
         try {
             // 🔍 ETAPA 1: COLETA TODOS OS ARTIGOS DE TODAS AS CATEGORIAS

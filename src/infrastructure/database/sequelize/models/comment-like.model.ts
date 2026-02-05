@@ -37,28 +37,35 @@ import { User } from './user.model';
 })
 export class CommentLike extends Model<CommentLike> {
   @Column({
-    type: DataType.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-    allowNull: false,
+      type: DataType.UUID,
+      defaultValue: DataType.UUIDV4,
+      allowNull: false,
+      primaryKey: true,
+      unique: true
   })
-  id: number;
+  id: string;
 
   @ForeignKey(() => Comment)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
     allowNull: false,
+    primaryKey: true,
+    unique: true,
     field: 'comment_id',
   })
-  commentId: number;
+  commentId: string;
 
   @ForeignKey(() => User)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
     allowNull: false,
+    primaryKey: true,
+    unique: true,
     field: 'user_id',
   })
-  userId: number;
+  userId: string;
 
   @Column({
     type: DataType.ENUM('like', 'dislike'),

@@ -1,16 +1,16 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Heroes } from "../../../infrastructure/database/sequelize/models/heroes.model";
-import { HeroesRepository } from "../../../infrastructure/repositories/heroes.repository";
+import type { IHeroesRepository } from "../../ports/out/heroes.port";
+import type { IFindAllHeroesPort } from "../../ports/in/heroes/find-all-heroes.port";
 
 @Injectable()
-export class FindAllHeroesUseCase {
-    
+export class FindAllHeroesUseCase implements IFindAllHeroesPort {
     constructor(
-        private readonly heroesRepository: HeroesRepository
-    ){}
+        @Inject('IHeroesRepository') private readonly heroesRepository: IHeroesRepository
+    ) {}
 
-    async findAllHeroes(): Promise<ApiResponseInterface<Heroes>>{
+    async execute(): Promise<ApiResponseInterface<Heroes>> {
         const heroes = await this.heroesRepository.findAllHeroes();
 
         if(!heroes){

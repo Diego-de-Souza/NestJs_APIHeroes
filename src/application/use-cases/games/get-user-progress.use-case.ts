@@ -1,13 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { ApiResponseInterface } from '../../../domain/interfaces/APIResponse.interface';
 import { UserGameProcess } from '../../../infrastructure/database/sequelize/models/index.model';
-import { GamesRepository } from '../../../infrastructure/repositories/games.repository';
+import type { IGamesRepository } from '../../ports/out/games.port';
+import type { IGetUserGameProgressPort } from '../../ports/in/games/get-user-progress.port';
 
 @Injectable()
-export class GetUserProgressUseCase {
-  constructor(private readonly gamesRepository: GamesRepository) {}
+export class GetUserProgressUseCase implements IGetUserGameProgressPort {
+  constructor(
+    @Inject('IGamesRepository') private readonly gamesRepository: IGamesRepository
+  ) {}
 
-  async getUserGameProgress(userId: number, gameId: number): Promise<ApiResponseInterface<UserGameProcess | null>> {
+  async execute(userId: string, gameId: string): Promise<ApiResponseInterface<UserGameProcess | null>> {
     const progress = await this.gamesRepository.findOneProcess(userId, gameId);
 
     if (!progress) {

@@ -1,6 +1,6 @@
 export interface SacContactInterface {
-  id: number;
-  usuario_id: number;
+  id: string;
+  usuario_id: string;
   ticket_number: string;
   type: 'suporte' | 'reclamacao' | 'elogio';
   subject: string;
@@ -12,16 +12,16 @@ export interface SacContactInterface {
 }
 
 export interface SacResponseInterface {
-  id: number;
-  contact_id: number;
+  id: string;
+  contact_id: string;
   message: string;
   author: string;
   created_at: Date;
 }
 
 export interface SacAttachmentInterface {
-  id: number;
-  contact_id: number | null;
+  id: string;
+  contact_id: string | null;
   response_id: number | null;
   file_name: string;
   file_path: string;

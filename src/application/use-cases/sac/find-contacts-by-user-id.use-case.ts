@@ -11,7 +11,7 @@ export class FindContactsByUserIdUseCase {
         private readonly sacRepository: SacRepository
     ){}
 
-    async findContactsByUserId(usuario_id: number, filters?: { type?: string, status?: string }): Promise<ApiResponseInterface<SacContact>>{
+    async findContactsByUserId(usuario_id: string, filters?: { type?: string, status?: string }): Promise<ApiResponseInterface<SacContact>>{
         try {
             const contacts = await this.sacRepository.findContactsByUserId(usuario_id, filters);
 

@@ -1,18 +1,19 @@
-import { HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { HttpStatus, Injectable, Logger, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Notification } from "../../../infrastructure/database/sequelize/models/notification.model";
-import { NotificationsRepository } from "../../../infrastructure/repositories/notifications.repository";
+import type { INotificationsRepository } from "../../ports/out/notifications.port";
 import { CreateNotificationDto } from "../../../interface/dtos/notifications/create-notification.dto";
+import type { ICreateNotificationPort } from "../../ports/in/notifications/create-notification.port";
 
 @Injectable()
-export class CreateNotificationUseCase {
+export class CreateNotificationUseCase implements ICreateNotificationPort {
     private readonly logger = new Logger(CreateNotificationUseCase.name);
 
     constructor(
-        private readonly notificationsRepository: NotificationsRepository
-    ){}
+        @Inject('INotificationsRepository') private readonly notificationsRepository: INotificationsRepository
+    ) {}
 
-    async createNotification(notificationDto: CreateNotificationDto): Promise<ApiResponseInterface<Notification>>{
+    async execute(notificationDto: CreateNotificationDto): Promise<ApiResponseInterface<Notification>> {
         try {
             const notification = await this.notificationsRepository.createNotification(notificationDto);
 

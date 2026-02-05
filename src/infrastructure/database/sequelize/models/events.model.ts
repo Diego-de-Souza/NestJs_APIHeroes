@@ -6,13 +6,13 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
 })
 export class Events extends Model<Events>{
     @Column({
-        type: DataType.INTEGER,
-        allowNull:false,
-        autoIncrement:true,
-        primaryKey:true,
-        unique:true
+        type: DataType.UUID,
+        defaultValue: DataType.UUIDV4,
+        allowNull: false,
+        primaryKey: true,
+        unique: true
     })
-    id:number;
+    id: string;
 
     @Column({
         type: DataType.STRING(100),

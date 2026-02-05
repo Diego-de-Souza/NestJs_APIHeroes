@@ -8,21 +8,21 @@ import { User } from "./user.model";
 })
 export class UserSocial extends Model<UserSocial> {
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
     allowNull: false,
-    autoIncrement: true,
     primaryKey: true,
-    unique: true,
+    unique: true
   })
-  id: number;
+  id: string;
 
   @ForeignKey(() => User)
   @Column({ 
-    type: DataType.INTEGER,
-    allowNull: true,
+    type: DataType.UUID,
+    allowNull: false,
     field: 'user_id'
   })
-  userId: number;
+  userId: string;
 
   @Column({ 
     type: DataType.STRING(100),

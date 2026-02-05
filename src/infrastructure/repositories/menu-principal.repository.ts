@@ -3,9 +3,10 @@ import { InjectModel } from "@nestjs/sequelize";
 import { Studio } from "../database/sequelize/models/studio.model";
 import { Team } from "../database/sequelize/models/equipes.model";
 import { Heroes } from "../database/sequelize/models/heroes.model";
+import type { IMenuPrincipalRepository } from "../../application/ports/out/menu-principal.port";
 
 @Injectable()
-export class MenuPrincipalRepository {
+export class MenuPrincipalRepository implements IMenuPrincipalRepository {
     
     constructor(
         @InjectModel(Studio) private readonly studioModel: typeof Studio,

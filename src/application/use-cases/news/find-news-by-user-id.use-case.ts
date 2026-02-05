@@ -1,20 +1,22 @@
-import { HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import { News } from "../../../infrastructure/database/sequelize/models/news.model";
-import { NewsRepository } from "../../../infrastructure/repositories/news.repository";
+import type { INewsletterRepository } from "src/application/ports/out/newsletter.port";
+import { NewsletterInterface } from "src/domain/interfaces/newsletter.interface";
+import type { IGetListNewsletterPort } from "src/application/ports/in/newsletter/get-list-newsletter.port";
 
 @Injectable()
-export class FindNewsByUserIdUseCase {
+export class FindNewsByUserIdUseCase implements IGetListNewsletterPort{
     private readonly logger = new Logger(FindNewsByUserIdUseCase.name);
 
     constructor(
-        private readonly newsRepository: NewsRepository
+        @Inject('INewsletterRepository') private readonly newsletterRepository: INewsletterRepository
     ){}
 
-    async findNewsByUserId(usuario_id: number): Promise<ApiResponseInterface<News>>{
+    async execute(): Promise<ApiResponseInterface<NewsletterInterface>>{
         try {
-            const news = await this.newsRepository.findNewsByUserId(usuario_id);
+            const news = await this.newsletterRepository.findListNewsletter();
 
+            console.log('news errado', news);
             return {
                 status: HttpStatus.OK,
                 message: "Notícias encontradas com sucesso.",

@@ -1,20 +1,20 @@
-import { HttpStatus, Injectable, NotFoundException, BadRequestException, Logger, InternalServerErrorException } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, NotFoundException, Logger, InternalServerErrorException } from '@nestjs/common';
 import { ApiResponseInterface } from '../../../domain/interfaces/APIResponse.interface';
-import { CommentsRepository } from '../../../infrastructure/repositories/comments.repository';
+import type { ICommentsRepository } from '../../../application/ports/out/comments.port';
+import type { ICreateCommentPort } from '../../../application/ports/in/comments/create-comment.port';
 import { CreateCommentDto } from '../../../interface/dtos/comments/create-comment.dto';
 import { Comment } from '../../../infrastructure/database/sequelize/models/comment.model';
-import { User } from '../../../infrastructure/database/sequelize/models/user.model';
 import { sanitizeContent } from '../../../shared/utils/sanitize-content.util';
 
 @Injectable()
-export class CreateCommentUseCase {
+export class CreateCommentUseCase implements ICreateCommentPort {
   private readonly logger = new Logger(CreateCommentUseCase.name);
 
   constructor(
-    private readonly commentsRepository: CommentsRepository,
+    @Inject('ICommentsRepository') private readonly commentsRepository: ICommentsRepository,
   ) {}
 
-  async execute(createCommentDto: CreateCommentDto, userId: number): Promise<ApiResponseInterface<Comment>> {
+  async execute(createCommentDto: CreateCommentDto, userId: string): Promise<ApiResponseInterface<Comment>> {
     try {
       // Validar que o artigo existe
       const articleExists = await this.commentsRepository.articleExists(createCommentDto.articleId);
@@ -42,7 +42,7 @@ export class CreateCommentUseCase {
       });
 
       // Buscar comentário criado com relações
-      const createdComment = await this.commentsRepository.findById(comment.id);
+      const createdComment = await this.commentsRepository.findById(comment.id, false);
       if (!createdComment) {
         throw new InternalServerErrorException('Erro ao buscar comentário criado');
       }

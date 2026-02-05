@@ -1,16 +1,16 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { GamesRepository } from "src/infrastructure/repositories/games.repository";
-
+import { Injectable, Logger, Inject } from "@nestjs/common";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import type { IGamesRepository } from "../../ports/out/games.port";
+import type { IUpdateGamePort } from "../../ports/in/games/update-game.port";
 
 @Injectable()
-export class UpdateGameUseCase {
+export class UpdateGameUseCase implements IUpdateGamePort {
     private readonly logger = new Logger(UpdateGameUseCase.name);
     constructor(
-        private readonly gamesRepository: GamesRepository
-    ){}
-    
-    async updateGame(id: number, gameData: any): Promise<ApiResponseInterface>{
+        @Inject('IGamesRepository') private readonly gamesRepository: IGamesRepository
+    ) {}
+
+    async execute(id: string, gameData: Record<string, unknown>): Promise<ApiResponseInterface<unknown>> {
         try{
             const gameExist = await this.gamesRepository.findGameById(id);
             
@@ -33,14 +33,14 @@ export class UpdateGameUseCase {
             return {
                 status: 200,
                 message: 'Jogo atualizado com sucesso.',
-                dataUnit: game,
             };
-        }catch(error){
+        } catch (error: unknown) {
+            const err = error as Error;
             this.logger.error('Erro ao atualizar jogo:', error);
             return {
                 status: 500,
                 message: 'Erro inesperado ao atualizar jogo.',
-                error: error.message || error,
+                error: (err?.message ?? String(error)),
             };
         }
     }

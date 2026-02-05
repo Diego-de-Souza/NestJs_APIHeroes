@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { QuizLevel } from './quiz-level.model';
 
 @Table({
   tableName: "quiz_heroes",
@@ -6,19 +7,21 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
 })
 export class QuizHeroes extends Model<QuizHeroes> {
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
     allowNull: false,
-    autoIncrement: true,
     primaryKey: true,
-    unique: true,
+    unique: true
   })
-  id: number;
+  id: string;
 
+  @ForeignKey(() => QuizLevel)
   @Column({
-      type: DataType.INTEGER,
+      type: DataType.UUID,
       allowNull: false,
+      field: 'quiz_level_id',
   })
-  quiz_level_id : number;
+  quiz_level_id : string;
 
   @Column({
     type: DataType.STRING(50),
@@ -37,4 +40,7 @@ export class QuizHeroes extends Model<QuizHeroes> {
     allowNull: false
   })
   quote: string;
+
+  @BelongsTo(() => QuizLevel)
+  quiz_level: QuizLevel;
 }

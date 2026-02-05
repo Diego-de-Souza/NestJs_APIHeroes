@@ -71,7 +71,7 @@ export class ProcessAnswerQuizUseCase {
 
     processPoints(
         AnswerUser: AnswerQuizDto['answers'],
-        dataquestions: Array<{ dataValues: { id: number; answer: string } }>,
+        dataquestions: Array<{ dataValues?: { id: string; answer: string }; id?: string; answer?: string }>,
         totalPoints: number
     ): { score: number; answered: number; notAnswered: number } {
         const numQuestions = dataquestions.length;
@@ -81,10 +81,12 @@ export class ProcessAnswerQuizUseCase {
         let answered = 0;
 
         for (const userAnswer of AnswerUser) {
-            const question = dataquestions.find(q => q.dataValues.id === userAnswer.questionId);
+            const getQuestionId = (q: typeof dataquestions[0]) => q.dataValues?.id ?? q.id;
+            const getQuestionAnswer = (q: typeof dataquestions[0]) => q.dataValues?.answer ?? q.answer;
+            const question = dataquestions.find(q => String(getQuestionId(q)) === String(userAnswer.questionId));
             if (question) {
                 answered++;
-                if (question.dataValues.answer === userAnswer.selected) {
+                if (getQuestionAnswer(question) === userAnswer.selected) {
                     score += pointsPerQuestion;
                 }
             }

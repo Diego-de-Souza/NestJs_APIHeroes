@@ -1,20 +1,21 @@
-import { HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { HttpStatus, Injectable, Logger, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Heroes } from "../../../infrastructure/database/sequelize/models/heroes.model";
-import { HeroesRepository } from "../../../infrastructure/repositories/heroes.repository";
+import type { IHeroesRepository } from "../../ports/out/heroes.port";
 import { UpdateDadosHeroisDto } from "../../../interface/dtos/dados-herois/update-dados-herois.dto";
 import { ImageService } from "../../services/image.service";
+import type { IUpdateHeroesPort } from "../../ports/in/heroes/update-heroes.port";
 
 @Injectable()
-export class UpdateHeroesUseCase {
+export class UpdateHeroesUseCase implements IUpdateHeroesPort {
     private readonly logger = new Logger(UpdateHeroesUseCase.name);
-    
-    constructor(
-        private readonly heroesRepository: HeroesRepository,
-        private readonly imageService: ImageService
-    ){}
 
-    async updateHeroes(id: number, heroesDto: UpdateDadosHeroisDto): Promise<ApiResponseInterface<Heroes>>{
+    constructor(
+        @Inject('IHeroesRepository') private readonly heroesRepository: IHeroesRepository,
+        private readonly imageService: ImageService
+    ) {}
+
+    async execute(id: string, heroesDto: UpdateDadosHeroisDto): Promise<ApiResponseInterface<Heroes>> {
         const heroesExists = await this.heroesRepository.findHeroesById(id);
 
         if(!heroesExists){
@@ -24,11 +25,10 @@ export class UpdateHeroesUseCase {
             }
         }
 
-        // Salva as imagens no S3 se existirem
-        if (heroesDto.image1) {
+        // Salva as imagens no S3 somente se forem Buffer (upload). Se forem URL (string), mantém como está.
+        if (heroesDto.image1 && Buffer.isBuffer(heroesDto.image1)) {
             try {
                 this.logger.log('Salvando image1 no S3...');
-                // Deleta a imagem antiga se existir
                 if (heroesExists.image1 && typeof heroesExists.image1 === 'string') {
                     try {
                         await this.imageService.deleteImage(heroesExists.image1);
@@ -38,22 +38,20 @@ export class UpdateHeroesUseCase {
                     }
                 }
                 const image1Url = await this.imageService.saveImageBuffer(
-                    heroesDto.image1 as Buffer,
+                    heroesDto.image1,
                     'heroes',
                     'image/jpeg'
                 );
-                // Salva a URL diretamente em image1 (substituindo o buffer)
-                (heroesDto as any).image1 = image1Url;
+                (heroesDto as Record<string, unknown>).image1 = image1Url;
                 this.logger.log(`Image1 salva com sucesso: ${image1Url}`);
             } catch (error) {
                 this.logger.error('Erro ao salvar image1 no S3:', error);
             }
         }
 
-        if (heroesDto.image2) {
+        if (heroesDto.image2 && Buffer.isBuffer(heroesDto.image2)) {
             try {
                 this.logger.log('Salvando image2 no S3...');
-                // Deleta a imagem antiga se existir
                 if (heroesExists.image2 && typeof heroesExists.image2 === 'string') {
                     try {
                         await this.imageService.deleteImage(heroesExists.image2);
@@ -63,12 +61,11 @@ export class UpdateHeroesUseCase {
                     }
                 }
                 const image2Url = await this.imageService.saveImageBuffer(
-                    heroesDto.image2 as Buffer,
+                    heroesDto.image2,
                     'heroes',
                     'image/jpeg'
                 );
-                // Salva a URL diretamente em image2 (substituindo o buffer)
-                (heroesDto as any).image2 = image2Url;
+                (heroesDto as Record<string, unknown>).image2 = image2Url;
                 this.logger.log(`Image2 salva com sucesso: ${image2Url}`);
             } catch (error) {
                 this.logger.error('Erro ao salvar image2 no S3:', error);

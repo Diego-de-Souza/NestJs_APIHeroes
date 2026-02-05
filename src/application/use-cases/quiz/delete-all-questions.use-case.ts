@@ -9,7 +9,7 @@ export class DeleteAllQuestionsUseCase {
         private readonly quizRepository: QuizRepository
     ){}
 
-    async deleteAllQuestions(quizLevelId: number): Promise<ApiResponseInterface<void>> {
+    async deleteAllQuestions(quizLevelId: string): Promise<ApiResponseInterface<void>> {
         try{
             await this.quizRepository.deleteAllQuestions(quizLevelId);
             return {

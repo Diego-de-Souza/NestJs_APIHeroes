@@ -1,19 +1,20 @@
-import { HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Article } from "../../../infrastructure/database/sequelize/models/article.model";
-import { ArticlesRepository } from "../../../infrastructure/repositories/articles.repository";
+import type { IFindClientArticlesByUserIdPort } from "src/application/ports/in/article/find-client-articles-by-user-id.port";
+import { IArticlePort } from "src/application/ports/out/article.port";
 
 @Injectable()
-export class FindClientArticlesByUserIdUseCase {
+export class FindClientArticlesByUserIdUseCase implements IFindClientArticlesByUserIdPort {
     private readonly logger = new Logger(FindClientArticlesByUserIdUseCase.name);
 
     constructor(
-        private readonly articleRepository: ArticlesRepository
+        @Inject('IArticlePort') private readonly articleRepository: IArticlePort
     ){}
 
-    async findClientArticlesByUserId(usuario_id: number): Promise<ApiResponseInterface<Article>>{
+    async execute(usuario_id: string): Promise<ApiResponseInterface<Article>>{
         try {
-            const articles = await this.articleRepository.findArticlesByUserId(usuario_id);
+            const articles = await this.articleRepository.findAllArticlesByUserId(usuario_id);
 
             return {
                 status: HttpStatus.OK,

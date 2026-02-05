@@ -18,6 +18,7 @@ import { UserRepository } from 'src/infrastructure/repositories/user.repository'
   controllers: [PaymentController],
   providers: [
     PaymentService,
+    { provide: 'IPaymentPort', useClass: PaymentService },
     PaymentRepository,
     PremiumGuard,
     UserRepository

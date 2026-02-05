@@ -6,7 +6,7 @@ import { QuizRepository } from "../../../infrastructure/repositories/quiz.reposi
 export class FindAllQuestionsUseCase {
     constructor(private readonly quizRepository: QuizRepository) {}
 
-    async findAllQuestions(quizLevelId: number): Promise<ApiResponseInterface<any>> {
+    async findAllQuestions(quizLevelId: string): Promise<ApiResponseInterface<any>> {
         try{
             const questions = await this.quizRepository.findAllQuestions(quizLevelId);
             return {

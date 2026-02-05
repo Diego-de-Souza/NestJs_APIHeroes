@@ -1,17 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Inject, Param, Post, Put, Query } from "@nestjs/common";
 import { ApiResponseInterface } from "../../domain/interfaces/APIResponse.interface";
 import { CreateQuizDto } from "../dtos/quiz/quizCreate.dto";
 import { CreateQuestionsDto } from "../dtos/quiz/create-questions.dto";
 import { AnswerQuizDto } from "../dtos/quiz/answer-quiz.dto";
 import { UpdateQuizDto } from "../dtos/quiz/update-quiz.dto";
 import { UpdateQuestionsDto } from "../dtos/quiz/update-questions.dto";
-import { QuizService } from "../../application/services/quiz.service";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
+import type { IQuizPort } from "../../application/ports/in/quiz/quiz.port";
 
 @Controller("quiz")
 export class QuizController {
     constructor(
-        private readonly quizService: QuizService
+        @Inject('IQuizPort') private readonly quizPort: IQuizPort
     ){}
 
     @Post()
@@ -20,7 +20,7 @@ export class QuizController {
     @ApiResponse({ status: 500, description: 'Erro inesperado ao criar quiz' })
     async registro(@Body() quizDto: CreateQuizDto): Promise<ApiResponseInterface> {
         try {
-          const result = await this.quizService.createQuiz(quizDto);
+          const result = await this.quizPort.createQuiz(quizDto);
           return result;
         } catch (error) {
           return {
@@ -37,7 +37,7 @@ export class QuizController {
     @ApiResponse({ status: 500, description: 'Erro inesperado ao criar perguntas' })
     async createQuestions(@Body() questionsDTO: CreateQuestionsDto): Promise<ApiResponseInterface> {
         try {
-          const result = await this.quizService.createQuestions(questionsDTO);
+          const result = await this.quizPort.createQuestions(questionsDTO);
           return result;
         } catch (error) {
           return {
@@ -52,9 +52,9 @@ export class QuizController {
     @ApiOperation({ summary: 'Busca o progresso do usuário no quiz' })
     @ApiResponse({ status: 200, description: 'Busca efetuada com sucesso' })
     @ApiResponse({ status: 500, description: 'Erro ao buscar questões' })
-    async getProgressQuiz(@Param('userId') userId: number): Promise<ApiResponseInterface> {
+    async getProgressQuiz(@Param('userId') userId: string): Promise<ApiResponseInterface> {
         try {
-            const dataQuestions = await this.quizService.getProgressQuiz(userId);
+            const dataQuestions = await this.quizPort.getProgressQuiz(userId);
             return dataQuestions;
         } catch (error) {
             return {
@@ -69,9 +69,9 @@ export class QuizController {
     @ApiOperation({ summary: 'Busca o progresso do usuário no quiz' })
     @ApiResponse({ status: 200, description: 'Busca efetuada com sucesso' })
     @ApiResponse({ status: 500, description: 'Erro ao buscar questões' })
-    async getQuestionQuiz(@Param('id') id: number): Promise<ApiResponseInterface> {
+    async getQuestionQuiz(@Param('id') id: string): Promise<ApiResponseInterface> {
         try {
-            const questions = await this.quizService.getQuestionQuiz(id);
+            const questions = await this.quizPort.getQuestionQuiz(id);
             return questions; 
         } catch (error) {
             return {
@@ -88,7 +88,7 @@ export class QuizController {
     @ApiResponse({ status: 500, description: 'Erro no processamento das questões' })
     async answerQuiz(@Body() answerDto: AnswerQuizDto): Promise<ApiResponseInterface<string>> {
         try {
-            const result = await this.quizService.answerQuiz(answerDto);
+            const result = await this.quizPort.answerQuiz(answerDto);
             return result;
         } catch (error) {
             return {
@@ -105,7 +105,7 @@ export class QuizController {
     @ApiResponse({ status: 500, description: 'Erro ao buscar questões' })
     async getAllQuiz(): Promise<ApiResponseInterface> {
         try {
-            const questions = await this.quizService.getAllQuiz();
+            const questions = await this.quizPort.getAllQuiz();
             return questions;
         } catch (error) {
             return {
@@ -120,9 +120,9 @@ export class QuizController {
     @ApiOperation({ summary: 'Busca lista de níveis de quiz' })
     @ApiResponse({ status: 200, description: 'Busca efetuada com sucesso' })
     @ApiResponse({ status: 500, description: 'Erro ao buscar níveis de quiz' })
-    async getAllQuizLevelsById(@Param('id') id: number): Promise<ApiResponseInterface> {
+    async getAllQuizLevelsById(@Param('id') id: string): Promise<ApiResponseInterface> {
         try {
-            const levels = await this.quizService.getAllQuizLevelsById(id);
+            const levels = await this.quizPort.getAllQuizLevelsById(id);
             return levels;
         } catch (error) {
             return {
@@ -139,7 +139,7 @@ export class QuizController {
     @ApiResponse({ status: 500, description: 'Erro ao buscar níveis de quiz' })
     async getAllQuizWithLevels(): Promise<ApiResponseInterface<any>> {
         try {
-            const levels = await this.quizService.getAllQuizWithLevels();
+            const levels = await this.quizPort.getAllQuizWithLevels();
             return levels;
         } catch (error) {
             return {
@@ -154,9 +154,9 @@ export class QuizController {
     @ApiOperation({ summary: 'Busca do quiz com level' })
     @ApiResponse({ status: 200, description: 'Busca efetuada com sucesso' })
     @ApiResponse({ status: 500, description: 'Erro ao buscar níveis de quiz' })
-    async getQuizWithLevels(@Param('id') id: number, @Param('levelId') levelId: number): Promise<ApiResponseInterface<any>> {
+    async getQuizWithLevels(@Param('id') id: string, @Param('levelId') levelId: string): Promise<ApiResponseInterface<any>> {
         try {
-            const levels = await this.quizService.getQuizWithLevels(id, levelId);
+            const levels = await this.quizPort.getQuizWithLevels(id, levelId);
             return levels;
         } catch (error) {
             return {
@@ -171,9 +171,9 @@ export class QuizController {
     @ApiOperation({ summary: 'Busca questões de um quiz' })
     @ApiResponse({ status: 200, description: 'Busca efetuada com sucesso' })
     @ApiResponse({ status: 500, description: 'Erro ao buscar questões' })
-    async getQuizQuestions(@Param('id') id: number): Promise<ApiResponseInterface<any>> {
+    async getQuizQuestions(@Param('id') id: string): Promise<ApiResponseInterface<any>> {
         try {
-            const questions = await this.quizService.getQuizQuestions(id);
+            const questions = await this.quizPort.getQuizQuestions(id);
             return questions;
         } catch (error) {
             return {
@@ -188,9 +188,9 @@ export class QuizController {
     @ApiOperation({ summary: 'Deletar um quiz' })
     @ApiResponse({ status: 200, description: 'Remoção efetuada com sucesso' })
     @ApiResponse({ status: 500, description: 'Erro ao remover quiz' })
-    async deleteQuizById(@Param('id') id: number, @Param('level_id') levelId: number): Promise<ApiResponseInterface<any>> {
+    async deleteQuizById(@Param('id') id: string, @Param('level_id') levelId: string): Promise<ApiResponseInterface<any>> {
         try {
-            const result = await this.quizService.deleteQuizById(id, levelId);
+            const result = await this.quizPort.deleteQuizById(id, levelId);
             return result;
         } catch (error) {
             return {
@@ -205,9 +205,9 @@ export class QuizController {
     @ApiOperation({ summary: 'Deletar uma questão de um quiz' })
     @ApiResponse({ status: 200, description: 'Remoção efetuada com sucesso' })
     @ApiResponse({ status: 500, description: 'Erro ao remover questão do quiz' })
-    async deleteQuizQuestion(@Param('quiz_level_id') quizLevelId: number, @Param('question_number') questionNumber: number): Promise<ApiResponseInterface<any>> {
+    async deleteQuizQuestion(@Param('quiz_level_id') quizLevelId: string, @Param('question_number') questionNumber: string): Promise<ApiResponseInterface<any>> {
         try {
-            const result = await this.quizService.deleteOneQuestion(quizLevelId, questionNumber);
+            const result = await this.quizPort.deleteOneQuestion(quizLevelId, String(questionNumber));
             return result;
         } catch (error) {
             return {
@@ -222,9 +222,9 @@ export class QuizController {
     @ApiOperation({ summary: 'Deletar todas as questões de um quiz' })
     @ApiResponse({ status: 200, description: 'Remoção efetuada com sucesso' })
     @ApiResponse({ status: 500, description: 'Erro ao remover questões do quiz' })
-    async deleteQuizQuestions(@Param('quiz_level_id') quizLevelId: number): Promise<ApiResponseInterface<any>> {
+    async deleteQuizQuestions(@Param('quiz_level_id') quizLevelId: string): Promise<ApiResponseInterface<any>> {
         try {
-            const result = await this.quizService.deleteAllQuestions(quizLevelId);
+            const result = await this.quizPort.deleteAllQuestions(quizLevelId);
             return result;
         } catch (error) {
             return {
@@ -239,9 +239,9 @@ export class QuizController {
     @ApiOperation({ summary: 'Atualizar um quiz' })
     @ApiResponse({ status: 200, description: 'Atualização efetuada com sucesso' })
     @ApiResponse({ status: 500, description: 'Erro ao atualizar quiz' })
-    async updateQuiz(@Param('id') id: number, @Body() quizDto: UpdateQuizDto): Promise<ApiResponseInterface<unknown>> {
+    async updateQuiz(@Param('id') id: string, @Body() quizDto: UpdateQuizDto): Promise<ApiResponseInterface<unknown>> {
         try {
-            const result = await this.quizService.updateQuiz(id, quizDto);
+            const result = await this.quizPort.updateQuiz(id, quizDto);
             return result;
         } catch (error) {
             return {
@@ -258,7 +258,7 @@ export class QuizController {
     @ApiResponse({ status: 500, description: 'Erro ao atualizar questões do quiz' })
     async updateQuestions(@Body('data') dataDto: UpdateQuestionsDto): Promise<ApiResponseInterface<{ totalUpdated: number }>> {
         try {
-            const result = await this.quizService.updateQuestions(dataDto);
+            const result = await this.quizPort.updateQuestions(dataDto);
             return result;
         } catch (error) {
             return {

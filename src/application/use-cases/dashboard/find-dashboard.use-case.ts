@@ -1,15 +1,16 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { DashboardInterface } from "../../../domain/interfaces/dashboard.interface";
-import { DashboardRepository } from "../../../infrastructure/repositories/dashboard.repository";
+import type { IDashboardRepository } from "../../ports/out/dashboard.port";
+import type { IFindDashboardPort } from "../../ports/in/dashboard/find-dashboard.port";
 
 @Injectable()
-export class FindDashboardUseCase {
+export class FindDashboardUseCase implements IFindDashboardPort {
     constructor(
-        private readonly dashboardRepository: DashboardRepository
+        @Inject('IDashboardRepository') private readonly dashboardRepository: IDashboardRepository
     ) {}
 
-    async getDashboard(): Promise<ApiResponseInterface<DashboardInterface>> {
+    async execute(): Promise<ApiResponseInterface<DashboardInterface>> {
         try{
             const numberUsersRegistered = await this.dashboardRepository.getNumberUsersRegistered();
 
@@ -37,11 +38,12 @@ export class FindDashboardUseCase {
                 message: 'Dashboard encontrado com sucesso',
                 data: [resultData]
             };
-        }catch(error){
+        } catch (error: unknown) {
+            const err = error as Error;
             return {
                 status: HttpStatus.INTERNAL_SERVER_ERROR,
                 message: 'Erro inesperado ao buscar dashboard',
-                error: error.message || error
+                error: (err?.message ?? String(error)),
             };
         }
     }

@@ -4,9 +4,9 @@ import { PartialType } from "@nestjs/mapped-types";
 import { QuestionDto } from "./create-questions.dto";
 
 export class UpdateQuestionDto extends PartialType(QuestionDto) {
-    @IsInt({ message: "quiz_level_id deve ser inteiro" })
+    @IsString({ message: "quiz_level_id deve ser uma string" })
     @IsNotEmpty({ message: "quiz_level_id não pode estar vazio" })
-    readonly quiz_level_id: number;
+    readonly quiz_level_id: string;
 
     @IsInt({ message: "question_number deve ser inteiro" })
     @IsOptional()

@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Events } from "../database/sequelize/models/events.model";
-
+import type { IEventsRepository } from "../../application/ports/out/events.port";
 
 @Injectable()
-export class EventsRepository {
+export class EventsRepository implements IEventsRepository {
     constructor(
         @InjectModel(Events) private readonly eventsModel: typeof Events
     ){}
@@ -17,11 +17,11 @@ export class EventsRepository {
         return await this.eventsModel.findAll();
     }
 
-    async deleteEvent(id: number): Promise<number> {
+    async deleteEvent(id: string): Promise<number> {
         return await this.eventsModel.destroy({where: {id}});
     }
 
-    async findEventById(id: number): Promise<Events> {
+    async findEventById(id: string): Promise<Events> {
         return await this.eventsModel.findByPk(id);
     }
 

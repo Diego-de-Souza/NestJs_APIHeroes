@@ -18,7 +18,7 @@ export class CreatePaymentIntentDto {
 
 export class CreateSubscriptionDto {
     @IsString({ message: 'Price ID deve ser uma string' })
-    priceId: string;
+    readonly priceId: string;
 
     @IsOptional()
     @IsString({ message: 'Customer ID deve ser uma string' })

@@ -32,7 +32,13 @@ export class UpdateNewsDto {
     @MaxLength(50, { message: "Tema deve conter menos de 50 caracteres" })
     readonly theme?: string;
 
-    @IsInt({ message: "Usuario ID deve ser um número inteiro" })
+
+    @IsOptional()
+    @IsString({ message: "Autor deve ser string" })
+    @MaxLength(50, { message: "Autor deve conter menos de 50 caracteres" })
+    readonly author?: string;
+
+    @IsString({ message: "Usuario ID deve ser uma string (UUID)" })
     @IsNotEmpty({ message: "Usuario ID é obrigatório" })
-    readonly usuario_id: number;
+    readonly usuario_id: string;
 }

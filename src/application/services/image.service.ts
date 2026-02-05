@@ -90,17 +90,33 @@ export class ImageService {
         }
     }
 
-    async deleteImage(imageUrl: string): Promise<void> {
-        try{
+    async deleteImage(imageUrl: string): Promise<boolean> {
+        try {
             const publicUrl = process.env.R2_PUBLIC_URL!;
+            
+            if (!imageUrl.includes(publicUrl)) {
+                this.logger.warn(`URL não pertence ao bucket: ${imageUrl}`);
+                return false;
+            }
+            
             let key = imageUrl.replace(publicUrl, '').replace(/^\/+/, '');
-
+            
+            if (!key) {
+                this.logger.error('Key vazia após processamento da URL');
+                return false;
+            }
+            
             await this.connection_s3.send(new DeleteObjectCommand({
                 Bucket: process.env.R2_BUCKET,
                 Key: key
             }));
-        }catch(error){
-            this.logger.error("Error deleting image:", error);
+            
+            this.logger.log(`Imagem deletada com sucesso: ${key}`);
+            return true;
+            
+        } catch (error) {
+            this.logger.error(`Erro ao deletar imagem ${imageUrl}:`, error);
+            return false;
         }
     }
 }

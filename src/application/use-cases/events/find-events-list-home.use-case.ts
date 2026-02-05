@@ -1,18 +1,18 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Events } from "../../../infrastructure/database/sequelize/models/events.model";
-import { EventsRepository } from "../../../infrastructure/repositories/events.repository";
-
+import type { IEventsRepository } from "../../../application/ports/out/events.port";
+import type { IFindEventsListHomePort } from "../../../application/ports/in/events/find-events-list-home.port";
 
 @Injectable()
-export class FindEventsListHomeUseCase {
+export class FindEventsListHomeUseCase implements IFindEventsListHomePort {
     constructor(
-        private readonly eventsRepository: EventsRepository
+        @Inject('IEventsRepository') private readonly eventsRepository: IEventsRepository
     ) {}
 
-    async listEventsHome(): Promise<ApiResponseInterface<Events>> {
+    async execute(): Promise<ApiResponseInterface<Events>> {
         try{
-            const eventsForHome = await this.eventsRepository.findEventsForHome();
+            const eventsForHome = await this.eventsRepository.findEventsForHome() as Events[];
             return {
                 status: 200,
                 message: 'Eventos para home listados com sucesso.',

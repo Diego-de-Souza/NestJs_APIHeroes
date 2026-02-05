@@ -1,14 +1,17 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Article } from "../../../infrastructure/database/sequelize/models/article.model";
-import { ArticlesRepository } from "../../../infrastructure/repositories/articles.repository";
+import type { IFindArticleByIdPort } from "src/application/ports/in/article/find-article-by-id.port";
+import type { IArticlePort } from "src/application/ports/out/article.port";
 
 @Injectable()
-export class FindArticleByIdUseCase {
+export class FindArticleByIdUseCase implements IFindArticleByIdPort {
 
-    constructor( private readonly articleRepository: ArticlesRepository){}
+    constructor( 
+        @Inject('IArticlePort') private readonly articleRepository: IArticlePort
+    ){}
 
-    async findArticleById(id: number): Promise<ApiResponseInterface<Article>>{
+    async execute(id: string): Promise<ApiResponseInterface<Article>>{
         const article = await this.articleRepository.findArticleById(id);
 
         if(!article){

@@ -5,19 +5,21 @@ import { Games } from '../../../../../infrastructure/database/sequelize/models/g
 @Table({ tableName: 'user_game_process', timestamps: false })
 export class UserGameProcess extends Model<UserGameProcess> {
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    allowNull: false,
     primaryKey: true,
-    autoIncrement: true,
+    unique: true
   })
-  id: number;
+  id: string;
 
   @ForeignKey(() => User)
-  @Column({ type: DataType.INTEGER, allowNull: false, field: 'user_id' })
-  user_id: number;
+  @Column({ type: DataType.UUID, allowNull: false, field: 'user_id' })
+  user_id: string;
 
   @ForeignKey(() => Games)
-  @Column({ type: DataType.INTEGER, allowNull: false, field: 'game_id' })
-  game_id: number;
+  @Column({ type: DataType.UUID, allowNull: false, field: 'game_id' })
+  game_id: string;
 
   @Column({ type: DataType.SMALLINT, allowNull: false, field: 'lvl_user' })
   lvl_user: number;

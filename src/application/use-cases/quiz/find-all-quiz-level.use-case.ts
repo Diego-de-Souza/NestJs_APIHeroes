@@ -10,7 +10,7 @@ export class FindAllQuizLevelByIdUseCase {
         private readonly quizRepository: QuizRepository
     ){}
 
-    async getAllQuizLevelsById(id: number): Promise<ApiResponseInterface<{ id: number; name: string; questionCount: number }>> {
+    async getAllQuizLevelsById(id: string): Promise<ApiResponseInterface<{ id: string; name: string; questionCount: number }>> {
         try{
             this.logger.debug(`Buscando níveis de quiz para ID: ${id}`);
             const quizLevels = await this.quizRepository.findAllQuizLevelsById(id);
@@ -19,7 +19,7 @@ export class FindAllQuizLevelByIdUseCase {
                 throw new NotFoundException('Níveis de quiz não encontrados.');
             }
 
-            const _dataQuizLevels: Array<{ id: number; name: string; questionCount: number }> = [];
+            const _dataQuizLevels: Array<{ id: string; name: string; questionCount: number }> = [];
             for(let quizLevel of quizLevels){
                 _dataQuizLevels.push({ id: quizLevel.id, name: quizLevel.name, questionCount: quizLevel.questions });
             }

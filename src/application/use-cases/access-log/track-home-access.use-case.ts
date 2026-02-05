@@ -13,7 +13,7 @@ export class TrackHomeAccessUseCase {
     ) {}
 
     async execute(
-        userId: number | null,
+        userId: string | null,
         ip: string,
         userAgent: string | undefined,
         route: string = '/home'

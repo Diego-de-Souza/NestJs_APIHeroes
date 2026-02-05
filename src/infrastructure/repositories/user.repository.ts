@@ -4,12 +4,13 @@ import { User } from "../database/sequelize/models/user.model";
 import { CreateUserDTO } from "../../interface/dtos/user/userCreate.dto";
 import { UpdateUserDTO } from "../../interface/dtos/user/UserUpdate.dto";
 import { Role } from "../database/sequelize/models/roles.model";
+import type { IUserRepository } from "../../application/ports/out/user.port";
 
 @Injectable()
-export class UserRepository {
+export class UserRepository implements IUserRepository {
   constructor(@InjectModel(User) private readonly userModel: typeof User) {}
 
-  async findById(id: number): Promise<User | null> {
+  async findById(id: string): Promise<User | null> {
     return this.userModel.findOne({ where: { id } });
   }
 
@@ -21,7 +22,7 @@ export class UserRepository {
     return this.userModel.create(dto);
   }
 
-  async update(id: number, dto: UpdateUserDTO): Promise<void> {
+  async update(id: string, dto: UpdateUserDTO): Promise<void> {
     await this.userModel.update(dto, { where: { id } });
   }
 
@@ -29,14 +30,14 @@ export class UserRepository {
     return this.userModel.findAll();
   }
 
-  async updatePassword(id: number, newPassword: string): Promise<void> {
+  async updatePassword(id: string, newPassword: string): Promise<void> {
     await this.userModel.update(
         { password: newPassword },
         { where: { id } }
     );
   }
 
-  async findUserRoleById(id: number): Promise<User | null> {
+  async findUserRoleById(id: string): Promise<User | null> {
     return this.userModel.findOne({
       where: { id },
       include: [{ model: Role, as: 'roles' }]

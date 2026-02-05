@@ -1,16 +1,17 @@
-import { HttpStatus, Injectable, Logger, NotFoundException, ForbiddenException } from "@nestjs/common";
+import { HttpStatus, Injectable, Logger, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import { NotificationsRepository } from "../../../infrastructure/repositories/notifications.repository";
+import type { INotificationsRepository } from "../../ports/out/notifications.port";
+import type { IDeleteNotificationPort } from "../../ports/in/notifications/delete-notification.port";
 
 @Injectable()
-export class DeleteNotificationUseCase {
+export class DeleteNotificationUseCase implements IDeleteNotificationPort {
     private readonly logger = new Logger(DeleteNotificationUseCase.name);
 
     constructor(
-        private readonly notificationsRepository: NotificationsRepository
-    ){}
+        @Inject('INotificationsRepository') private readonly notificationsRepository: INotificationsRepository
+    ) {}
 
-    async deleteNotification(id: number, usuario_id: number): Promise<ApiResponseInterface<void>>{
+    async execute(id: string, usuario_id: string): Promise<ApiResponseInterface<void>> {
         try {
             const notification = await this.notificationsRepository.findNotificationById(id);
 

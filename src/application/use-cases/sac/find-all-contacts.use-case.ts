@@ -1,18 +1,19 @@
-import { HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { HttpStatus, Injectable, Logger, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { SacContact } from "../../../infrastructure/database/sequelize/models/sac-contact.model";
-import { SacRepository } from "../../../infrastructure/repositories/sac.repository";
 import { FilterContactsDto } from "../../../interface/dtos/sac/filter-contacts.dto";
+import type { ISacRepository } from "../../ports/out/sac.port";
+import type { IFindAllContactsPort } from "../../ports/in/sac/find-all-contacts.port";
 
 @Injectable()
-export class FindAllContactsUseCase {
+export class FindAllContactsUseCase implements IFindAllContactsPort {
     private readonly logger = new Logger(FindAllContactsUseCase.name);
 
     constructor(
-        private readonly sacRepository: SacRepository
+        @Inject('ISacRepository') private readonly sacRepository: ISacRepository
     ){}
 
-    async findAllContacts(filters: FilterContactsDto): Promise<ApiResponseInterface<SacContact>>{
+    async execute(filters: FilterContactsDto): Promise<ApiResponseInterface<SacContact>>{
         try {
             const { contacts, total } = await this.sacRepository.findAllContacts(filters);
 

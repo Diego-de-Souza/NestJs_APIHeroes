@@ -1,5 +1,5 @@
-import { IsOptional, IsInt, IsEnum, Min, Max } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsOptional, IsInt, IsEnum, Min, Max, IsString } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 
 export enum CommentSortBy {
   NEWEST = 'newest',
@@ -9,14 +9,14 @@ export enum CommentSortBy {
 
 export class CommentFiltersDto {
   @IsOptional()
-  @Type(() => Number)
-  @IsInt({ message: 'articleId deve ser um número inteiro' })
-  articleId?: number;
+  @Transform(({ value }) => (value != null && value !== '' ? String(value) : undefined))
+  @IsString({ message: 'articleId deve ser uma string' })
+  articleId?: string;
 
   @IsOptional()
-  @Type(() => Number)
-  @IsInt({ message: 'userId deve ser um número inteiro' })
-  userId?: number;
+  @Transform(({ value }) => (value != null && value !== '' ? String(value) : undefined))
+  @IsString({ message: 'userId deve ser uma string' })
+  userId?: string;
 
   @IsOptional()
   @IsEnum(CommentSortBy, { message: 'sortBy deve ser: newest, oldest ou mostLiked' })

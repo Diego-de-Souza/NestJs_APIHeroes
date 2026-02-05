@@ -1,15 +1,18 @@
-import { BadRequestException, HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, HttpStatus, Injectable, Logger, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Heroes } from "../../../infrastructure/database/sequelize/models/heroes.model";
-import { HeroesRepository } from "../../../infrastructure/repositories/heroes.repository";
+import type { IHeroesRepository } from "../../ports/out/heroes.port";
+import type { IFindHeroesByReleaseYearPort } from "../../ports/in/heroes/find-heroes-by-release-year.port";
 
 @Injectable()
-export class FindHeroesByReleaseYearUseCase {
+export class FindHeroesByReleaseYearUseCase implements IFindHeroesByReleaseYearPort {
     private readonly logger = new Logger(FindHeroesByReleaseYearUseCase.name);
 
-    constructor(private readonly heroesRepository: HeroesRepository) {}
+    constructor(
+        @Inject('IHeroesRepository') private readonly heroesRepository: IHeroesRepository
+    ) {}
 
-    async findHeroesByReleaseYear(year: number): Promise<ApiResponseInterface<Heroes>> {
+    async execute(year: number): Promise<ApiResponseInterface<Heroes>> {
         try{
             if (!year || year < 1900 || year > 2100) {
                 throw new BadRequestException('Ano de lançamento inválido');

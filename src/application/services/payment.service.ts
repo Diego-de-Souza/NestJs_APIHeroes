@@ -3,9 +3,10 @@ import Stripe from 'stripe';
 import { PaymentRepository } from '../../infrastructure/repositories/payment.repository';
 import { PlanType } from '../../domain/interfaces/subscription-plans.interface';
 import { SUBSCRIPTION_PLANS, isValidPlan } from '../../shared/utils/subscription-plans.utils';
+import type { IPaymentPort } from '../ports/in/payment/payment.port';
 
 @Injectable()
-export class PaymentService {
+export class PaymentService implements IPaymentPort {
   private readonly logger = new Logger(PaymentService.name);
   
   private stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -15,7 +16,7 @@ export class PaymentService {
   constructor(private readonly paymentRepository: PaymentRepository) {}
 
   // ✅ CRIAR PAYMENT INTENT PARA PLANO ESPECÍFICO
-  async createPaymentIntent(userId: number, planType: string, amount: number, currency: string = 'brl') {
+  async createPaymentIntent(userId: string, planType: string, amount: number, currency: string = 'brl') {
     try {
       // Valida se o plano existe
       if (!isValidPlan(planType)) {
@@ -80,7 +81,7 @@ export class PaymentService {
   }
 
   // ✅ CRIAR SUBSCRIPTION
-  async createSubscription(userId: number, planType: string, customerId?: string) {
+  async createSubscription(userId: string, planType: string, customerId?: string) {
     try {
       // Se não tem customer, cria um
       if (!customerId) {
@@ -186,7 +187,7 @@ export class PaymentService {
   }
 
   // ✅ VERIFICAR STATUS PREMIUM COM DETALHES
-  async checkPremiumStatus(userId: number) {
+  async checkPremiumStatus(userId: string) {
     const details = await this.paymentRepository.getActiveSubscriptionDetails(userId);
     
     return {
@@ -199,7 +200,7 @@ export class PaymentService {
   }
 
   // ✅ CANCELAR SUBSCRIPTION
-  async cancelSubscription(userId: number) {
+  async cancelSubscription(userId: string) {
     try {
       const subscription = await this.paymentRepository.findSubscriptionByUserId(userId);
       

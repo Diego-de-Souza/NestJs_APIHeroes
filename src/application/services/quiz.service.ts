@@ -20,9 +20,10 @@ import { FindOneQuizAndQuizLevelUseCase } from "../../application/use-cases/quiz
 import { UpdateQuizUseCase } from "../../application/use-cases/quiz/update-quiz.use-case";
 import { FindAllQuestionsUseCase } from "../../application/use-cases/quiz/find-all-questions.use-case";
 import { UpdateQuestionsUseCase } from "../../application/use-cases/quiz/update-questions.use-case";
+import type { IQuizPort } from "../ports/in/quiz/quiz.port";
 
 @Injectable()
-export class QuizService {
+export class QuizService implements IQuizPort {
     
     constructor(
         private readonly createQuizUseCase: CreateQuizUseCase,
@@ -50,11 +51,11 @@ export class QuizService {
         return await this.createQuestionUseCase.createQuestions(questionsDTO);
     }
 
-    async getProgressQuiz(userId: number): Promise<ApiResponseInterface>{
+    async getProgressQuiz(userId: string): Promise<ApiResponseInterface>{
         return await this.findProgressQuestionsByTheme.getProgressQuiz(userId);
     }
 
-    async getQuestionQuiz(id: number): Promise<ApiResponseInterface> {
+    async getQuestionQuiz(id: string): Promise<ApiResponseInterface> {
         return await this.findQuestionByIdUseCase.findQuestionById(id);
     }
 
@@ -66,7 +67,7 @@ export class QuizService {
         return await this.findAllQuizUseCase.getAllQuiz();
     }
 
-    async getAllQuizLevelsById(id: number): Promise<ApiResponseInterface<{ id: number; name: string; questionCount: number }>> {
+    async getAllQuizLevelsById(id: string): Promise<ApiResponseInterface<{ id: string; name: string; questionCount: number }>> {
         return await this.findAllQuizLevelsByIdUseCase.getAllQuizLevelsById(id);
     }
     
@@ -74,27 +75,27 @@ export class QuizService {
         return await this.findAllQuizWithLevelsUseCase.getAllQuizWithLevels();
     }
 
-    async getQuizWithLevels(id: number, levelId: number): Promise<ApiResponseInterface<unknown>> {
+    async getQuizWithLevels(id: string, levelId: string): Promise<ApiResponseInterface<unknown>> {
         return await this.findOneQuizAndQuizLevelUseCase.findOneQuizAndQuizLevel(id, levelId);
     }
 
-    async getQuizQuestions(id: number): Promise<ApiResponseInterface<unknown>> {
+    async getQuizQuestions(id: string): Promise<ApiResponseInterface<unknown>> {
         return await this.findAllQuestionsUseCase.findAllQuestions(id);
     }
 
-    async deleteQuizById(id: number, levelId: number): Promise<ApiResponseInterface<unknown>> {
+    async deleteQuizById(id: string, levelId: string): Promise<ApiResponseInterface<unknown>> {
         return await this.deleteQuizByIdUseCase.deleteQuizById(id, levelId);
     }
 
-    async deleteOneQuestion(quizLevelId: number, questionNumber: number): Promise<ApiResponseInterface<unknown>> {
+    async deleteOneQuestion(quizLevelId: string, questionNumber: string): Promise<ApiResponseInterface<unknown>> {
         return await this.deleteOneQuizUseCase.deleteOneQuestion(quizLevelId, questionNumber);
     }
 
-    async deleteAllQuestions(quizLevelId: number): Promise<ApiResponseInterface<unknown>> {
+    async deleteAllQuestions(quizLevelId: string): Promise<ApiResponseInterface<unknown>> {
         return await this.deleteAllQuestionsUseCase.deleteAllQuestions(quizLevelId);
     }
 
-    async updateQuiz(id: number, quizDto: UpdateQuizDto): Promise<ApiResponseInterface<unknown>> {
+    async updateQuiz(id: string, quizDto: UpdateQuizDto): Promise<ApiResponseInterface<unknown>> {
         return await this.updateQuizUseCase.updateQuiz(id, quizDto);
     }
 

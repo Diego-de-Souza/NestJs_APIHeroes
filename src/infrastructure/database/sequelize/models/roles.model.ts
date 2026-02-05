@@ -4,18 +4,20 @@ import { User } from './user.model';
 @Table({ tableName: 'roles', timestamps: true })
 export class Role extends Model<Role> {
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    allowNull: false,
     primaryKey: true,
-    autoIncrement: true,
+    unique: true
   })
-  id: number;
+  id: string;
 
   @Column({ type: DataType.STRING(50), allowNull: false })
   role: string;
 
   @ForeignKey(() => User)
-  @Column({ type: DataType.INTEGER, allowNull: false })
-  usuario_id: number;
+  @Column({ type: DataType.UUID, allowNull: false, field: 'usuario_id' })
+  usuario_id: string;
 
   @Column({ type: DataType.STRING(50), allowNull: false })
   access: string;

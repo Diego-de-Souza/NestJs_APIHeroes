@@ -32,6 +32,10 @@ export class CreateNewsDto {
     @MaxLength(50, { message: "Tema deve conter menos de 50 caracteres" })
     readonly theme: string;
 
+    @IsString({ message: "Autor deve ser string" })
+    @IsNotEmpty({ message: "Autor não pode estar vazio" })
+    readonly author: string;
+
     @IsInt({ message: "Usuario ID deve ser um número inteiro" })
     @IsNotEmpty({ message: "Usuario ID é obrigatório" })
     readonly usuario_id: number;

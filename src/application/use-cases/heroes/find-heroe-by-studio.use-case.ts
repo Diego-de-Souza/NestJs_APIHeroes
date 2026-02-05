@@ -1,15 +1,18 @@
-import { BadRequestException, HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, HttpStatus, Injectable, Logger, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Heroes } from "../../../infrastructure/database/sequelize/models/heroes.model";
-import { HeroesRepository } from "../../../infrastructure/repositories/heroes.repository";
+import type { IHeroesRepository } from "../../ports/out/heroes.port";
+import type { IFindHeroesByStudioPort } from "../../ports/in/heroes/find-heroes-by-studio.port";
 
 @Injectable()
-export class FindHeroesByStudioUseCase {
+export class FindHeroesByStudioUseCase implements IFindHeroesByStudioPort {
     private readonly logger = new Logger(FindHeroesByStudioUseCase.name);
 
-    constructor(private readonly heroesRepository: HeroesRepository) {}
+    constructor(
+        @Inject('IHeroesRepository') private readonly heroesRepository: IHeroesRepository
+    ) {}
 
-    async findHeroesByStudio(studioId: number): Promise<ApiResponseInterface<Heroes>> {
+    async execute(studioId: string): Promise<ApiResponseInterface<Heroes>> {
         try{
             if (!studioId) {
                 throw new BadRequestException('Studio ID is required');

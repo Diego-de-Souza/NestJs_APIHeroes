@@ -58,7 +58,7 @@ export class AccessLogRepository {
     }
 
     async hasRecentAccess(
-        userId: number | null,
+        userId: string | null,
         ip: string,
         actionType: string,
         minutesThreshold: number = 5

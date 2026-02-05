@@ -1,7 +1,7 @@
 
 
 export interface HeroesData<T = any> {
-    id: number,
+    id: string,
     name: string,
     studio: string,
     power_type: string,

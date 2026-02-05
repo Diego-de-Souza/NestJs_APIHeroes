@@ -8,9 +8,9 @@ import {
 } from "class-validator";
 
 export class CreateNotificationDto {
-    @IsInt({ message: "Usuario ID deve ser um número inteiro" })
+    @IsString({ message: "Usuario ID deve ser uma string" })
     @IsNotEmpty({ message: "Usuario ID é obrigatório" })
-    readonly usuario_id: number;
+    readonly usuario_id: string;
 
     @IsString({ message: "Título deve ser string" })
     @IsNotEmpty({ message: "Título não pode estar vazio" })

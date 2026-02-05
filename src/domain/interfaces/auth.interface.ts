@@ -3,7 +3,7 @@ export interface SignInResponse {
     has_totp: boolean;
     session_token: string;
     user: {
-        id: number;
+        id: string;
         nickname: string;
         email: string;
         role?: string;

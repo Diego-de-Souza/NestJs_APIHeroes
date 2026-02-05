@@ -1,22 +1,21 @@
-import { HttpStatus, Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, InternalServerErrorException, Inject } from '@nestjs/common';
 import { ApiResponseInterface } from '../../../domain/interfaces/APIResponse.interface';
-import { ArticlesRepository } from '../../../infrastructure/repositories/articles.repository';
 import { SearchArticlesDto } from '../../../interface/dtos/articles/search-articles.dto';
 import { Article } from '../../../infrastructure/database/sequelize/models/article.model';
 import { Op } from 'sequelize';
+import type { ISearchArticlePort } from 'src/application/ports/in/article/search-article.port';
+import type { IArticlePort } from 'src/application/ports/out/article.port';
 
 @Injectable()
-export class SearchArticlesUseCase {
+export class SearchArticlesUseCase implements ISearchArticlePort {
   private readonly logger = new Logger(SearchArticlesUseCase.name);
 
   constructor(
-    private readonly articlesRepository: ArticlesRepository,
+    @Inject('IArticlePort') private readonly articleRepository: IArticlePort
   ) {}
 
   async execute(searchDto: SearchArticlesDto): Promise<ApiResponseInterface<Article>> {
     try {
-      const { Article } = await import('../../../infrastructure/database/sequelize/models/article.model');
-      
       const where: any = {};
       const order: any = [];
 
@@ -79,15 +78,10 @@ export class SearchArticlesUseCase {
       const offset = searchDto.offset || 0;
 
       // Buscar artigos
-      const articles = await Article.findAll({
-        where,
-        order,
-        limit,
-        offset,
-      });
+      const articles = await this.articleRepository.searchAllArticles(where, order, limit, offset);
 
       // Contar total
-      const total = await Article.count({ where });
+      const total = await this.articleRepository.countArticles(where);
 
       return {
         status: HttpStatus.OK,

@@ -1,5 +1,5 @@
 export interface QuizInterface {
-    id: number;
+    id: string;
     name: string;
     logo: string | null;
     theme: string;
@@ -10,8 +10,8 @@ export interface QuizWithLevelsInterface extends QuizInterface {
 }
 
 export interface QuizLevelInterface {
-    id: number;
-    quiz_id: number;
+    id: string;
+    quiz_id: string;
     name: string;
     difficulty: string;
     unlocked: boolean;

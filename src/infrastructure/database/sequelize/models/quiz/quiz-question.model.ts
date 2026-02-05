@@ -4,15 +4,17 @@ import { QuizLevel } from './quiz-level.model';
 @Table({ tableName: 'quiz_questions', timestamps: false })
 export class QuizQuestion extends Model<QuizQuestion> {
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    allowNull: false,
     primaryKey: true,
-    autoIncrement: true,
+    unique: true
   })
-  id: number;
+  id: string;
 
   @ForeignKey(() => QuizLevel)
-  @Column({ type: DataType.INTEGER, field: 'quiz_level_id' })
-  quiz_level_id: number;
+  @Column({ type: DataType.UUID, field: 'quiz_level_id' })
+  quiz_level_id: string;
 
   @Column({ type: DataType.TEXT })
   question: string;

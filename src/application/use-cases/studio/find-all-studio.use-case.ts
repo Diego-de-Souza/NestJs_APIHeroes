@@ -1,16 +1,16 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Inject } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Studio } from "../../../infrastructure/database/sequelize/models/studio.model";
-import { StudioRepository } from "../../../infrastructure/repositories/studio.repository";
+import type { IStudioRepository } from "../../ports/out/studio.port";
+import type { IFindAllStudioPort } from "../../ports/in/studio/find-all-studio.port";
 
 @Injectable()
-export class FindAllStudioUseCase{
-
+export class FindAllStudioUseCase implements IFindAllStudioPort {
     constructor(
-        private readonly studioRepository: StudioRepository
-    ){}
+        @Inject('IStudioRepository') private readonly studioRepository: IStudioRepository
+    ) {}
 
-    async findAllStudio(): Promise<ApiResponseInterface<Studio>> {
+    async execute(): Promise<ApiResponseInterface<Studio>> {
         const studioAll = await this.studioRepository.findAllStudio();
 
         if(!studioAll){
