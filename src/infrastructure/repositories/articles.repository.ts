@@ -4,8 +4,8 @@ import { Op, QueryTypes, WhereOptions } from "sequelize";
 import { Article } from "../database/sequelize/models/article.model";
 import { CreateArticleDto } from "../../interface/dtos/articles/articlesCreate.dto";
 import { UpdateArticlesDto } from "../../interface/dtos/articles/articlesUpdate.dto";
-import type { IArticlePort } from "src/application/ports/out/article.port";
-import { SearchSuggestionsDto } from "src/interface/dtos/articles/search-suggestions.dto";
+import type { IArticlePort } from "../../application/ports/out/article.port";
+import { SearchSuggestionsDto } from "../../interface/dtos/articles/search-suggestions.dto";
 
 @Injectable()
 export class ArticlesRepository implements IArticlePort {

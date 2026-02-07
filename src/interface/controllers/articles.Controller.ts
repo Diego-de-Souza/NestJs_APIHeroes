@@ -6,22 +6,22 @@ import { Article } from "../../infrastructure/database/sequelize/models/article.
 import { SearchArticlesDto } from "../dtos/articles/search-articles.dto";
 import { SearchSuggestionsDto } from "../dtos/articles/search-suggestions.dto";
 import { AuthGuard } from "../guards/auth.guard";
-import type { IFindArticlesForHomepagePort } from "src/application/ports/in/article/find-articles-for-homepage.port";
-import type { ICreateArticlePort } from "src/application/ports/in/article/create-article.port";
+import type { IFindArticlesForHomepagePort } from "../../application/ports/in/article/find-articles-for-homepage.port";
+import type { ICreateArticlePort } from "../../application/ports/in/article/create-article.port";
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from "@nestjs/swagger";
-import type { IUpdateArticlePort } from "src/application/ports/in/article/update-article.port";
-import type { IFindArticleByIdPort } from "src/application/ports/in/article/find-article-by-id.port";
-import type { IFindAllArticlePort } from "src/application/ports/in/article/find-all-article.port";
-import type { IDeleteArticlePort } from "src/application/ports/in/article/delete-article.port";
-import { ISearchArticlePort } from "src/application/ports/in/article/search-article.port";
-import type { IGetSearchSuggestionsPort } from "src/application/ports/in/article/get-search-suggestions.port";
-import type { ICreateClientArticlePort } from "src/application/ports/in/article/create-client-article.port";
-import type { IFindClientArticlesByUserIdPort } from "src/application/ports/in/article/find-client-articles-by-user-id.port";
-import type { IFindClientArticleByIdPort } from "src/application/ports/in/article/find-client-article-by-id.port";
-import type { IUpdateClientArticlePort } from "src/application/ports/in/article/update-client-article.port";
-import type { IDeleteClientArticlePort } from "src/application/ports/in/article/delete-client-article.port";
+import type { IUpdateArticlePort } from "../../application/ports/in/article/update-article.port";
+import type { IFindArticleByIdPort } from "../../application/ports/in/article/find-article-by-id.port";
+import type { IFindAllArticlePort } from "../../application/ports/in/article/find-all-article.port";
+import type { IDeleteArticlePort } from "../../application/ports/in/article/delete-article.port";
+import { ISearchArticlePort } from "../../application/ports/in/article/search-article.port";
+import type { IGetSearchSuggestionsPort } from "../../application/ports/in/article/get-search-suggestions.port";
+import type { ICreateClientArticlePort } from "../../application/ports/in/article/create-client-article.port";
+import type { IFindClientArticlesByUserIdPort } from "../../application/ports/in/article/find-client-articles-by-user-id.port";
+import type { IFindClientArticleByIdPort } from "../../application/ports/in/article/find-client-article-by-id.port";
+import type { IUpdateClientArticlePort } from "../../application/ports/in/article/update-client-article.port";
+import type { IDeleteClientArticlePort } from "../../application/ports/in/article/delete-client-article.port";
 import{ DeleteManyArticlesDto } from "../dtos/articles/delete-many-articles.dto";
-import type { IDeleteManyClientArticlePort } from "src/application/ports/in/article/delete-many-client-article.port";
+import type { IDeleteManyClientArticlePort } from "../../application/ports/in/article/delete-many-client-article.port";
 
 @Controller("articles")
 export class ArticlesController {

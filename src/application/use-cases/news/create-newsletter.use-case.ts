@@ -1,9 +1,9 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import type { ICreateNewsletterPort } from "src/application/ports/in/newsletter/create-newsletter.port";
-import type { INewsletterRepository } from "src/application/ports/out/newsletter.port";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { NewsletterInterface } from "src/domain/interfaces/newsletter.interface";
-import { CreateNewsletterDto } from "src/interface/dtos/news/create-newsletter.dto";
+import type { ICreateNewsletterPort } from "../../ports/in/newsletter/create-newsletter.port";
+import type { INewsletterRepository } from "../../ports/out/newsletter.port";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { NewsletterInterface } from "../../../domain/interfaces/newsletter.interface";
+import { CreateNewsletterDto } from "../../../interface/dtos/news/create-newsletter.dto";
 import { ImageService } from "../../services/image.service";
 
 @Injectable()

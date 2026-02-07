@@ -7,7 +7,7 @@ import { CreateTeamUseCase } from '../../application/use-cases/team/create-team.
 import { findTeamByIdUseCase } from '../../application/use-cases/team/find-team-by-id.use-case';
 import { FindAllTeamUseCase } from '../../application/use-cases/team/find-all-team.use-case';
 import { AuthModule } from './auth.module';
-import { UpdateTeamUseCase } from 'src/application/use-cases/team/update-team.use-case';
+import { UpdateTeamUseCase } from '../../application/use-cases/team/update-team.use-case';
 
 /**
  * Módulo Team – arquitetura Clean/Hexagonal.

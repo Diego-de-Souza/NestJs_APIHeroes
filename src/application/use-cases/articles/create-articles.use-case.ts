@@ -3,8 +3,8 @@ import { ImageService } from "../../../application/services/image.service";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Article } from "../../../infrastructure/database/sequelize/models/article.model";
 import { CreateArticleDto } from "../../../interface/dtos/articles/articlesCreate.dto";
-import type { ICreateArticlePort } from "src/application/ports/in/article/create-article.port";
-import type { IArticlePort } from "src/application/ports/out/article.port";
+import type { ICreateArticlePort } from "../../ports/in/article/create-article.port";
+import type { IArticlePort } from "../../ports/out/article.port";
 
 @Injectable()
 export class CreateArticleUseCase implements ICreateArticlePort {

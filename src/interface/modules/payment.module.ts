@@ -8,7 +8,7 @@ import { AuthModule } from './auth.module';
 import { Subscription } from '../../infrastructure/database/sequelize/models/subscription.model';
 import { Payment } from '../../infrastructure/database/sequelize/models/payment.model';
 import { models } from '../../infrastructure/database/sequelize/models/index.model';
-import { UserRepository } from 'src/infrastructure/repositories/user.repository';
+import { UserRepository } from '../../infrastructure/repositories/user.repository';
 
 @Module({
   imports: [

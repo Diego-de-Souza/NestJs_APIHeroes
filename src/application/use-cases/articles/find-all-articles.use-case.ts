@@ -1,8 +1,8 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { Article } from "../../../infrastructure/database/sequelize/models/article.model";
-import type { IArticlePort } from "src/application/ports/out/article.port";
-import type { IFindAllArticlePort } from "src/application/ports/in/article/find-all-article.port";
+import type { IArticlePort } from "../../ports/out/article.port";
+import type { IFindAllArticlePort } from "../../ports/in/article/find-all-article.port";
 
 @Injectable()
 export class FindAllArticleUseCase implements IFindAllArticlePort {

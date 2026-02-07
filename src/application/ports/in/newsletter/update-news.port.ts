@@ -1,6 +1,6 @@
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { News } from "src/infrastructure/database/sequelize/models/news.model";
-import { UpdateNewsDto } from "src/interface/dtos/news/update-news.dto";
+import { ApiResponseInterface } from "../../../../domain/interfaces/APIResponse.interface";
+import { News } from "../../../../infrastructure/database/sequelize/models/news.model";
+import { UpdateNewsDto } from "../../../../interface/dtos/news/update-news.dto";
 
 /** Port IN: contrato para atualizar newsletter. */
 export interface IUpdateNewsPort {

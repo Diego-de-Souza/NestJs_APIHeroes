@@ -1,5 +1,5 @@
-import { Comment } from "src/infrastructure/database/sequelize/models/comment.model";
-import { CommentLike } from "src/infrastructure/database/sequelize/models/comment-like.model";
+import { Comment } from "../../../infrastructure/database/sequelize/models/comment.model";
+import { CommentLike } from "../../../infrastructure/database/sequelize/models/comment-like.model";
 
 /** Port OUT: contrato do repositório de comentários. UseCase → Port → Repository. */
 export interface ICommentsRepository {

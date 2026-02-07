@@ -1,7 +1,7 @@
 import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import type { INewsletterRepository } from "src/application/ports/out/newsletter.port";
-import type { IDeleteManyNewsPort } from "src/application/ports/in/newsletter/delete-many-news.port";
+import type { INewsletterRepository } from "../../ports/out/newsletter.port";
+import type { IDeleteManyNewsPort } from "../../ports/in/newsletter/delete-many-news.port";
 
 @Injectable()
 export class DeleteManyNewsUseCase implements IDeleteManyNewsPort {

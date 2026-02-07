@@ -1,8 +1,8 @@
 import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import type { INewsletterRepository } from "src/application/ports/out/newsletter.port";
-import { NewsletterInterface } from "src/domain/interfaces/newsletter.interface";
-import type { IGetListNewsletterPort } from "src/application/ports/in/newsletter/get-list-newsletter.port";
+import type { INewsletterRepository } from "../../ports/out/newsletter.port";
+import { NewsletterInterface } from "../../../domain/interfaces/newsletter.interface";
+import type { IGetListNewsletterPort } from "../../ports/in/newsletter/get-list-newsletter.port";
 
 @Injectable()
 export class FindNewsByUserIdUseCase implements IGetListNewsletterPort{

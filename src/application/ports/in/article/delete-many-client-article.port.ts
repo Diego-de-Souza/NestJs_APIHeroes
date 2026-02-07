@@ -1,5 +1,5 @@
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { DeleteManyArticlesDto } from "src/interface/dtos/articles/delete-many-articles.dto";
+import { ApiResponseInterface } from "../../../../domain/interfaces/APIResponse.interface";
+import { DeleteManyArticlesDto } from "../../../../interface/dtos/articles/delete-many-articles.dto";
 
 
 export interface IDeleteManyClientArticlePort {

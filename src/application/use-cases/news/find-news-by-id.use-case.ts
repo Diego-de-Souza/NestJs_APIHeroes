@@ -1,8 +1,8 @@
 import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
 import { News } from "../../../infrastructure/database/sequelize/models/news.model";
-import type { INewsletterRepository } from "src/application/ports/out/newsletter.port";
-import type { IFindNewsByIdPort } from "src/application/ports/in/newsletter/find-news-by-id.port";
+import type { INewsletterRepository } from "../../ports/out/newsletter.port";
+import type { IFindNewsByIdPort } from "../../ports/in/newsletter/find-news-by-id.port";
 
 @Injectable()
 export class FindNewsByIdUseCase implements IFindNewsByIdPort {

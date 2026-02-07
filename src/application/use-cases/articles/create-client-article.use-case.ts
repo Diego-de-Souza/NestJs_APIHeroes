@@ -4,8 +4,8 @@ import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.int
 import { Article } from "../../../infrastructure/database/sequelize/models/article.model";
 import { CreateArticleDto } from "../../../interface/dtos/articles/articlesCreate.dto";
 import { UserRepository } from "../../../infrastructure/repositories/user.repository";
-import type { ICreateClientArticlePort } from "src/application/ports/in/article/create-client-article.port";
-import type { IArticlePort } from "src/application/ports/out/article.port";
+import type { ICreateClientArticlePort } from "../../ports/in/article/create-client-article.port";
+import type { IArticlePort } from "../../ports/out/article.port";
 
 @Injectable()
 export class CreateClientArticleUseCase implements ICreateClientArticlePort {

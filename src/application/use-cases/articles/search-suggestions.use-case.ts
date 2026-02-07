@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable, Logger, InternalServerErrorException, Inject } from '@nestjs/common';
 import { ApiResponseInterface } from '../../../domain/interfaces/APIResponse.interface';
 import { SearchSuggestionsDto } from '../../../interface/dtos/articles/search-suggestions.dto';
-import type { IGetSearchSuggestionsPort } from 'src/application/ports/in/article/get-search-suggestions.port';
-import type { IArticlePort } from 'src/application/ports/out/article.port';
+import type { IGetSearchSuggestionsPort } from '../../ports/in/article/get-search-suggestions.port';
+import type { IArticlePort } from '../../ports/out/article.port';
 
 @Injectable()
 export class SearchSuggestionsUseCase implements IGetSearchSuggestionsPort {

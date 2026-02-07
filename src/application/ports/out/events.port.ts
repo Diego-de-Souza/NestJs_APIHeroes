@@ -1,4 +1,4 @@
-import { Events } from "src/infrastructure/database/sequelize/models/events.model";
+import { Events } from "../../../infrastructure/database/sequelize/models/events.model";
 
 /** Port OUT: contrato do repositório de eventos. */
 export interface IEventsRepository {

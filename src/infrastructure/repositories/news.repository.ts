@@ -4,8 +4,8 @@ import { Op } from "sequelize";
 import { News } from "../database/sequelize/models/news.model";
 import { UpdateNewsDto } from "../../interface/dtos/news/update-news.dto";
 import { Role } from "../database/sequelize/models/roles.model";
-import type { INewsletterRepository } from "src/application/ports/out/newsletter.port";
-import { CreateNewsletterDto } from "src/interface/dtos/news/create-newsletter.dto";
+import type { INewsletterRepository } from "../../application/ports/out/newsletter.port";
+import { CreateNewsletterDto } from "../../interface/dtos/news/create-newsletter.dto";
 
 @Injectable()
 export class NewsRepository implements INewsletterRepository{

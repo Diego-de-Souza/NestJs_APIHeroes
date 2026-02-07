@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString, MaxLength, MinLength } from "class-validator";
-import { NewsletterInterface } from "src/domain/interfaces/newsletter.interface";
+import { NewsletterInterface } from "../../../domain/interfaces/newsletter.interface";
 
 export class CreateNewsletterDto implements NewsletterInterface{
     @IsString({ message: "Título deve ser string" })

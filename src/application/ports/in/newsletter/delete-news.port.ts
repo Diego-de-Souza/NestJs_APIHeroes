@@ -1,4 +1,4 @@
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
+import { ApiResponseInterface } from "../../../../domain/interfaces/APIResponse.interface";
 
 /** Port IN: contrato para excluir uma newsletter. */
 export interface IDeleteNewsPort {

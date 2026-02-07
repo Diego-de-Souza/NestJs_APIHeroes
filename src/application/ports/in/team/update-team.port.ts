@@ -1,6 +1,6 @@
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { Team } from "src/infrastructure/database/sequelize/models/team.model";
-import { CreateTeamDto } from "src/interface/dtos/team/create-team.dto";
+import { ApiResponseInterface } from "../../../../domain/interfaces/APIResponse.interface";
+import { Team } from "../../../../infrastructure/database/sequelize/models/equipes.model";
+import { CreateTeamDto } from "../../../../interface/dtos/team/create-team.dto";
 
 
 export interface IUpdateTeamPort {

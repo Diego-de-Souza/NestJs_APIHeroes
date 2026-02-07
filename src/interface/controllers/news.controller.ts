@@ -5,17 +5,17 @@ import { DeleteManyNewsDto } from "../dtos/news/delete-many-news.dto";
 import { News } from "../../infrastructure/database/sequelize/models/news.model";
 import { AuthGuard } from "../guards/auth.guard";
 import { Request } from "express";
-import { NewsletterInterface } from "src/domain/interfaces/newsletter.interface";
+import { NewsletterInterface } from "../../domain/interfaces/newsletter.interface";
 import { CreateNewsletterDto } from "../dtos/news/create-newsletter.dto";
-import type { ICreateNewsletterPort } from "src/application/ports/in/newsletter/create-newsletter.port";
-import type { IGetListNewsletterPort } from "src/application/ports/in/newsletter/get-list-newsletter.port";
-import type { IFindNewsByIdPort } from "src/application/ports/in/newsletter/find-news-by-id.port";
-import type { IUpdateNewsPort } from "src/application/ports/in/newsletter/update-news.port";
-import type { IDeleteNewsPort } from "src/application/ports/in/newsletter/delete-news.port";
-import type { IDeleteManyNewsPort } from "src/application/ports/in/newsletter/delete-many-news.port";
+import type { ICreateNewsletterPort } from "../../application/ports/in/newsletter/create-newsletter.port";
+import type { IGetListNewsletterPort } from "../../application/ports/in/newsletter/get-list-newsletter.port";
+import type { IFindNewsByIdPort } from "../../application/ports/in/newsletter/find-news-by-id.port";
+import type { IUpdateNewsPort } from "../../application/ports/in/newsletter/update-news.port";
+import type { IDeleteNewsPort } from "../../application/ports/in/newsletter/delete-news.port";
+import type { IDeleteManyNewsPort } from "../../application/ports/in/newsletter/delete-many-news.port";
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from "@nestjs/swagger";
-import type { IFindListNewsletterPort } from "src/application/ports/in/newsletter/find-list-newsletter.port";
-import type { IFindListNewsletterClientPort } from "src/application/ports/in/newsletter/find-list-newsletter-client.port";
+import type { IFindListNewsletterPort } from "../../application/ports/in/newsletter/find-list-newsletter.port";
+import type { IFindListNewsletterClientPort } from "../../application/ports/in/newsletter/find-list-newsletter-client.port";
 
 /**
  * Controller depende apenas dos Ports IN (contratos).

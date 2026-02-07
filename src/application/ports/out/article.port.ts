@@ -1,8 +1,8 @@
 import { WhereOptions } from "sequelize";
-import { Article } from "src/infrastructure/database/sequelize/models/article.model";
-import { CreateArticleDto } from "src/interface/dtos/articles/articlesCreate.dto";
-import { UpdateArticlesDto } from "src/interface/dtos/articles/articlesUpdate.dto";
-import { SearchSuggestionsDto } from "src/interface/dtos/articles/search-suggestions.dto";
+import { Article } from "../../../infrastructure/database/sequelize/models/article.model";
+import { CreateArticleDto } from "../../../interface/dtos/articles/articlesCreate.dto";
+import { UpdateArticlesDto } from "../../../interface/dtos/articles/articlesUpdate.dto";
+import { SearchSuggestionsDto } from "../../../interface/dtos/articles/search-suggestions.dto";
 
 
 export interface IArticlePort {

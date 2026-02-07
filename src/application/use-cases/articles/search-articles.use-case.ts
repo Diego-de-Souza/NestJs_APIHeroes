@@ -3,8 +3,8 @@ import { ApiResponseInterface } from '../../../domain/interfaces/APIResponse.int
 import { SearchArticlesDto } from '../../../interface/dtos/articles/search-articles.dto';
 import { Article } from '../../../infrastructure/database/sequelize/models/article.model';
 import { Op } from 'sequelize';
-import type { ISearchArticlePort } from 'src/application/ports/in/article/search-article.port';
-import type { IArticlePort } from 'src/application/ports/out/article.port';
+import type { ISearchArticlePort } from '../../ports/in/article/search-article.port';
+import type { IArticlePort } from '../../ports/out/article.port';
 
 @Injectable()
 export class SearchArticlesUseCase implements ISearchArticlePort {

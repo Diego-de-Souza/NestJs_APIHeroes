@@ -1,6 +1,6 @@
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { Article } from "src/infrastructure/database/sequelize/models/article.model";
-import { CreateArticleDto } from "src/interface/dtos/articles/articlesCreate.dto";
+import { ApiResponseInterface } from "../../../../domain/interfaces/APIResponse.interface";
+import { Article } from "../../../../infrastructure/database/sequelize/models/article.model";
+import { CreateArticleDto } from "../../../../interface/dtos/articles/articlesCreate.dto";
 
 
 export interface ICreateClientArticlePort {

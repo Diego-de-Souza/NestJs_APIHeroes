@@ -1,6 +1,6 @@
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { CommentWithUser } from "src/domain/interfaces/comment.interface";
-import { CommentFiltersDto } from "src/interface/dtos/comments/comment-filters.dto";
+import { ApiResponseInterface } from "../../../../domain/interfaces/APIResponse.interface";
+import { CommentWithUser } from "../../../../domain/interfaces/comment.interface";
+import { CommentFiltersDto } from "../../../../interface/dtos/comments/comment-filters.dto";
 
 export interface IFindCommentsPort {
   execute(filters: CommentFiltersDto, userId?: string): Promise<ApiResponseInterface<CommentWithUser>>;

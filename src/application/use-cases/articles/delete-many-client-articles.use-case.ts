@@ -1,9 +1,9 @@
 import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ImageService } from "../../../application/services/image.service";
 import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
-import type { IDeleteManyClientArticlePort } from "src/application/ports/in/article/delete-many-client-article.port";
-import type{ DeleteManyArticlesDto } from "src/interface/dtos/articles/delete-many-articles.dto";
-import type { IArticlePort } from "src/application/ports/out/article.port";
+import type { IDeleteManyClientArticlePort } from "../../ports/in/article/delete-many-client-article.port";
+import type{ DeleteManyArticlesDto } from "../../../interface/dtos/articles/delete-many-articles.dto";
+import type { IArticlePort } from "../../ports/out/article.port";
 
 @Injectable()
 export class DeleteManyClientArticlesUseCase implements IDeleteManyClientArticlePort {

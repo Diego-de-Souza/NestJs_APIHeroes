@@ -1,7 +1,7 @@
-import { News } from "src/infrastructure/database/sequelize/models/news.model";
-import { Role } from "src/infrastructure/database/sequelize/models/roles.model";
-import { CreateNewsletterDto } from "src/interface/dtos/news/create-newsletter.dto";
-import { UpdateNewsDto } from "src/interface/dtos/news/update-news.dto";
+import { News } from "../../../infrastructure/database/sequelize/models/news.model";
+import { Role } from "../../../infrastructure/database/sequelize/models/roles.model";
+import { CreateNewsletterDto } from "../../../interface/dtos/news/create-newsletter.dto";
+import { UpdateNewsDto } from "../../../interface/dtos/news/update-news.dto";
 
 
 export interface INewsletterRepository {

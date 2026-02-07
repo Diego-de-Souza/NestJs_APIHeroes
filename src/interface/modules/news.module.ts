@@ -10,10 +10,10 @@ import { UpdateNewsUseCase } from "../../application/use-cases/news/update-news.
 import { DeleteNewsUseCase } from "../../application/use-cases/news/delete-news.use-case";
 import { DeleteManyNewsUseCase } from "../../application/use-cases/news/delete-many-news.use-case";
 import { AuthModule } from "./auth.module";
-import { FindListNewsletterUseCase } from "src/application/use-cases/news/find-list-newsletter.use-case";
+import { FindListNewsletterUseCase } from "../../application/use-cases/news/find-list-newsletter.use-case";
 import { ImageService } from "../../application/services/image.service";
 import { ConverterImageUseCase } from "../../application/use-cases/images/converter-image.use-case";
-import { FindListNewsletterClientUseCase } from "src/application/use-cases/news/find-list-newsletter-client.port";
+import { FindListNewsletterClientUseCase } from "../../application/use-cases/news/find-list-newsletter-client.port";
 
 /**
  * Módulo News – arquitetura híbrida Clean/Hexagonal.

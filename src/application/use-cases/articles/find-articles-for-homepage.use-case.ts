@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { ArticlesRepository } from "../../../infrastructure/repositories/articles.repository";
-import type { IFindArticlesForHomepagePort } from "src/application/ports/in/article/find-articles-for-homepage.port";
-import { IArticlePort } from "src/application/ports/out/article.port";
+import type { IFindArticlesForHomepagePort } from "../../ports/in/article/find-articles-for-homepage.port";
+import { IArticlePort } from "../../ports/out/article.port";
 
 
 @Injectable()

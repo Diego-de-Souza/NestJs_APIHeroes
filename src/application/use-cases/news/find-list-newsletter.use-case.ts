@@ -1,8 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
-import type { IFindListNewsletterPort } from "src/application/ports/in/newsletter/find-list-newsletter.port";
-import type { INewsletterRepository } from "src/application/ports/out/newsletter.port";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { NewsletterInterface } from "src/domain/interfaces/newsletter.interface";
+import type { IFindListNewsletterPort } from "../../ports/in/newsletter/find-list-newsletter.port";
+import type { INewsletterRepository } from "../../ports/out/newsletter.port";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { NewsletterInterface } from "../../../domain/interfaces/newsletter.interface";
 
 
 @Injectable()

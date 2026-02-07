@@ -1,6 +1,6 @@
-import { CreateNewsletterDto } from "src/interface/dtos/news/create-newsletter.dto";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { NewsletterInterface } from "src/domain/interfaces/newsletter.interface";
+import { CreateNewsletterDto } from "../../../../interface/dtos/news/create-newsletter.dto";
+import { ApiResponseInterface } from "../../../../domain/interfaces/APIResponse.interface";
+import { NewsletterInterface } from "../../../../domain/interfaces/newsletter.interface";
 
 /** Port IN: contrato para criação de newsletter. Controller → Port → UseCase. */
 export interface ICreateNewsletterPort {
