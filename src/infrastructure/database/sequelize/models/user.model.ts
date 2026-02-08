@@ -58,13 +58,13 @@ export class User extends Model<User> {
   @Column({ type: DataType.STRING(255), allowNull: false })
   password: string;
 
-  @Column({ type: DataType.STRING(255), field: 'totp_secret' })
+  @Column({ type: DataType.TEXT, field: 'totp_secret' })
   totp_secret: string;
 
-  @Column({ type: DataType.STRING(255), field: 'mfa_secret' })
+  @Column({ type: DataType.TEXT, field: 'mfa_secret' })
   mfa_secret: string;
 
-  @Column({ type: DataType.STRING(255), field: 'token_fcm' })
+  @Column({ type: DataType.TEXT, field: 'token_fcm' })
   token_fcm: string;
 
   @Column({
