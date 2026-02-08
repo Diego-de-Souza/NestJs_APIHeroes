@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { IForgotPasswordPort } from "src/application/ports/in/auth/forgot-password.port";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { AuthRepository } from "src/infrastructure/repositories/auth.repository";
-import { ForgotPasswordDto } from "src/interface/dtos/auth/forgot-password.dto";
+import { IForgotPasswordPort } from "../../ports/in/auth/forgot-password.port";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { AuthRepository } from "../../../infrastructure/repositories/auth.repository";
+import { ForgotPasswordDto } from "../../../interface/dtos/auth/forgot-password.dto";
 
 @Injectable()
 export class ForgotPasswordUseCase implements IForgotPasswordPort{

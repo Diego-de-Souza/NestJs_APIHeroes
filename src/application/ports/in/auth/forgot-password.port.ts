@@ -1,5 +1,5 @@
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { ForgotPasswordDto } from "src/interface/dtos/auth/forgot-password.dto";
+import { ApiResponseInterface } from "../../../../domain/interfaces/APIResponse.interface";
+import { ForgotPasswordDto } from "../../../../interface/dtos/auth/forgot-password.dto";
 
 
 export interface IForgotPasswordPort {

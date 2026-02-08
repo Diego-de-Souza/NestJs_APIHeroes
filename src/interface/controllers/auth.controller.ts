@@ -8,9 +8,9 @@ import { AuthGuard } from '../guards/auth.guard';
 import { Request } from 'express';
 import type { IAuthPort } from '../../application/ports/in/auth/auth.port';
 import { ForgotPasswordDto } from '../dtos/auth/forgot-password.dto';
-import type{ IForgotPasswordPort } from 'src/application/ports/in/auth/forgot-password.port';
+import type{ IForgotPasswordPort } from '../../application/ports/in/auth/forgot-password.port';
 import { ChangePasswordDto } from '../dtos/auth/change-password.dto';
-import type { IChangePasswordPort } from 'src/application/ports/in/auth/change-password.port';
+import type { IChangePasswordPort } from '../../application/ports/in/auth/change-password.port';
 
 @ApiTags('Auth') 
 @Controller('auth')

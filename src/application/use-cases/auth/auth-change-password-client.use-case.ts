@@ -1,9 +1,9 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { ApiResponseInterface } from "src/domain/interfaces/APIResponse.interface";
-import { AuthRepository } from "src/infrastructure/repositories/auth.repository";
+import { ApiResponseInterface } from "../../../domain/interfaces/APIResponse.interface";
+import { AuthRepository } from "../../../infrastructure/repositories/auth.repository";
 import { GenenerateHashUseCase } from "./generate-hash.use-case";
-import { UserRepository } from "src/infrastructure/repositories/user.repository";
-import type { IChangePasswordPort } from "src/application/ports/in/auth/change-password.port";
+import { UserRepository } from "../../../infrastructure/repositories/user.repository";
+import type { IChangePasswordPort } from "../../ports/in/auth/change-password.port";
 
 @Injectable()
 export class AuthChangePasswordClientUseCase implements IChangePasswordPort {

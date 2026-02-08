@@ -27,8 +27,8 @@ import { AuthRegisterAcessoUserUseCase } from '../../application/use-cases/auth/
 import { HttpModule } from '@nestjs/axios';
 import { AccessLogModule } from './access-log.module';
 import { AuthGuard } from '../../interface/guards/auth.guard';
-import { ForgotPasswordUseCase } from 'src/application/use-cases/auth/forgot-password.use-case';
-import { AuthChangePasswordClientUseCase } from 'src/application/use-cases/auth/auth-change-password-client.use-case';
+import { ForgotPasswordUseCase } from '../../application/use-cases/auth/forgot-password.use-case';
+import { AuthChangePasswordClientUseCase } from '../../application/use-cases/auth/auth-change-password-client.use-case';
 
 @Module({
   imports: [
