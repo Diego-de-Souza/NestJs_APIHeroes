@@ -7,6 +7,10 @@ import { CreateUserLoginDto } from '../dtos/user/userLoginCreate.dto';
 import { AuthGuard } from '../guards/auth.guard';
 import { Request } from 'express';
 import type { IAuthPort } from '../../application/ports/in/auth/auth.port';
+import { ForgotPasswordDto } from '../dtos/auth/forgot-password.dto';
+import type{ IForgotPasswordPort } from 'src/application/ports/in/auth/forgot-password.port';
+import { ChangePasswordDto } from '../dtos/auth/change-password.dto';
+import type { IChangePasswordPort } from 'src/application/ports/in/auth/change-password.port';
 
 @ApiTags('Auth') 
 @Controller('auth')
@@ -14,7 +18,9 @@ export class AuthController {
   private readonly logger = new Logger(AuthController.name);
 
   constructor(
-    @Inject('IAuthPort') private readonly authPort: IAuthPort
+    @Inject('IAuthPort') private readonly authPort: IAuthPort,
+    @Inject('IForgotPasswordPort') private readonly forgotPasswordPort: IForgotPasswordPort,
+    @Inject('IChangePasswordPort') private readonly changePasswordPort: IChangePasswordPort
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -353,6 +359,41 @@ export class AuthController {
       throw new BadRequestException({
         status: 400,
         message: `Erro ao registrar acesso do usuário. (controller): ${error.message}`,
+      });
+    }
+  }
+
+  @Post('forgot-password')
+  @ApiOperation({ summary: 'Esqueceu a senha? (Recuperação de senha)' })
+  @ApiResponse({ status: 200, description: 'Senha recuperada com sucesso' })
+  @ApiResponse({ status: 400, description: 'Email não encontrado' })
+  @ApiResponse({ status: 401, description: 'Email não fornecido' })
+  async forgotPassword(@Body() body: ForgotPasswordDto): Promise<ApiResponseInterface> {
+    try {
+      const result = await this.forgotPasswordPort.execute(body);
+      return result;
+    } catch (error) {
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao recuperar a senha. (controller): ${error.message}`,
+      });
+    }
+  }
+
+  @Post('change-password-client')
+  @ApiOperation({ summary: 'Altera a senha do usuário' })
+  @ApiResponse({ status: 200, description: 'Senha alterada com sucesso' })
+  @ApiResponse({ status: 400, description: 'Erro ao alterar a senha' })
+  @ApiResponse({ status: 401, description: 'Não autenticado' })
+  @ApiBody({ type: ChangePasswordDto })
+  async changePasswordClient( @Body() body: ChangePasswordDto ): Promise<ApiResponseInterface> {
+    try {
+      const result = await this.changePasswordPort.execute(body.newPassword, body.id);
+      return result;
+    } catch (error) {
+      throw new BadRequestException({
+        status: 400,
+        message: `Erro ao alterar a senha. (controller): ${error.message}`,
       });
     }
   }

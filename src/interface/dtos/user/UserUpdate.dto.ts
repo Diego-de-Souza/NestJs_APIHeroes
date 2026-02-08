@@ -28,6 +28,10 @@ export class UpdateUserDTO {
     @IsString({ message: 'O email deve ser uma string.' })
     @IsEmail({}, { message: 'O segundo email deve ser válido.' })
     secondemail?: string; 
+
+    @IsString({message: "CPF deve ser string"})
+    @IsNotEmpty({message: "CPF não pode estar vazio"})
+    cpf: string;
         
     @IsString({message: "uf deve ser string"})
     uf: string;

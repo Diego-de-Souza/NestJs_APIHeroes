@@ -28,6 +28,9 @@ export class User extends Model<User> {
   @Column({ type: DataType.STRING(100) })
   secondemail: string;
 
+  @Column({ type: DataType.STRING(11), allowNull: false, unique: true })
+  cpf: string;
+
   @Column({ type: DataType.STRING(15) })
   phone: string;
 

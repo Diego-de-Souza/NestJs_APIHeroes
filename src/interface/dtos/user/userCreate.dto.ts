@@ -36,6 +36,11 @@ export class CreateUserDTO{
     secondemail?: string; 
     
     @ApiProperty()
+    @IsString({message: "CPF deve ser string"})
+    @IsNotEmpty({message: "CPF não pode estar vazio"})
+    cpf: string;
+
+    @ApiProperty()
     @IsString({message: "uf deve ser string"})
     uf: string;
     

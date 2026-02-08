@@ -27,11 +27,11 @@ export class AuthSignOutUseCase {
                 };
             }
 
-            // ✅ BUSCA A VALIDAÇÃO PARA PEGAR O USER_ID
+            //  BUSCA A VALIDAÇÃO PARA PEGAR O USER_ID
             const validation = await this.authRepository.findValidationByTokenId(sessionToken);
             
             if (validation) {
-                // ✅ REMOVE TODAS AS SESSÕES DO USUÁRIO (LOGOUT DE TODOS OS DISPOSITIVOS)
+                //  REMOVE TODAS AS SESSÕES DO USUÁRIO (LOGOUT DE TODOS OS DISPOSITIVOS)
                 await this.authRepository.deleteAllUserValidations(validation.user_id);
                 
                 this.logger.log(`Logout realizado para usuário ID: ${validation.user_id}`);

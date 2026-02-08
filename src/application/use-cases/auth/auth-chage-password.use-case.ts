@@ -13,9 +13,7 @@ export class AuthChangePasswordUseCase {
     constructor(
         private readonly authRepository: AuthRepository,
         private readonly userRepository: UserRepository,
-        private readonly tokenUseCase: TokenUseCase,
-        private readonly generateHashUseCase: GenenerateHashUseCase,
-        private readonly configService: ConfigService
+        private readonly generateHashUseCase: GenenerateHashUseCase
     ){}
 
     async changePassword(newPassword: string, req: Request): Promise<ApiResponseInterface> {
@@ -38,11 +36,7 @@ export class AuthChangePasswordUseCase {
                 };
             }
 
-            const ENCRYPTION_KEY = this.configService.get<string>('ENCRYPTION_KEY');
-            const decryptedPassword = CryptoJS.AES.decrypt(newPassword, ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8);
-
-            console.log(decryptedPassword)
-            const hashedPassword = await this.generateHashUseCase.generateHash(decryptedPassword);
+            const hashedPassword = await this.generateHashUseCase.generateHash(newPassword);
 
             await this.userRepository.updatePassword(user.dataValues.id,hashedPassword);
 

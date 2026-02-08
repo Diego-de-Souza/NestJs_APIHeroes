@@ -54,7 +54,7 @@ async function bootstrap() {
       'Accept', 
       'Authorization',
       'X-Requested-With',
-      'x-session-token' 
+      'x-session-token',
     ],
     credentials: true
   });

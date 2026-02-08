@@ -5,6 +5,7 @@ export interface UserInterface {
     birthdate?: Date;
     firstemail: string;
     secondemail?: string;
+    cpf?: string;
     uf?: string;
     address?: string;
     complement?: string;

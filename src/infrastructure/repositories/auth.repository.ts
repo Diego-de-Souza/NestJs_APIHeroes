@@ -182,4 +182,14 @@ export class AuthRepository {
             }
         });
     }
+
+    async forgotPassword(email: string, birthdate: string, cpf: string): Promise<User | null>{
+        return await this.userModel.findOne({
+            where: {
+                firstemail: email,
+                birthdate: birthdate,
+                cpf: cpf
+            }
+        });
+    }
 }
