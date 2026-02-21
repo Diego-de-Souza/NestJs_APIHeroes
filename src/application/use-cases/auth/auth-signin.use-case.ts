@@ -77,7 +77,8 @@ export class AuthSignInUseCase {
                     id: user.dataValues.id,
                     nickname: user.dataValues.nickname,
                     email: user.dataValues.firstemail,
-                    role: role?.dataValues?.role
+                    role: role?.dataValues?.role,
+                    access_role: role?.dataValues?.access
                 }
             };
         }catch(error){

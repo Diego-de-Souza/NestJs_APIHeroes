@@ -7,6 +7,7 @@ export interface SignInResponse {
         nickname: string;
         email: string;
         role?: string;
+        access_role?: string;
     };
 }
 
