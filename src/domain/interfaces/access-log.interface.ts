@@ -1,5 +1,3 @@
-import { strict } from "assert";
-
 export interface AccessLogData {
     route: string;
     method: string;

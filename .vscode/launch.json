@@ -3,8 +3,20 @@
   "configurations": [
     {
       "type": "node",
+      "request": "launch",
+      "name": "Debug NestJS (F5)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:debug"],
+      "autoAttachChildProcesses": true,
+      "restart": true,
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
       "request": "attach",
-      "name": "Debug NestJS",
+      "name": "Attach NestJS (9232)",
       "port": 9232,
       "restart": true,
       "protocol": "inspector",

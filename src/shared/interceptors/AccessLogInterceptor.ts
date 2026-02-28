@@ -22,23 +22,20 @@ export class AccessLogInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
         const request = context.switchToHttp().getRequest<Request>();
         const response = context.switchToHttp().getResponse();
-        
+
         const { url, method } = request;
 
-        // Só registra rotas específicas: home (register-acesso-user) e login (signin)
+        // Log only signin requests here.
         if (!this.shouldLogRoute(url, method)) {
-            // Não é uma rota que deve ser registrada, apenas continua sem registrar
             return next.handle();
         }
 
         const startTime = Date.now();
         const { ip, headers } = request;
-        const user = request['user']; // Usuário autenticado (se houver)
+        const user = request['user'];
 
-        // Determina o tipo de ação baseado na rota
         const actionType = this.determineActionType(url, method);
 
-        // Registra o acesso de forma assíncrona (não bloqueia a requisição)
         const accessData: AccessLogData = {
             route: url,
             method,
@@ -49,34 +46,38 @@ export class AccessLogInterceptor implements NestInterceptor {
             actionType
         };
 
-        // Verifica se é uma rota de login
         const isLoginRoute = this.isLoginRoute(url, method);
 
-        // Usa tap para capturar o status code e tempo de resposta após a requisição
         return next.handle().pipe(
             tap({
-                next: () => {
+                next: (result: any) => {
                     const responseTime = Date.now() - startTime;
                     const statusCode = response.statusCode;
 
-                    // Para login, só registra se for sucesso (status 2xx)
                     if (isLoginRoute && !this.isSuccessStatus(statusCode)) {
-                        return; // Não registra login com falha
+                        return;
                     }
 
-                    // Atualiza os dados com status code e tempo de resposta
+                    // On /auth/signin, req.user is usually empty.
+                    // Try reading user id from the controller/use-case response payload.
+                    if (!accessData.userId) {
+                        accessData.userId =
+                            result?.user?.id ||
+                            result?.dataUnit?.user?.id ||
+                            result?.data?.user?.id ||
+                            null;
+                    }
+
                     accessData.statusCode = statusCode;
                     accessData.responseTime = responseTime;
 
-                    // Registra o acesso de forma assíncrona
                     this.accessLogService.logAccess(accessData).catch((error) => {
-                        this.logger.error('Erro ao registrar acesso:', error);
+                        this.logger.error('Error while registering access:', error);
                     });
                 },
                 error: (error) => {
-                    // Para login, não registra erros
                     if (isLoginRoute) {
-                        return; // Não registra login com falha
+                        return;
                     }
 
                     const responseTime = Date.now() - startTime;
@@ -84,7 +85,7 @@ export class AccessLogInterceptor implements NestInterceptor {
                     accessData.responseTime = responseTime;
 
                     this.accessLogService.logAccess(accessData).catch((err) => {
-                        this.logger.error('Erro ao registrar acesso (erro):', err);
+                        this.logger.error('Error while registering access (error path):', err);
                     });
                 }
             })
@@ -92,14 +93,10 @@ export class AccessLogInterceptor implements NestInterceptor {
     }
 
     private shouldLogRoute(url: string, method: string): boolean {
-        // Registra apenas Login: /api/auth/signin (POST)
-        // A rota /api/auth/register-acesso-user já tem sua própria lógica de registro
-        // com controle de duplicatas, então não deve ser registrada pelo interceptor
         return url.includes('/auth/signin') && method === 'POST';
     }
 
     private determineActionType(url: string, method: string): AccessLogData['actionType'] {
-        // Login
         if (url.includes('/auth/signin') && method === 'POST') {
             return 'login';
         }

@@ -44,13 +44,10 @@ export class AccessLog extends Model<AccessLog> {
     @ForeignKey(() => User)
     @Column({
         type: DataType.UUID,
-        defaultValue: DataType.UUIDV4,
-        allowNull: false,
-        primaryKey: true,
-        unique: true,
+        allowNull: true,
         field: 'user_id'
     })
-    userId: string;
+    userId: string | null;
 
     @Column({
         type: DataType.DATE,
