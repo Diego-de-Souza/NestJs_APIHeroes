@@ -7,4 +7,5 @@ export interface IEventsRepository {
   deleteEvent(id: string): Promise<number>;
   findEventById(id: string): Promise<Events>;
   findEventsForHome(): Promise<Events[]>;
+  deleteEventsInLote(ids: string[]): Promise<number>;
 }

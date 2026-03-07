@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Events } from "../database/sequelize/models/events.model";
 import type { IEventsRepository } from "../../application/ports/out/events.port";
+import { Op } from "sequelize";
 
 @Injectable()
 export class EventsRepository implements IEventsRepository {
@@ -29,6 +30,16 @@ export class EventsRepository implements IEventsRepository {
         return await this.eventsModel.findAll({
             limit: 6,
             order: [['created_at', 'DESC']]
+        });
+    }
+
+    async deleteEventsInLote(ids: string[]): Promise<number> {
+        return await this.eventsModel.destroy({
+            where: {
+                id: {
+                    [Op.in]: ids
+                }
+            }
         });
     }
 }

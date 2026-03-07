@@ -13,10 +13,27 @@ export class FindEventsListHomeUseCase implements IFindEventsListHomePort {
     async execute(): Promise<ApiResponseInterface<Events>> {
         try{
             const eventsForHome = await this.eventsRepository.findEventsForHome() as Events[];
+
+            const currentDate = new Date();
+            const eventosNaoVencidos = [];
+            const idsParaExcluir = [];
+
+            for (const event of eventsForHome) {
+                const eventDate = new Date(event.date_event);
+                
+                if (eventDate < currentDate) {
+                    idsParaExcluir.push(event.id);
+                } else {
+                    eventosNaoVencidos.push(event);
+                }
+            }
+
+            await this.eventsRepository.deleteEventsInLote(idsParaExcluir);
+
             return {
                 status: 200,
                 message: 'Eventos para home listados com sucesso.',
-                data: eventsForHome
+                data: eventosNaoVencidos
             };
         }catch(error){
             return {
